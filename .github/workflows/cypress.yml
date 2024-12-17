@@ -27,5 +27,7 @@ jobs:
           build: npm run build   # Build the Next.js app
           start: npm run start   # Start the Next.js app
           wait-on: "http://localhost:3000"  # Wait until the app is ready before running tests
+          record: true           # Enable test recording
+
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}  # Securely pass the Cypress Record Key from GitHub Secrets
