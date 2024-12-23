@@ -1,4 +1,4 @@
-name: E2E Testing for Kokesa Booking App 
+name: E2E Testing for Kokesa Booking App
 
 on: [push]
 
@@ -14,7 +14,7 @@ jobs:
       - name: Set up Node.js (v20)
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       # Step 3: Install dependencies using npm
       - name: Install Dependencies
@@ -22,12 +22,12 @@ jobs:
 
       # Step 4: Run Cypress tests with recording enabled
       - name: Run Cypress Tests with Recording
-        uses: cypress-io/github-action@v4  # Updated to version v4
+        uses: cypress-io/github-action@v4 # Updated to version v4
         with:
-          build: npm run build   # Build the Next.js app
-          start: npm run start   # Start the Next.js app
-          wait-on: "http://localhost:3000"  # Wait until the app is ready before running tests
-          record: true           # Enable test recording
+          build: npm run build # Build the Next.js app
+          start: npm run start # Start the Next.js app
+          wait-on: "http://localhost:3000" # Wait until the app is ready before running tests
+          record: true # Enable test recording
 
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}  # Securely pass the Cypress Record Key from GitHub Secrets
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }} # Securely pass the Cypress Record Key from GitHub Secrets
