@@ -7,12 +7,13 @@ function RegistrationPage() {
   return (
     <main className="w-full flex">
       {/* Image Section */}
-      <div className="flex-1 hidden md:block relative h-screen">
+      <div className="flex-1 hidden md:block relative h-screen w-full">
         <Image
           className="object-cover w-full h-full"
           src={regImage}
           alt="Registration Image"
-          layout="fill"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          fill
         />
       </div>
 
