@@ -1,8 +1,8 @@
-import React, { ReactNode } from "react";
-interface Props {
+import React, { ComponentPropsWithoutRef, ReactNode } from "react";
+type Props = {
   children: ReactNode;
   type: "submit" | "reset" | "button";
-}
+} & ComponentPropsWithoutRef<"button">;
 
 function Button({ children, type }: Props) {
   return (

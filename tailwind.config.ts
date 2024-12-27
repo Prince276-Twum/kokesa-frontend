@@ -11,7 +11,9 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: "#0B0A0A",
         formBorder: "#717171",
+        neutral: "#6D6D6D",
       },
     },
   },
