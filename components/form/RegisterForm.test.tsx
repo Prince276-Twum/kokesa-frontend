@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import user from "@testing-library/user-event";
 import RegisterForm from "./RegisterForm";
 import "@testing-library/jest-dom";
-import { use } from "chai";
 
 describe("RegisterForm", () => {
   test("renders the form with all fields", () => {
