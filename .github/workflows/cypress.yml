@@ -1,6 +1,7 @@
 name: E2E Testing for Kokesa Booking App
 
-on: [push]
+on:push:
+  pull_request:
 
 jobs:
   e2e_test:

@@ -1,6 +1,7 @@
 name: Unit testing for kokesa
 
-on: [push]
+on:push:
+  pull_request:
 jobs:
   NextJS-Tests:
     name: Unit testing for kokesa
