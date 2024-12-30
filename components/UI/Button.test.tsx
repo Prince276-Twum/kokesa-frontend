@@ -2,7 +2,6 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Button from "./Button";
-import { GoSync } from "react-icons/go";
 
 describe("Button", () => {
   it("renders the button with children", () => {
