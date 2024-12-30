@@ -3,7 +3,7 @@ name: Unit testing for kokesa
 on: [push]
 jobs:
   NextJS-Tests:
-    name: Tests for Next.js app
+    name: Unit testing for kokesa
     runs-on: ubuntu-latest
 
     steps:

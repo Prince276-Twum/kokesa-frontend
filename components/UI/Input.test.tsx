@@ -65,7 +65,7 @@ describe("Input Component", () => {
 
     // Check if the input has the correct class name
     expect(input).toHaveClass(
-      "border-2 border-formBorder px-4 py-3 md:py-3 w-full rounded-md focus:outline-none"
+      "border-2 border-neutral-formBorder px-4 py-3 md:py-3 w-full rounded-md focus:outline-none"
     );
   });
 });
