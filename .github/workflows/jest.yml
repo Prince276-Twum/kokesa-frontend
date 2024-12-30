@@ -1,9 +1,9 @@
 name: Unit testing for kokesa
 
-on:["push"]
+on: [push]
 jobs:
   NextJS-Tests:
-    name: Unit testing for kokesa
+    name: Tests for Next.js app
     runs-on: ubuntu-latest
 
     steps:
