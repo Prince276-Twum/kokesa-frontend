@@ -142,7 +142,10 @@ function RegisterForm() {
       {/* Footer Link */}
       <p className="text-center text-neutral mt-3 text-sm">
         Already a registered user?
-        <Link href="./login" className="text-primary ml-1 font-semibold">
+        <Link
+          href="./login"
+          className="text-primary ml-1 underline font-semibold"
+        >
           Sign In
         </Link>
       </p>
