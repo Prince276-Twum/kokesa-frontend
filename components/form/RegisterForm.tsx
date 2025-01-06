@@ -119,7 +119,7 @@ function RegisterForm() {
         </div>
 
         {/* Submit Button */}
-        <Button danger  rounded loading={true} type="submit">
+        <Button primary rounded loading={false} type="submit">
           Create An Account
         </Button>
       </form>
