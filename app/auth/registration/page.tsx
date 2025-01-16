@@ -2,6 +2,7 @@ import React from "react";
 import RegisterForm from "@/components/form/RegisterForm";
 import Image from "next/image";
 import regImage from "@/public/reg.jpeg";
+import logo from "@/public/Vector.png";
 
 function RegistrationPage() {
   return (
@@ -20,6 +21,11 @@ function RegistrationPage() {
       {/* Registration Form Section */}
       <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 lg:p-20 md:min-h-screen overflow-auto">
         <div className="w-full max-w-md p-6 bg-white rounded-lg">
+          <div className="flex justify-center mb-12">
+            <div className="bg-black  inline-block p-2 px-6  rounded-md">
+              <Image src={logo} alt="kokesa logo" />
+            </div>
+          </div>
           <h1 className="text-2xl text-center font-semibold mb-4">
             Create an Account
           </h1>
