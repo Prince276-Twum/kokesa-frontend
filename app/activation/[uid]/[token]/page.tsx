@@ -44,7 +44,7 @@ function Page({ params }: Props) {
         className="p-6 bg-green-100 text-green-700 rounded-lg mb-4"
       >
         <h2 className="text-3xl font-bold mb-4">
-          Email Verification Successful!
+          Email Verification Successful&excl;
         </h2>
         <p className="text-lg leading-6 mb-4">
           Your email has been successfully verified. You can now log in and set
