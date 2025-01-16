@@ -1,12 +1,11 @@
 "use client";
 import logo from "@/public/Vector.png";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { use } from "react";
 import { useActivationMutation } from "@/store/features/authApiSlice";
 import Image from "next/image";
 import Button from "@/components/UI/Button";
-// import Spinner from "@/components/UI/Spinner"; // Assuming you have a Spinner component
 
 interface Props {
   params: Promise<{ uid: string; token: string }>;
@@ -14,13 +13,12 @@ interface Props {
 
 function Page({ params }: Props) {
   const router = useRouter();
-  const [activate, { isError, error, isLoading, isSuccess, data }] =
-    useActivationMutation();
+  const [activate, { isError, error, isSuccess }] = useActivationMutation();
   const { uid, token } = use(params);
 
   useEffect(() => {
     activate({ uid, token });
-  }, []);
+  }, [uid, token, activate]);
 
   let content;
 
@@ -48,7 +46,7 @@ function Page({ params }: Props) {
         <h2 className="text-3xl font-bold mb-4">
           Email Verification Successful!
         </h2>
-        <p className="text-lg leading-6 mb-41">
+        <p className="text-lg leading-6 mb-4">
           Your email has been successfully verified. You can now log in and set
           up your business.
         </p>
