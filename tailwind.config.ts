@@ -28,6 +28,10 @@ export default {
           // Light Gray for backgrounds
         },
       },
+
+      fontFamily: {
+        manrope: ["Manrope", "sans-serif"],
+      },
     },
   },
   plugins: [],

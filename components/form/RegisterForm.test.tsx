@@ -3,10 +3,24 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import user from "@testing-library/user-event";
 import RegisterForm from "./RegisterForm";
 import "@testing-library/jest-dom";
+import CustomProvider from "@/store/Provider";
+
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn().mockReturnValue({
+    route: "/",
+    pathname: "",
+    query: {},
+    asPath: "",
+  }),
+}));
 
 describe("RegisterForm", () => {
   test("renders the form with all fields", () => {
-    render(<RegisterForm />);
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
     expect(screen.getByPlaceholderText("Enter Your Email")).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText("Enter Your Password")
@@ -18,7 +32,11 @@ describe("RegisterForm", () => {
   });
 
   test("shows email error message on invalid email", async () => {
-    render(<RegisterForm />);
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
     const emailInput = screen.getByPlaceholderText("Enter Your Email");
     const submitButton = screen.getByText("Create An Account");
 
@@ -33,7 +51,11 @@ describe("RegisterForm", () => {
   });
 
   test("shows password feedback messages on typing", async () => {
-    render(<RegisterForm />);
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
     const passwordInput = screen.getByPlaceholderText("Enter Your Password");
 
     await user.type(passwordInput, "short");
@@ -54,7 +76,11 @@ describe("RegisterForm", () => {
   });
 
   test("shows terms error message if not accepted", async () => {
-    render(<RegisterForm />);
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
     const submitButton = screen.getByText("Create An Account");
     fireEvent.click(submitButton);
 
@@ -66,7 +92,11 @@ describe("RegisterForm", () => {
   });
 
   test("submits the form successfully with valid inputs", async () => {
-    render(<RegisterForm />);
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
     const emailInput = screen.getByPlaceholderText("Enter Your Email");
     const passwordInput = screen.getByPlaceholderText("Enter Your Password");
     const termsCheckbox = screen.getByLabelText(
