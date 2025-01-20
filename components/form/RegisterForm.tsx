@@ -1,14 +1,13 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
-import Button from "../UI/Button";
-import Input from "../UI/Input";
-import usePasswordValidation from "@/hooks/usePasswordValidation";
 import useEmailValidation from "@/hooks/useEmailValidation";
+import usePasswordValidation from "@/hooks/usePasswordValidation";
 import { useRegisterMutation } from "@/store/features/authApiSlice";
 import { useRouter } from "next/navigation";
+import React, { ChangeEvent, useState } from "react";
 import GoogleSignUp from "../common/GoogleSignUp";
-import { toast } from "react-toastify";
+import Button from "../UI/Button";
+import Input from "../UI/Input";
 
 interface FieldErrors {
   data: { email: []; password: [] };
@@ -64,7 +63,7 @@ function RegisterForm() {
       register({ email, password })
         .unwrap()
         .then(() => router.push("/redirectemail"))
-        .catch((err) => {});
+        .catch(() => {});
     }
   };
   return (

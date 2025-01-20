@@ -1,21 +1,21 @@
 "use client";
-import React, { FormEvent, useState } from "react";
-import Input from "../UI/Input";
-import Button from "../UI/Button";
-import GoogleSignUp from "../common/GoogleSignUp";
 import useEmailValidation from "@/hooks/useEmailValidation";
 import { useLoginMutation } from "@/store/features/authApiSlice";
-import { toast } from "react-toastify";
-import Link from "next/link";
-import { useAppDispatch } from "@/store/hooks";
 import { setAuth } from "@/store/features/authSlice";
+import { useAppDispatch } from "@/store/hooks";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { toast } from "react-toastify";
+import Button from "../UI/Button";
+import Input from "../UI/Input";
+import GoogleSignUp from "../common/GoogleSignUp";
 
 function LoginForm() {
   const { email, emailError, handleEmailChange, checkEmailValidity } =
     useEmailValidation();
   const [password, setPassword] = useState("");
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
-  const [login, { isError, isLoading, data }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const dispatch = useAppDispatch()
 
   
