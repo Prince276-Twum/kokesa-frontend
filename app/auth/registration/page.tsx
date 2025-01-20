@@ -19,18 +19,18 @@ function RegistrationPage() {
       </div>
 
       {/* Registration Form Section */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 lg:p-20 md:min-h-screen overflow-auto">
-        <div className="w-full max-w-md p-6 bg-white rounded-lg">
+      <div className="flex-1 flex flex-col justify-center  p-6 md:p-12 lg:p-20 md:min-h-screen overflow-auto">
+        <div className="w-full max-w-md py-6 mx-auto bg-white rounded-lg">
           <div className="flex justify-center mb-12">
             <div className="bg-black  inline-block p-2 px-6  rounded-md">
               <Image src={logo} alt="kokesa logo" />
             </div>
           </div>
-          <h1 className="text-2xl text-center font-semibold mb-4">
+          <h1 className=" text-2xl md:text-[2rem] text-center font-extrabold md:font-bold mb-4">
             Create an Account
           </h1>
-          <RegisterForm />
         </div>
+        <RegisterForm />
       </div>
     </main>
   );
