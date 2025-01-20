@@ -85,9 +85,7 @@ describe("RegisterForm", () => {
     fireEvent.click(submitButton);
 
     expect(
-      screen.getByText(
-        "You must agree to the terms and conditions before submitting."
-      )
+      screen.getByText("You must agree to the terms and conditions.")
     ).toBeInTheDocument();
   });
 

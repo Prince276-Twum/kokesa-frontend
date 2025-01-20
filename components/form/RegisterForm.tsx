@@ -2,13 +2,12 @@
 
 import React, { ChangeEvent, useState } from "react";
 import Button from "../UI/Button";
-import { FcGoogle } from "react-icons/fc";
 import Input from "../UI/Input";
 import usePasswordValidation from "@/hooks/usePasswordValidation";
 import useEmailValidation from "@/hooks/useEmailValidation";
-import Link from "next/link";
 import { useRegisterMutation } from "@/store/features/authApiSlice";
 import { useRouter } from "next/navigation";
+import GoogleSignUp from "../common/GoogleSignUp";
 
 interface FieldErrors {
   data: { email: []; password: [] };
@@ -49,9 +48,7 @@ function RegisterForm() {
     setShowEmailError(true);
     setShowPasswordError(true);
     if (!acceptTerms) {
-      setTermsError(
-        "You must agree to the terms and conditions before submitting."
-      );
+      setTermsError("You must agree to the terms and conditions.");
     } else {
       setTermsError(null); // Clear any previous errors
     }
@@ -60,7 +57,7 @@ function RegisterForm() {
       setShowMessages(true);
     }
     if (!checkEmailValidity()) {
-      return false;
+      return;
     }
     if (acceptTerms && isValid) {
       register({ email, password })
@@ -72,7 +69,7 @@ function RegisterForm() {
     }
   };
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto ">
       <form onSubmit={handleSubmit} noValidate>
         {/* Email Input */}
         <div className="mb-4">
@@ -176,31 +173,7 @@ function RegisterForm() {
         </Button>
       </form>
 
-      {/* Divider */}
-      <div className="flex items-center gap-2 mt-8">
-        <div className="border-t border-gray-300 flex-1"></div>
-        <p className="text-sm text-gray-600">OR signup with</p>
-        <div className="border-t border-gray-300 flex-1"></div>
-      </div>
-
-      {/* Google Signup Button */}
-      <div className="flex justify-center mt-6">
-        <button className="flex items-center py-2 px-4 gap-4 justify-center shadow-md w-full max-w-sm">
-          <FcGoogle size={24} />
-          <p className="text-lg font-medium">Google Account</p>
-        </button>
-      </div>
-
-      {/* Footer Link */}
-      <p className="text-center text-neutral mt-3 text-sm">
-        Already a registered user?
-        <Link
-          href="./login"
-          className="text-primary ml-1 underline font-semibold"
-        >
-          Sign In
-        </Link>
-      </p>
+      <GoogleSignUp />
     </div>
   );
 }
