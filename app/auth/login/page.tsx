@@ -2,8 +2,14 @@ import LoginForm from "@/components/form/LoginForm";
 import Image from "next/image";
 import React from "react";
 import logo from "@/public/Vector.png";
-
 import alarmImg from "@/public/loginalarm.png";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kokesa | Sign In",
+  description:
+    "Log in to your Kokesa account to manage bookings and access your dashboard.",
+};
 
 function LoginPage() {
   return (

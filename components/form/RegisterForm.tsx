@@ -1,13 +1,13 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
-import Button from "../UI/Button";
-import Input from "../UI/Input";
-import usePasswordValidation from "@/hooks/usePasswordValidation";
 import useEmailValidation from "@/hooks/useEmailValidation";
+import usePasswordValidation from "@/hooks/usePasswordValidation";
 import { useRegisterMutation } from "@/store/features/authApiSlice";
 import { useRouter } from "next/navigation";
+import React, { ChangeEvent, useState } from "react";
 import GoogleSignUp from "../common/GoogleSignUp";
+import Button from "../UI/Button";
+import Input from "../UI/Input";
 
 interface FieldErrors {
   data: { email: []; password: [] };
@@ -63,9 +63,7 @@ function RegisterForm() {
       register({ email, password })
         .unwrap()
         .then(() => router.push("/redirectemail"))
-        .catch((err) => {
-          console.error("Registration error: ", JSON.stringify(err, null, 2));
-        });
+        .catch(() => {});
     }
   };
   return (
@@ -91,12 +89,18 @@ function RegisterForm() {
             <>
               {isError &&
                 error?.data?.email?.map((error, index) => (
-                  <p key={index} className="text-red-500 text-sm mt-1">
+                  <p
+                    key={index}
+                    className="text-red-500 text-sm md:text-base mt-1"
+                  >
                     {error}
                   </p>
                 ))}
               {emailError && (
-                <p id="email-error" className="text-red-500 text-sm mt-1">
+                <p
+                  id="email-error"
+                  className="text-red-500 text-sm md:text-base mt-1"
+                >
                   {emailError}
                 </p>
               )}
@@ -126,13 +130,19 @@ function RegisterForm() {
               <>
                 {isError &&
                   error?.data?.password?.map((error, index) => (
-                    <p key={index} className="text-red-500 text-sm mt-1">
+                    <p
+                      key={index}
+                      className="text-red-500 text-sm md:text-basemt-1"
+                    >
                       {error}
                     </p>
                   ))}
               </>
             )}
-            <div id="password-feedback" className="text-sm mb-4 space-y-1">
+            <div
+              id="password-feedback"
+              className="text-sm md:text-base mb-4 space-y-1"
+            >
               {feedbackMessages.map((item, index) => (
                 <p
                   key={index}

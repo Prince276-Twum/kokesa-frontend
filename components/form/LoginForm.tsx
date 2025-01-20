@@ -1,24 +1,43 @@
 "use client";
-import React, { FormEvent, useState } from "react";
-import Input from "../UI/Input";
-import Button from "../UI/Button";
-import GoogleSignUp from "../common/GoogleSignUp";
 import useEmailValidation from "@/hooks/useEmailValidation";
+import { useLoginMutation } from "@/store/features/authApiSlice";
+import { setAuth } from "@/store/features/authSlice";
+import { useAppDispatch } from "@/store/hooks";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { toast } from "react-toastify";
+import Button from "../UI/Button";
+import Input from "../UI/Input";
+import GoogleSignUp from "../common/GoogleSignUp";
 
 function LoginForm() {
   const { email, emailError, handleEmailChange, checkEmailValidity } =
     useEmailValidation();
-  const [enterdPassword, setEnterdPassword] = useState("");
+  const [password, setPassword] = useState("");
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useAppDispatch()
 
+  
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    if (enterdPassword == "") {
-      setIsPasswordEmpty(true);
-    }
-    if (!checkEmailValidity()) {
-      return;
+    const isEmailValid = checkEmailValidity();
+    const isPasswordValid = password !== "";
+
+    if (isEmailValid && isPasswordValid) {
+      login({ email, password })
+        .unwrap()
+        .then(() => {
+          dispatch(setAuth())
+        })
+        .catch(() => {
+          toast.error("failed to sign in");
+        });
+    } else {
+      // Update error states
+      if (!isEmailValid) checkEmailValidity(); // Re-run to trigger email error display
+      if (!isPasswordValid) setIsPasswordEmpty(true);
     }
   };
 
@@ -41,7 +60,7 @@ function LoginForm() {
           </Input>
 
           {emailError && (
-            <p id="email-error" className="text-red-500 ">
+            <p id="email-error" className="text-red-500 text-sm md:text-base">
               {emailError}
             </p>
           )}
@@ -53,28 +72,38 @@ function LoginForm() {
             cn={isPasswordEmpty ? "border-red-500" : ""}
             placeholder="Enter Your Password"
             id="password"
-            type="email"
+            type="password"
             onChange={(e) => {
-              setEnterdPassword(e.target.value);
+              setPassword(e.target.value);
               setIsPasswordEmpty(false);
             }}
-            value={enterdPassword}
+            value={password}
           >
             Password
           </Input>
 
           {isPasswordEmpty && (
-            <p id="passwprd-error" className="text-red-500">
+            <p
+              id="passwprd-error"
+              className="text-red-500 text-sm md:text-base"
+            >
               please enter a valid password
             </p>
           )}
         </div>
 
         <div className="mt-8">
-          <Button primary rounded>
+          <Button primary rounded loading={isLoading} disabled={isLoading}>
             Sign In
           </Button>
         </div>
+
+        <Link
+          className="text-left block py-2  font-semibold text-green-500"
+          href=""
+        >
+          Forgot password?
+        </Link>
       </form>
 
       <GoogleSignUp login />
