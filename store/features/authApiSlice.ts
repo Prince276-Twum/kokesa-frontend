@@ -21,7 +21,18 @@ const authApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    login: builder.mutation({
+      query: ({ email, password }) => {
+        return {
+          url: "/jwt/create/",
+          method: "POST",
+          body: { email, password },
+        };
+      },
+    }),
   }),
 });
 
-export const { useRegisterMutation, useActivationMutation } = authApiSlice;
+export const { useRegisterMutation, useActivationMutation, useLoginMutation } =
+  authApiSlice;

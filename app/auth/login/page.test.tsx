@@ -1,10 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import LoginPage from "./page";
 import "@testing-library/jest-dom";
+import CustomProvider from "@/store/Provider";
 
 describe("LoginPage", () => {
   it("renders the login page with all elements", () => {
-    render(<LoginPage />);
+    render(
+      <CustomProvider>
+        <LoginPage />
+      </CustomProvider>
+    );
 
     // Check for the presence of the image
     const image = screen.getByAltText(
