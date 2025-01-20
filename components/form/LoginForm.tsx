@@ -1,10 +1,9 @@
 "use client";
-import React, { FormEvent, FormEventHandler, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import Input from "../UI/Input";
 import Button from "../UI/Button";
 import GoogleSignUp from "../common/GoogleSignUp";
 import useEmailValidation from "@/hooks/useEmailValidation";
-import { trace } from "console";
 
 function LoginForm() {
   const { email, emailError, handleEmailChange, checkEmailValidity } =
