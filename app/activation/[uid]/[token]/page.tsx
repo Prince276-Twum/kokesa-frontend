@@ -68,7 +68,7 @@ function Page({ params }: Props) {
           {content}
 
             <Button primary rounded onClick={() => router.push("/auth/login")}>
-              Login to Setup Your Business
+              Login to Setup Your Business.
             </Button>
     
         </div>
