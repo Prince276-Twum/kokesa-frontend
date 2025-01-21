@@ -4,6 +4,7 @@ import Image from "next/image";
 import regImage from "@/public/reg.jpeg";
 import logo from "@/public/Vector.png";
 
+
 function RegistrationPage() {
   return (
     <main className="w-full md:min-h-screen flex">
