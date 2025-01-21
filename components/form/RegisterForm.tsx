@@ -23,8 +23,6 @@ interface RegisterError {
 }
 
 function RegisterForm() {
-  console.log(process.env.NEXT_PUBLIC_HOST)
-
   const router = useRouter();
   const [register, { isLoading, error, isError }] =
     useRegisterMutation<RegisterError>();
@@ -180,7 +178,7 @@ function RegisterForm() {
         </div>
 
         {/* Submit Button */}
-        <Button primary rounded loading={isLoading} type="submit">
+        <Button el="button" primary rounded loading={isLoading} type="submit">
           Create An Account
         </Button>
       </form>

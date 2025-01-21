@@ -1,18 +1,15 @@
 "use client";
+import Button from "@/components/UI/Button";
 import logo from "@/public/Vector.png";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { use } from "react";
 import { useActivationMutation } from "@/store/features/authApiSlice";
 import Image from "next/image";
-import Button from "@/components/UI/Button";
+import { use, useEffect } from "react";
 
 interface Props {
   params: Promise<{ uid: string; token: string }>;
 }
 
 function Page({ params }: Props) {
-  const router = useRouter();
   const [activate, { isError, error, isSuccess }] = useActivationMutation();
   const { uid, token } = use(params);
 
@@ -67,10 +64,9 @@ function Page({ params }: Props) {
         <div className="text-center">
           {content}
 
-            <Button primary rounded onClick={() => router.push("/auth/login")}>
-              Login to Setup Your Business.
-            </Button>
-    
+          <Button primary rounded el="anchor" href="/auth/login">
+            Login to Setup Your Business.
+          </Button>
         </div>
       </div>
     </main>
