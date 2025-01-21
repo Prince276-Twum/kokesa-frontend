@@ -18,7 +18,7 @@ function RedirectEmailPage() {
           <p className="mb-6 text-lg  leading-6 text-neutral-gray">
             Please go to your email to verify your email address.
           </p>
-          <Button primary rounded>
+          <Button el="anchor" href="mailto" primary rounded>
             Login to Setup Your Business
           </Button>
         </div>
