@@ -44,7 +44,7 @@ function Page({ params }: Props) {
         className="p-6 bg-green-100 text-green-700 rounded-lg mb-4"
       >
         <h2 className="text-3xl font-bold mb-4">
-          Email Verification Successful&excl;
+          Email Verification Successful!
         </h2>
         <p className="text-lg leading-6 mb-4">
           Your email has been successfully verified. You can now log in and set
@@ -67,11 +67,10 @@ function Page({ params }: Props) {
         <div className="text-center">
           {content}
 
-          {isSuccess && (
-            <Button primary rounded onClick={() => router.push("/login")}>
-              Login to Setup Your Business
+            <Button primary rounded onClick={() => router.push("/auth/login")}>
+              Login to Setup Your Business.
             </Button>
-          )}
+    
         </div>
       </div>
     </main>
