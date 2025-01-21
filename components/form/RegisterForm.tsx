@@ -23,6 +23,8 @@ interface RegisterError {
 }
 
 function RegisterForm() {
+  console.log(process.env.NEXT_PUBLIC_HOST)
+
   const router = useRouter();
   const [register, { isLoading, error, isError }] =
     useRegisterMutation<RegisterError>();
