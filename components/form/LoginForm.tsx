@@ -16,9 +16,8 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
-  
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
@@ -29,7 +28,7 @@ function LoginForm() {
       login({ email, password })
         .unwrap()
         .then(() => {
-          dispatch(setAuth())
+          dispatch(setAuth());
         })
         .catch(() => {
           toast.error("failed to sign in");
@@ -93,7 +92,13 @@ function LoginForm() {
         </div>
 
         <div className="mt-8">
-          <Button primary rounded loading={isLoading} disabled={isLoading}>
+          <Button
+            el="button"
+            primary
+            rounded
+            loading={isLoading}
+            disabled={isLoading}
+          >
             Sign In
           </Button>
         </div>
