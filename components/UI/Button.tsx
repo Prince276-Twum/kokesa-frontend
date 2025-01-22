@@ -85,7 +85,7 @@ function Button({
       "bg-green-500 text-white": success,
       "bg-red-500 text-white": danger,
       "bg-yellow-400 text-white": warning,
-      "rounded-lg": rounded,
+      "rounded-md": rounded,
       "rounded-full": rounded && primary, // Example custom rule
       "bg-white": outline,
       "text-blue-500": outline && primary,

@@ -3,6 +3,15 @@ import LoginPage from "./page";
 import "@testing-library/jest-dom";
 import CustomProvider from "@/store/Provider";
 
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn().mockReturnValue({
+    route: "/",
+    pathname: "",
+    query: {},
+    asPath: "",
+  }),
+}));
+
 describe("LoginPage", () => {
   it("renders the login page with all elements", () => {
     render(

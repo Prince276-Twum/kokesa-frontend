@@ -83,7 +83,7 @@ describe("Button Component", () => {
     const button = screen.getByText(children);
 
     // Check the applied styles
-    expect(button).toHaveClass("bg-white text-red-500 rounded-lg");
+    expect(button).toHaveClass("bg-white text-red-500 rounded-md");
   });
 
   it("renders with default behavior when `el` is omitted", () => {
