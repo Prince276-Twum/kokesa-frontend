@@ -18,7 +18,7 @@ function RedirectEmailPage() {
           <p className="mb-6 text-lg leading-6 text-neutral-gray">
             We’ve sent a verification email to your address. Please check your inbox and follow the link to verify your account.
           </p>
-          <Button  primary rounded>
+          <Button el="anchor" href="/auth/login" primary rounded>
             Go to Login
           </Button>
         </div>

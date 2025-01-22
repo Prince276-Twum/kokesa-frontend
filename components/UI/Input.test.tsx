@@ -2,70 +2,104 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import Input from "./Input";
+import Button from "./Button";
 
-describe("Input Component", () => {
-  it("renders the input element with the correct props", () => {
-    const id = "test-input";
-    const placeholder = "Enter text";
-    const type = "text";
-    const label = "Test Label";
+describe("Button Component", () => {
+  it("renders as a button element with the correct props", async () => {
+    const children = "Click Me";
+    const onClick = jest.fn();
+    const className = "custom-class";
 
     render(
-      <Input id={id} placeholder={placeholder} type={type}>
-        {label}
-      </Input>
+      <Button
+        el="button"
+        type="button"
+        primary
+        onClick={onClick}
+        className={className}
+      >
+        {children}
+      </Button>
     );
 
-    // Check if the label is rendered with the correct text
-    expect(screen.getByText(label)).toBeInTheDocument();
+    const button = screen.getByRole("button", { name: children });
 
-    // Check if the input element is rendered
-    const input = screen.getByPlaceholderText(placeholder);
-    expect(input).toBeInTheDocument();
+    // Check if the button is rendered with correct props
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveClass("custom-class");
+    expect(button).toHaveClass("bg-primary-base text-white"); // Primary button class
+    expect(button).toHaveAttribute("type", "button");
 
-    // Check if the input has the correct id and type
-    expect(input).toHaveAttribute("id", id);
-    expect(input).toHaveAttribute("type", type);
+    // Simulate a click event
+    await userEvent.click(button);
+
+    expect(onClick).toHaveBeenCalled();
   });
 
-  it("applies additional props to the input element", async () => {
-    const id = "test-input";
-    const placeholder = "Enter text";
-    const type = "text";
-    const onChange = jest.fn();
+  it("renders as an anchor element with the correct props", () => {
+    const children = "Go to Link";
+    const href = "/test-link";
+    const className = "custom-class";
 
     render(
-      <Input id={id} placeholder={placeholder} type={type} onChange={onChange}>
-        Test Label
-      </Input>
+      <Button el="anchor" href={href} secondary className={className}>
+        {children}
+      </Button>
     );
 
-    const input = screen.getByPlaceholderText(placeholder);
+    const anchor = screen.getByText(children);
 
-    await userEvent.type(input, "Hello");
-
-    // Ensure the onChange handler is called
-    expect(onChange).toHaveBeenCalled();
-    expect(onChange).toHaveBeenCalledTimes(5); // "Hello" = 5 calls
+    // Check if the anchor is rendered with correct props
+    expect(anchor).toBeInTheDocument();
+    expect(anchor).toHaveClass("custom-class");
+    expect(anchor).toHaveClass("bg-gray-500 text-white");
+    expect(anchor).toHaveAttribute("href", href);
   });
 
-  it("renders with the correct styles", () => {
-    const id = "test-input";
-    const placeholder = "Enter text";
-    const type = "text";
+  it("renders with a loading spinner when loading is true", () => {
+    const children = "Loading";
+    render(
+      <Button el="button" type="button" primary loading>
+        {children}
+      </Button>
+    );
+
+    const button = screen.getByRole("button");
+
+    expect(button).toHaveClass("opacity-80 cursor-not-allowed");
+    expect(screen.getByTestId("spinner")).toBeInTheDocument();
+    expect(screen.queryByText(children)).not.toBeInTheDocument();
+  });
+
+  it("applies the correct styles based on variations", () => {
+    const children = "Styled Button";
 
     render(
-      <Input id={id} placeholder={placeholder} type={type}>
-        Test Label
-      </Input>
+      <Button el="button" danger rounded outline>
+        {children}
+      </Button>
     );
 
-    const input = screen.getByPlaceholderText(placeholder);
+    const button = screen.getByText(children);
 
-    // Check if the input has the correct class name
-    expect(input).toHaveClass(
-      "border-2 border-neutral-formBorder px-4 py-3 md:py-3 w-full rounded-md focus:outline-none"
+    // Check the applied styles
+    expect(button).toHaveClass("bg-white text-red-500 rounded-lg");
+  });
+
+  it("renders with default behavior when `el` is omitted", () => {
+    const children = "Default Button";
+
+    render(
+      <Button el="button" type="submit" success>
+        {children}
+      </Button>
     );
+
+    const button = screen.getByText(children);
+
+    // Check if the default element is a button
+    expect(button.tagName).toBe("BUTTON");
+    expect(button).toHaveClass("bg-green-500 text-white");
+    expect(button).toHaveAttribute("type", "submit");
   });
 });
