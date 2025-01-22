@@ -5,6 +5,9 @@ import logo from "@/public/Vector.png";
 import alarmImg from "@/public/loginalarm.png";
 import type { Metadata } from "next";
 
+
+
+
 export const metadata: Metadata = {
   title: "Kokesa | Sign In",
   description:

@@ -9,8 +9,10 @@ import { toast } from "react-toastify";
 import Button from "../UI/Button";
 import Input from "../UI/Input";
 import GoogleSignUp from "../common/GoogleSignUp";
+import { useRouter } from "next/navigation";
 
 function LoginForm() {
+  const router = useRouter();
   const { email, emailError, handleEmailChange, checkEmailValidity } =
     useEmailValidation();
   const [password, setPassword] = useState("");
@@ -29,8 +31,11 @@ function LoginForm() {
         .unwrap()
         .then(() => {
           dispatch(setAuth());
+          router.push("/dashboard");
+
         })
         .catch(() => {
+
           toast.error("failed to sign in");
         });
     } else {
