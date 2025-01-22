@@ -14,12 +14,12 @@ function RedirectEmailPage() {
         </div>
 
         <div className="text-center">
-          <h2 className="text-3xl font-bold mb-6 ">Verify Your Email</h2>
-          <p className="mb-6 text-lg  leading-6 text-neutral-gray">
-            Please go to your email to verify your email address.
+          <h2 className="text-3xl font-bold mb-6">Verify Your Email</h2>
+          <p className="mb-6 text-lg leading-6 text-neutral-gray">
+            We’ve sent a verification email to your address. Please check your inbox and follow the link to verify your account.
           </p>
-          <Button primary rounded>
-            Login to Setup Your Business
+          <Button  primary rounded>
+            Go to Login
           </Button>
         </div>
       </div>
