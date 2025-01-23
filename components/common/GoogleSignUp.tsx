@@ -1,6 +1,7 @@
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
+import { continueWithGoogleAuth } from "@/utils/continue-with-googleauth";
 
 interface Props {
   login?: boolean;
@@ -21,6 +22,7 @@ function GoogleSignUp({ login }: Props) {
       {/* Google Signup Button */}
       <div className="flex flex-col items-center justify-center mt-6">
         <button
+          onClick={continueWithGoogleAuth}
           className="flex items-center py-2 px-4 gap-4 justify-center shadow-md w-full max-w-sm rounded-md bg-white 
                      text-gray-800 hover:bg-gray-100 hover:shadow-lg focus:outline-none
                      active:scale-95 transition-transform duration-150"
