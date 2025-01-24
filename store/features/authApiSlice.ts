@@ -1,5 +1,19 @@
 import { apiSlice } from "../service/apiSlice";
 
+interface User {
+  email: string;
+}
+
+interface GoogelAuthArgs {
+  state: string;
+  code: string;
+}
+
+interface CreateUserResponse {
+  success: boolean;
+  user: User;
+}
+
 const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
@@ -31,8 +45,27 @@ const authApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    googleAuth: builder.mutation<CreateUserResponse, GoogelAuthArgs>({
+      query: ({ state, code }) => {
+        return {
+          url: `/o/google-oauth2/?state=${encodeURIComponent(
+            state
+          )}&code=${encodeURIComponent(code)}`,
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        };
+      },
+    }),
   }),
 });
 
-export const { useRegisterMutation, useActivationMutation, useLoginMutation } =
-  authApiSlice;
+export const {
+  useRegisterMutation,
+  useActivationMutation,
+  useLoginMutation,
+  useGoogleAuthMutation,
+} = authApiSlice;
