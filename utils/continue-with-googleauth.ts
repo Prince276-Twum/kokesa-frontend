@@ -12,14 +12,17 @@ export async function continueWithGoogleAuth() {
 
     const res = await fetch(url, {
       method: "GET",
+
       headers: {
         Accept: "application/json",
       },
+      credentials: "include",
     });
 
     const data = await res.json();
+    console.log(data);
 
-    if (res.status == 200 && typeof window != "undefined") {
+    if (res.status == 200 && typeof window !== "undefined") {
       window.location.replace(data.authorization_url);
     } else {
       toast.error("something went wrong");
