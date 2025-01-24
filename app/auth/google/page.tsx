@@ -4,14 +4,14 @@ import { useGoogleAuthMutation } from "@/store/features/authApiSlice";
 import { setAuth } from "@/store/features/authSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { toast } from "react-toastify";
 
-interface AuthError {
-  status: number;
+function LoadingFallback() {
+  return <p>Loading...</p>;
 }
 
-function Page() {
+function GoogleAuthPage() {
   const [googleSignIn] = useGoogleAuthMutation();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,8 +30,8 @@ function Page() {
           router.push("/dashboard");
           toast.success("Logged in successfully!");
         })
-        .catch((error: AuthError) => {
-          const status = error.status || 500;
+        .catch((error) => {
+          const status = (error as { status?: number })?.status || 500;
           if (status === 404) {
             router.push("/404");
           } else if (status === 500) {
@@ -50,4 +50,10 @@ function Page() {
   return <></>;
 }
 
-export default Page;
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <GoogleAuthPage />
+    </Suspense>
+  );
+}
