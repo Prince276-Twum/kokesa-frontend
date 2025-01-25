@@ -7,7 +7,7 @@ interface initialStateProps {
 
 const initialState: initialStateProps = {
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
 };
 
 const authSlice = createSlice({
@@ -22,7 +22,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
     },
     finishInitialLoad(state) {
-      state.isLoading = true;
+      state.isLoading = false;
     },
   },
 });

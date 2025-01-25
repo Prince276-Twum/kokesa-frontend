@@ -12,11 +12,11 @@ export async function continueWithGoogleAuth() {
 
     const res = await fetch(url, {
       method: "GET",
+      credentials: "include",
 
       headers: {
         Accept: "application/json",
       },
-      credentials: "include",
     });
 
     const data = await res.json();
