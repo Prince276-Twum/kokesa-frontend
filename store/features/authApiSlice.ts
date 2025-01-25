@@ -1,3 +1,4 @@
+import { verify } from "crypto";
 import { apiSlice } from "../service/apiSlice";
 
 interface User {
@@ -60,6 +61,15 @@ const authApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    verify: builder.mutation({
+      query: () => {
+        return {
+          url: "/jwt/verify/",
+          method: "POST",
+        };
+      },
+    }),
   }),
 });
 
@@ -68,4 +78,5 @@ export const {
   useActivationMutation,
   useLoginMutation,
   useGoogleAuthMutation,
+  useVerifyMutation,
 } = authApiSlice;

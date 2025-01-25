@@ -1,0 +1,24 @@
+"use client";
+import { useAppSelector } from "@/store/hooks";
+import { redirect } from "next/navigation";
+import React, { ReactNode } from "react";
+interface Props {
+  children: ReactNode;
+}
+
+function RequireAuth({ children }: Props) {
+  const { isAuthenticated, isLoading } = useAppSelector((store) => store.auth);
+
+  if (isLoading) {
+    return <>spinner</>;
+  }
+
+  if (!isAuthenticated) {
+    redirect("/auth/login");
+    return <div>RequireAuth</div>;
+  }
+
+  return <>{children}</>;
+}
+
+export default RequireAuth;
