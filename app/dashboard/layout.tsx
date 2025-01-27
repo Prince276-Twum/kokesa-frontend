@@ -1,4 +1,5 @@
 import RequireAuth from "@/components/utils/RequireAuth";
+import RequireBusinessComplete from "@/components/utils/RequireBusinessComplete";
 import React, { type ReactNode } from "react";
 
 interface Props {
@@ -8,7 +9,9 @@ interface Props {
 function layout({ children }: Props) {
   return (
     <>
-      <RequireAuth>{children}</RequireAuth>
+      <RequireAuth>
+        <RequireBusinessComplete>{children}</RequireBusinessComplete>
+      </RequireAuth>
     </>
   );
 }
