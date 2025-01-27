@@ -15,7 +15,6 @@ function RequireAuth({ children }: Props) {
 
   if (!isAuthenticated) {
     redirect("/auth/login");
-    return <div>RequireAuth</div>;
   }
 
   return <>{children}</>;

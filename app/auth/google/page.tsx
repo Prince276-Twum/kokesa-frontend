@@ -45,6 +45,11 @@ function GoogleAuthPage() {
           effectRan.current = true;
         });
     }
+
+    else{
+      toast.error("something went wrong")
+      router.push("login")
+    }
   }, [googleSignIn, dispatch, router, searchParams]);
 
   return <></>;
