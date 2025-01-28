@@ -53,3 +53,7 @@ select {
 .max-container {
   @apply max-w-[1280px] mx-auto;
 }
+
+.text-header {
+  @apply text-2xl md:text-[1.5rem] text-center font-extrabold md:font-bold mb-4;
+}

@@ -21,10 +21,8 @@ describe("LoginForm", () => {
         <LoginForm />
       </CustomProvider>
     );
-    expect(screen.getByPlaceholderText("Enter Your Email")).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText("Enter Your Password")
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Enter Your Email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Enter Your Password")).toBeInTheDocument();
     expect(screen.getByText("Sign In")).toBeInTheDocument();
   });
 
@@ -34,7 +32,7 @@ describe("LoginForm", () => {
         <LoginForm />
       </CustomProvider>
     );
-    const emailInput = screen.getByPlaceholderText("Enter Your Email");
+    const emailInput = screen.getByLabelText("Enter Your Email");
     const submitButton = screen.getByText("Sign In");
 
     await user.click(emailInput);
@@ -67,8 +65,8 @@ describe("LoginForm", () => {
         <LoginForm />
       </CustomProvider>
     );
-    const emailInput = screen.getByPlaceholderText("Enter Your Email");
-    const passwordInput = screen.getByPlaceholderText("Enter Your Password");
+    const emailInput = screen.getByLabelText("Enter Your Email");
+    const passwordInput = screen.getByLabelText("Enter Your Password");
     const submitButton = screen.getByText("Sign In");
 
     await user.type(emailInput, "test@example.com");

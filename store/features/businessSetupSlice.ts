@@ -8,7 +8,7 @@ interface initialStateType {
 
 const initialState: initialStateType = {
   isSetupComplete: false,
-  currentStep: 0,
+  currentStep: 1,
   isLoading: true,
 };
 
@@ -16,7 +16,7 @@ const businessSetupSlice = createSlice({
   name: "businessSetup",
   initialState,
   reducers: {
-    sethBusinessComplete(state, actions: PayloadAction<boolean>) {
+    setBusinessComplete(state, actions: PayloadAction<boolean>) {
       state.isSetupComplete = actions.payload;
     },
 
@@ -24,15 +24,12 @@ const businessSetupSlice = createSlice({
       state.currentStep = actions.payload;
     },
 
-    sethFinishBusinessLoading(state) {
+    setFinishBusinessLoading(state) {
       state.isLoading = false;
     },
   },
 });
 
 export default businessSetupSlice;
-export const {
-  setCurrentStep,
-  sethBusinessComplete,
-  sethFinishBusinessLoading,
-} = businessSetupSlice.actions;
+export const { setCurrentStep, setBusinessComplete, setFinishBusinessLoading } =
+  businessSetupSlice.actions;
