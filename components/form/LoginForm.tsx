@@ -32,10 +32,8 @@ function LoginForm() {
         .then(() => {
           dispatch(setAuth());
           router.push("/dashboard");
-
         })
         .catch(() => {
-
           toast.error("failed to sign in");
         });
     } else {
@@ -59,9 +57,7 @@ function LoginForm() {
             }}
             cn={emailError ? "border-red-500" : ""}
             aria-describedby="email-error"
-          >
-            Email
-          </Input>
+          ></Input>
 
           {emailError && (
             <p id="email-error" className="text-red-500 text-sm md:text-base">
@@ -82,9 +78,7 @@ function LoginForm() {
               setIsPasswordEmpty(false);
             }}
             value={password}
-          >
-            Password
-          </Input>
+          ></Input>
 
           {isPasswordEmpty && (
             <p

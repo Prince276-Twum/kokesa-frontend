@@ -35,8 +35,8 @@ describe("LoginPage", () => {
     expect(headings.length).toBeGreaterThan(0);
 
     // Check for the presence of the LoginForm component
-    const emailInput = screen.getByPlaceholderText("Enter Your Email");
-    const passwordInput = screen.getByPlaceholderText("Enter Your Password");
+    const emailInput = screen.getByLabelText("Enter Your Email");
+    const passwordInput = screen.getByLabelText("Enter Your Password");
     const signInButtons = screen.getAllByText("Sign In");
     const signInButton = signInButtons.find(
       (button) => button.tagName === "BUTTON"
