@@ -9,6 +9,7 @@ function RedirectEmailPage() {
   const [resending, setResending] = useState(false);
   const [waitTime, setWaitTime] = useState(0); 
 
+  
   console.log(resending)
   useEffect(() => {
     const storedWaitTime = localStorage.getItem("waitTime");

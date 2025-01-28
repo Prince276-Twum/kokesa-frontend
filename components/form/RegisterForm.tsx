@@ -82,9 +82,7 @@ function RegisterForm() {
             }}
             cn={emailError ? "border-red-500" : ""}
             aria-describedby="email-error"
-          >
-            Email
-          </Input>
+          ></Input>
           {showEmailError && (
             <>
               {isError &&
@@ -118,9 +116,7 @@ function RegisterForm() {
             onChange={handlePasswordChange}
             aria-describedby="password-feedback"
             cn={showMessages ? (isValid ? "" : "border-red-500") : ""}
-          >
-            Password
-          </Input>
+          ></Input>
         </div>
 
         {/* Real-Time Password Feedback */}

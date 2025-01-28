@@ -1,105 +1,95 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import user from "@testing-library/user-event";
+import Input from "./Input";
 import "@testing-library/jest-dom";
-import Button from "./Button";
 
-describe("Button Component", () => {
-  it("renders as a button element with the correct props", async () => {
-    const children = "Click Me";
-    const onClick = jest.fn();
-    const className = "custom-class";
-
+describe("Input Component", () => {
+  test("renders input with the correct label", () => {
     render(
-      <Button
-        el="button"
-        type="button"
-        primary
-        onClick={onClick}
-        className={className}
-      >
-        {children}
-      </Button>
+      <Input
+        id="email"
+        placeholder="Email"
+        type="email"
+        cn="custom-class"
+        data-testid="input-element"
+      />
     );
 
-    const button = screen.getByRole("button", { name: children });
+    // Check if the input is rendered with the correct label
+    const inputElement = screen.getByTestId("input-element");
+    expect(inputElement).toBeInTheDocument();
+    expect(inputElement).toHaveAttribute("type", "email");
 
-    // Check if the button is rendered with correct props
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveClass("custom-class");
-    expect(button).toHaveClass("bg-primary-base text-white"); // Primary button class
-    expect(button).toHaveAttribute("type", "button");
-
-    // Simulate a click event
-    await userEvent.click(button);
-
-    expect(onClick).toHaveBeenCalled();
+    // Check for the label text
+    const labelElement = screen.getByText("Email");
+    expect(labelElement).toBeInTheDocument();
+    expect(labelElement).toHaveAttribute("for", "email");
   });
 
-  it("renders as an anchor element with the correct props", () => {
-    const children = "Go to Link";
-    const href = "/test-link";
-    const className = "custom-class";
-
+  test("applies additional class names and styles", () => {
     render(
-      <Button el="anchor" href={href} secondary className={className}>
-        {children}
-      </Button>
+      <Input
+        id="password"
+        placeholder="Password"
+        type="password"
+        cn="custom-class"
+        data-testid="input-element"
+      />
     );
 
-    const anchor = screen.getByText(children);
-
-    // Check if the anchor is rendered with correct props
-    expect(anchor).toBeInTheDocument();
-    expect(anchor).toHaveClass("custom-class");
-    expect(anchor).toHaveClass("bg-gray-500 text-white");
-    expect(anchor).toHaveAttribute("href", href);
+    const inputElement = screen.getByTestId("input-element");
+    expect(inputElement).toHaveClass("custom-class");
   });
 
-  it("renders with a loading spinner when loading is true", () => {
-    const children = "Loading";
+  test("handles user input correctly", async () => {
     render(
-      <Button el="button" type="button" primary loading>
-        {children}
-      </Button>
+      <Input
+        id="username"
+        placeholder="Username"
+        type="text"
+        data-testid="input-element"
+      />
     );
 
-    const button = screen.getByRole("button");
+    const inputElement = screen.getByTestId("input-element");
 
-    expect(button).toHaveClass("opacity-80 cursor-not-allowed");
-    expect(screen.getByTestId("spinner")).toBeInTheDocument();
-    expect(screen.queryByText(children)).not.toBeInTheDocument();
+    // Simulate user typing into the input field
+    await user.type(inputElement, "testuser");
+
+    expect(inputElement).toHaveValue("testuser");
   });
 
-  it("applies the correct styles based on variations", () => {
-    const children = "Styled Button";
+  test("renders with default props if no additional props are provided", () => {
+    render(<Input id="default" placeholder="Default Input" />);
 
-    render(
-      <Button el="button" danger rounded outline>
-        {children}
-      </Button>
-    );
-
-    const button = screen.getByText(children);
-
-    // Check the applied styles
-    expect(button).toHaveClass("bg-white text-red-500 rounded-md");
+    const inputElement = screen.getByLabelText("Default Input");
+    expect(inputElement).toBeInTheDocument();
+    expect(inputElement).toHaveAttribute("type", "text");
   });
 
-  it("renders with default behavior when `el` is omitted", () => {
-    const children = "Default Button";
-
+  test("interacts with focus and peer styles", async () => {
     render(
-      <Button el="button" type="submit" success>
-        {children}
-      </Button>
+      <Input
+        id="email"
+        placeholder="Email"
+        type="email"
+        data-testid="input-element"
+      />
     );
 
-    const button = screen.getByText(children);
+    const inputElement = screen.getByTestId("input-element");
+    const labelElement = screen.getByText("Email");
 
-    // Check if the default element is a button
-    expect(button.tagName).toBe("BUTTON");
-    expect(button).toHaveClass("bg-green-500 text-white");
-    expect(button).toHaveAttribute("type", "submit");
+    // Initially, the label should be at the default position
+    expect(labelElement).toHaveClass("peer-placeholder-shown:top-2");
+
+    // Focus on the input
+    await user.click(inputElement);
+
+    // After focusing, the label should move
+    expect(labelElement).toHaveClass(
+      "peer-focus:-top-2.5 peer-focus:text-blue-500"
+    );
   });
 });
