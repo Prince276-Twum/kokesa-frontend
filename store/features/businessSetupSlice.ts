@@ -1,15 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface BusinessDetail {
+  businessName: string;
+  userName: string;
+  phoneNumber: string | undefined;
+}
+
 interface initialStateType {
   isSetupComplete: boolean;
   currentStep: number;
   isLoading: boolean;
+  detail: BusinessDetail;
 }
 
 const initialState: initialStateType = {
   isSetupComplete: false,
   currentStep: 1,
   isLoading: true,
+  detail: { businessName: "", userName: "", phoneNumber: "" },
 };
 
 const businessSetupSlice = createSlice({
@@ -27,9 +35,17 @@ const businessSetupSlice = createSlice({
     setFinishBusinessLoading(state) {
       state.isLoading = false;
     },
+
+    setBusinessDetail(state, actions: PayloadAction<BusinessDetail>) {
+      state.detail = actions.payload;
+    },
   },
 });
 
 export default businessSetupSlice;
-export const { setCurrentStep, setBusinessComplete, setFinishBusinessLoading } =
-  businessSetupSlice.actions;
+export const {
+  setCurrentStep,
+  setBusinessComplete,
+  setFinishBusinessLoading,
+  setBusinessDetail,
+} = businessSetupSlice.actions;

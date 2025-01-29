@@ -6,7 +6,7 @@ interface initialStateProps {
 }
 
 const initialState: initialStateProps = {
-  isAuthenticated: false,
+  isAuthenticated: true,
   isLoading: true,
 };
 
@@ -15,7 +15,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuth(state) {
-      console.log("wow");
       state.isAuthenticated = true;
     },
     logout(state) {

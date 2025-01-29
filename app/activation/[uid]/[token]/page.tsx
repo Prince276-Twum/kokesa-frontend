@@ -10,7 +10,7 @@ interface Props {
 }
 
 function Page({ params }: Props) {
-  const [activate, { isError, error, isSuccess }] = useActivationMutation();
+  const [activate, { isError, isSuccess }] = useActivationMutation();
   const { uid, token } = use(params);
 
   useEffect(() => {
@@ -51,7 +51,6 @@ function Page({ params }: Props) {
     );
   }
 
-  console.log(error);
   return (
     <main className="flex justify-center items-center p-4 bg-white mt-20">
       <div className="bg-white rounded-md shadow-lg max-w-[450px] w-full px-6 py-8">

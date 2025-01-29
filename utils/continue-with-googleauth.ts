@@ -20,7 +20,6 @@ export async function continueWithGoogleAuth() {
     });
 
     const data = await res.json();
-    console.log(data);
 
     if (res.status == 200 && typeof window !== "undefined") {
       window.location.replace(data.authorization_url);
