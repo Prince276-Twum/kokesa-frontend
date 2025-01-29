@@ -45,7 +45,8 @@ function Page() {
   const handlePrevStep = () => {
     if (currentStep === 2) {
       dispatch(setCurrentStep(currentStep - 1)); // Use Redux to manage step
-      router.push("/business-setup/detail");
+      router.push('/business-setup/detail', undefined, { shallow: true });
+;
     }
   };
 
