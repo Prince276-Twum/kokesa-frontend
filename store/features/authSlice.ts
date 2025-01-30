@@ -6,7 +6,7 @@ interface initialStateProps {
 }
 
 const initialState: initialStateProps = {
-  isAuthenticated: true,
+  isAuthenticated: false,
   isLoading: true,
 };
 
