@@ -51,7 +51,6 @@ function Page() {
 
   const { title, subtitle } = stepContent[currentStep - 1] || {};
 
-  console.log("many");
   let content;
   if (currentStep === 1) {
     content = <SetupDetails />;

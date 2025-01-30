@@ -1,15 +1,10 @@
 "use client";
 import RequireAuth from "@/components/utils/RequireAuth";
-import { useAppSelector } from "@/store/hooks";
-import { redirect } from "next/navigation";
+import useVerifyBusinessComplete from "@/hooks/useVerifyBusinessComplete";
 import React, { ReactNode } from "react";
 
 function Layout({ children }: { children: ReactNode }) {
-  const { isSetupComplete } = useAppSelector((store) => store.businessSetup);
-
-  if (isSetupComplete) {
-    redirect("/dashboard");
-  }
+  useVerifyBusinessComplete();
   return (
     <div>
       <RequireAuth>{children}</RequireAuth>
