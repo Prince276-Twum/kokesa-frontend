@@ -1,12 +1,17 @@
+"use client";
+
 import RequireAuth from "@/components/utils/RequireAuth";
 import RequireBusinessComplete from "@/components/utils/RequireBusinessComplete";
+import useVerifyBusinessComplete from "@/hooks/useVerifyBusinessComplete";
 import React, { type ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
 }
 
-function layout({ children }: Props) {
+function Layout({ children }: Props) {
+  useVerifyBusinessComplete();
+
   return (
     <>
       <RequireAuth>
@@ -16,4 +21,4 @@ function layout({ children }: Props) {
   );
 }
 
-export default layout;
+export default Layout;

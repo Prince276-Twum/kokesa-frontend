@@ -67,22 +67,12 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
 
   useEffect(() => {
     if (currentStep === 1) {
-      // Check if data is already available in Redux store
-      if (detail.businessName && detail.userName && detail.phoneNumber) {
-        setBusinessName(detail.businessName);
-        setUserName(detail.userName);
-        setPhoneValue(detail.phoneNumber);
-      } else {
-        // If not available in Redux, fetch data from API
-        if (isLoading) return;
-        if (isError) {
-          toast.error("Something went wrong");
-        }
-        if (data) {
-          setBusinessName(data?.business_name);
-          setUserName(data?.user_name);
-          setPhoneValue(data?.phone_number);
-        }
+      if (isLoading) return;
+
+      if (data) {
+        setBusinessName(data?.business_name);
+        setUserName(data?.user_name);
+        setPhoneValue(data?.phone_number);
       }
     }
   }, [currentStep, isLoading, isError, data, detail]);
