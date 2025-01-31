@@ -21,10 +21,6 @@ function SetupDetails() {
 
   return (
     <div>
-      <div className="flex flex-col justify-center items-center mb-8">
-        <h2 className="text-header">About You & Your Business</h2>
-        <p>Tell us about yourself and your business</p>
-      </div>
       <form onSubmit={onSubmit} className="w-full">
         <div className="mb-4">
           <Input
@@ -59,7 +55,13 @@ function SetupDetails() {
           />
         </div>
 
-        <Button el="button" primary rounded disabled={isButtonDisabled}>
+        <Button
+          el="button"
+          className=" disabled:cursor-not-allowed  disabled:opacity-50"
+          primary
+          rounded
+          disabled={isButtonDisabled}
+        >
           Continue
         </Button>
       </form>
