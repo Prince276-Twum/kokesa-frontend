@@ -95,7 +95,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
         businessName,
         userName,
         phoneNumber: phoneValue,
-        currentStep: 2,
+        currentStep: 1,
       })
         .unwrap()
         .then(() => {
