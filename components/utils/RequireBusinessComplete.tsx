@@ -22,7 +22,7 @@ function RequireBusinessComplete({ children }: Props) {
         redirect("/business-setup/details");
 
       case 2:
-        redirect("/business-setup/confirm-number");
+        redirect("/business-setup/category");
 
       default:
         redirect("business-setup/details");

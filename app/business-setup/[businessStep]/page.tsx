@@ -72,6 +72,7 @@ function Page() {
 
   const { title, subtitle } = stepContent[currentStep - 1] || {};
 
+
   return (
     <main className=" relative md:pt-20">
       <div className="max-w-md mx-auto md:shadow-lg p-6 md:rounded-lg md:p-6">
