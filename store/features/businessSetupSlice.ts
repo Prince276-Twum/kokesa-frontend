@@ -15,7 +15,7 @@ interface initialStateType {
 
 const initialState: initialStateType = {
   isSetupComplete: false,
-  currentStep: 1,
+  currentStep: 2,
   isLoading: true,
   detail: { businessName: "", userName: "", phoneNumber: "" },
 };
