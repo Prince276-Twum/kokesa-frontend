@@ -1,6 +1,6 @@
 import {
   useGetBusinessDetailQuery,
-  useSetBusinessDetailMutation,
+  useSetupBusinessMutation,
 } from "@/store/features/businessApiSetupSlice";
 import {
   setBusinessDetail,
@@ -22,10 +22,12 @@ interface UseBusinessSetupReturnType {
   defaultCountry: Country | undefined;
   isButtonDisabled: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isBusinessLoading: boolean;
 }
 
 const useBusinessSetup = (): UseBusinessSetupReturnType => {
-  const [createBusinessDetails] = useSetBusinessDetailMutation();
+  const [setupBusiness, { isLoading: isBusinessLoading }] =
+    useSetupBusinessMutation();
   const router = useRouter();
   const { currentStep, detail } = useAppSelector((store) => store.businessSetup);
   const [businessName, setBusinessName] = useState("");
@@ -88,7 +90,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
     e.preventDefault();
 
     if (!isButtonDisabled) {
-      createBusinessDetails({
+      setupBusiness({
         businessName,
         userName,
         phoneNumber: phoneValue,
@@ -122,6 +124,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
     defaultCountry,
     isButtonDisabled,
     onSubmit,
+    isBusinessLoading,
   };
 };
 
