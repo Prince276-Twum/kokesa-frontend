@@ -76,7 +76,7 @@ function Button({
   ...rest
 }: Props) {
   const classes = classnames(
-    " px-4 py-2 text-base md:px-6 md:py-2 md:text-lg w-full flex justify-center items-center gap-2" +
+    "  disabled:cursor-not-allowed  disabled:opacity-50 px-4 py-2 text-base md:px-6 md:py-2 md:text-lg w-full flex justify-center items-center gap-2" +
       className,
     {
       "opacity-80 cursor-not-allowed": loading,

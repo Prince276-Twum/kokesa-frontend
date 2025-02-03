@@ -54,7 +54,7 @@ function StepProgress({
       </div>
 
       {/* Subtitle */}
-      <p className="text-gray-500 mb-8">{subtitle}</p>
+      <p className="mb-8 text-small">{subtitle}</p>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import CustomPhoneInput from "../UI/CustomPhoneInput";
 import Button from "../UI/Button";
-import useBusinessSetup from "@/hooks/useBusinessDetail"; // Import the custom hook
+import useBusinessSetup from "@/hooks/useBusinessDetail";
 
 function SetupDetails() {
   const {
@@ -16,8 +16,9 @@ function SetupDetails() {
     setPhoneValue,
     defaultCountry,
     isButtonDisabled,
+    isBusinessLoading,
     onSubmit,
-  } = useBusinessSetup(); // Use the custom hook
+  } = useBusinessSetup();
 
   return (
     <div>
@@ -57,10 +58,10 @@ function SetupDetails() {
 
         <Button
           el="button"
-          className=" disabled:cursor-not-allowed  disabled:opacity-50"
           primary
           rounded
           disabled={isButtonDisabled}
+          loading={isBusinessLoading}
         >
           Continue
         </Button>

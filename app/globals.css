@@ -54,7 +54,7 @@ select {
 
 /* Subheading Text - For subtitles or smaller headings */
 .text-subheader {
-  @apply text-xl md:text-lg text-center font-semibold;
+  @apply text-xl md:text-lg font-semibold;
 }
 
 /* Body Text - For regular paragraphs and content */
