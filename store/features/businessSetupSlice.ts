@@ -11,12 +11,14 @@ interface initialStateType {
   currentStep: number;
   isLoading: boolean;
   detail: BusinessDetail;
+  businessLocationOption: string;
 }
 
 const initialState: initialStateType = {
   isSetupComplete: false,
-  currentStep: 2,
+  currentStep: 1,
   isLoading: true,
+  businessLocationOption: "",
   detail: { businessName: "", userName: "", phoneNumber: "" },
 };
 
@@ -39,11 +41,16 @@ const businessSetupSlice = createSlice({
     setBusinessDetail(state, actions: PayloadAction<BusinessDetail>) {
       state.detail = actions.payload;
     },
+
+    setBusinsessLocationOption(state, actions: PayloadAction<string>) {
+      state.businessLocationOption = actions.payload;
+    },
   },
 });
 
 export default businessSetupSlice;
 export const {
+  setBusinsessLocationOption,
   setCurrentStep,
   setBusinessComplete,
   setFinishBusinessLoading,

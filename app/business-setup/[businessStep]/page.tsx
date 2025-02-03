@@ -2,9 +2,10 @@
 import {
   BusinessCategory,
   SetupDetails,
+  ServiceLocationOptions,
   StepProgress,
+  BusinessAddress,
 } from "@/components/business-setup/";
-import ConfirmNumber from "@/components/business-setup/ConfirmNumber";
 import { setCurrentStep } from "@/store/features/businessSetupSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { FaArrowLeft } from "react-icons/fa";
@@ -15,16 +16,28 @@ const stepContent = [
     subtitle: "Tell us about yourself and your business",
     path: "/business-setup/details",
   },
-  {
-    title: "Confirm 6 Digit code",
-    subtitle:
-      "A 6 digit code was sent to +233 22 12 34 56, enter the code to continue. ",
-    path: "/business-setup/location",
-  },
+  // {
+  //   title: "Confirm 6 Digit code",
+  //   subtitle:
+  //     "A 6 digit code was sent to +233 22 12 34 56, enter the code to continue. ",
+  //   path: "/business-setup/location",
+  // },
   {
     title: "What business do you do?",
     subtitle: "Provide your business details",
     path: "/business-setup/category",
+  },
+
+  {
+    title: "Add Service Location",
+    subtitle: "Where do you work?",
+    path: "/business-setup/location",
+  },
+
+  {
+    title: "Your Address",
+    subtitle: "Add location for clients to find you",
+    path: "/business-setup/address",
   },
   {
     title: "Set Your Working Hours",
@@ -78,7 +91,7 @@ function Page() {
       <div className="max-w-md mx-auto md:shadow-lg p-6 md:rounded-lg md:p-6">
         <div>
           <StepProgress
-            currentStep={currentStep - 1}
+            currentStep={currentStep == 2 ? 0.5 : currentStep - 2}
             steps={[
               "Business Info",
               "Location",
@@ -94,9 +107,9 @@ function Page() {
             onBack={handlePrevStep}
           />
           {currentStep === 1 && <SetupDetails />}
-          {currentStep === 2 && <ConfirmNumber />}
-          {currentStep === 3 && <BusinessCategory />}
-          {currentStep === 4 && <div>Set Working Hours</div>}
+          {currentStep === 2 && <BusinessCategory />}
+          {currentStep === 3 && <ServiceLocationOptions />}
+          {currentStep === 4 && <BusinessAddress />}
           {currentStep === 5 && <div>Contact Information</div>}
           <div className="mt-4 flex justify-between">
             <button
@@ -113,7 +126,7 @@ function Page() {
               Next
             </button>
           </div>
-        </div>{" "}
+        </div>
       </div>
     </main>
   );

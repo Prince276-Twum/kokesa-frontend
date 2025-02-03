@@ -1,3 +1,4 @@
+import { Usable } from "react";
 import { apiSlice } from "../service/apiSlice";
 
 export interface BusinessResponse {
@@ -13,6 +14,26 @@ interface BusinessDetailResponse {
   userName: string;
   phoneNumber: string;
 }
+
+type SetupBusinessRequestBody =
+  | {
+      currentStep: 1;
+      businessName: string;
+      userName: string;
+      phoneNumber: string | undefined;
+    }
+  | {
+      currentStep: 2;
+      businessCategory: string;
+    }
+  | {
+      currentStep: 3;
+      serviceLocation: string;
+    }
+  | {
+      currentStep: 4;
+      services: string[];
+    };
 
 const businessApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -30,17 +51,47 @@ const businessApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    setBusinessDetail: builder.mutation({
-      query: ({ businessName, userName, phoneNumber, currentStep }) => {
+    setupBusiness: builder.mutation<any, SetupBusinessRequestBody>({
+      query: ({ currentStep, ...data }) => {
+        let body: Record<string, any> = {
+          currentStep,
+          ...data,
+        };
+
+        switch (currentStep) {
+          case 1:
+            body = {
+              current_step: currentStep,
+              business_name: body.businessName,
+              user_name: body.userName,
+              phone_number: body.phoneNumber,
+            };
+            break;
+          case 2:
+            body = {
+              current_step: currentStep,
+              business_type: body.businessCategory,
+            };
+            break;
+          case 3:
+            body = {
+              current_step: currentStep,
+              service_location: body.serviceLocation,
+            };
+            break;
+          case 4:
+            body = {
+              services: body.services,
+            };
+            break;
+          default:
+            throw new Error("Invalid currentStep");
+        }
+
         return {
           url: "/business/setup_detail/",
           method: "POST",
-          body: {
-            business_name: businessName,
-            user_name: userName,
-            phone_number: phoneNumber,
-            current_step: currentStep,
-          },
+          body: body,
         };
       },
     }),
@@ -50,5 +101,5 @@ const businessApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetBusinessQuery,
   useGetBusinessDetailQuery,
-  useSetBusinessDetailMutation,
+  useSetupBusinessMutation,
 } = businessApiSlice;
