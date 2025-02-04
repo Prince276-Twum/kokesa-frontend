@@ -12,6 +12,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.5",
     "@reduxjs/toolkit": "^2.5.0",
     "async-mutex": "^0.5.0",
     "axios": "^1.7.9",

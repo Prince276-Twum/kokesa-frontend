@@ -29,11 +29,15 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   const [setupBusiness, { isLoading: isBusinessLoading }] =
     useSetupBusinessMutation();
   const router = useRouter();
-  const { currentStep, detail } = useAppSelector((store) => store.businessSetup);
+  const { currentStep, detail } = useAppSelector(
+    (store) => store.businessSetup
+  );
   const [businessName, setBusinessName] = useState("");
   const [userName, setUserName] = useState("");
   const [phoneValue, setPhoneValue] = useState<string>();
-  const [defaultCountry, setDefaultCountry] = useState<Country | undefined>("GH");
+  const [defaultCountry, setDefaultCountry] = useState<Country | undefined>(
+    "GH"
+  );
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const dispatch = useAppDispatch();
   const { data, isLoading, isError } = useGetBusinessDetailQuery();
@@ -54,7 +58,9 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
     const isBusinessNameValid = businessName.trim().length > 0;
     const isUserNameValid = userName.trim().length > 0;
     const isPhoneValid = phoneValue && phoneValue.length > 0;
-    setIsButtonDisabled(!(isBusinessNameValid && isUserNameValid && isPhoneValid));
+    setIsButtonDisabled(
+      !(isBusinessNameValid && isUserNameValid && isPhoneValid)
+    );
   };
 
   useEffect(() => {
@@ -70,7 +76,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
       } else {
         if (isLoading) return;
         if (isError) {
-          toast.error("Something went wrong");
+          // toast.error("Something went wrong");
         }
         if (data && Array.isArray(data) && data.length === 0) {
           // No business profile exists, clear fields
