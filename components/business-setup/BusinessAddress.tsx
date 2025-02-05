@@ -1,8 +1,11 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import {
+  useGeocodeQuery,
+  useReverseGeocodeQuery,
+} from "@/store/proxy-apis/proxy-api";
 import Button from "../UI/Button";
+import { toast } from "react-toastify";
 
-// Define types for address components and location
 interface AddressComponent {
   city?: string;
   state?: string;
@@ -27,41 +30,38 @@ const AddressInput = () => {
   const [postalCode, setPostalCode] = useState<string>("");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
-  const [suggestions, setSuggestions] = useState<Location[]>([]); // Use Location[] type here
+  const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [confirmLocation, setConfirmLocation] = useState<boolean>(false);
 
-  const API_KEY = process.env.NEXT_PUBLIC_OPEN_CAGE_API_KEY;
+  const {
+    data: geocodeData,
+    isLoading: isGeocodeLoading,
+    isError: isGeocodeError,
+  } = useGeocodeQuery(address, { skip: address.length < 2 }); // Skip query if address length is less than 3
 
-  // Handle user input and fetch address suggestions from OpenCage
-  const handleAddressChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const {
+    data: reverseGeocodeData,
+    isLoading: isReverseGeocodeLoading,
+    isError: isReverseGeocodeError,
+  } = useReverseGeocodeQuery(
+    { latitude, longitude },
+    { skip: !latitude || !longitude }
+  );
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setAddress(query);
 
     if (query) {
-      try {
-        const response = await axios.get(
-          `https://api.opencagedata.com/geocode/v1/json`,
-          {
-            params: {
-              key: API_KEY,
-              q: query,
-              no_annotations: 1, // Don't include unnecessary annotations
-              limit: 5, // Limit suggestions to 5 results
-            },
-          }
-        );
-        setSuggestions(response.data.results);
-      } catch (error) {
-        console.error("Error fetching address suggestions:", error);
+      setSuggestions([]);
+      if (!isGeocodeLoading && !isGeocodeError && geocodeData) {
+        setSuggestions(geocodeData.results);
       }
     } else {
       setSuggestions([]);
     }
   };
 
-  // Handle selecting an address from the suggestions
   const handleSelectAddress = (selectedAddress: Location) => {
     setAddress(selectedAddress.formatted);
     setCity(selectedAddress.components.city || "");
@@ -70,15 +70,13 @@ const AddressInput = () => {
     setPostalCode(selectedAddress.components.postcode || "");
     setLatitude(selectedAddress.geometry.lat);
     setLongitude(selectedAddress.geometry.lng);
-    setSuggestions([]); // Clear suggestions after selection
+    setSuggestions([]);
   };
 
-  // Handle 'Get Latitude and Longitude' button click using browser's geolocation
   const handleGetLocation = () => {
-    setConfirmLocation(true); // Show the confirmation prompt
+    setConfirmLocation(true);
   };
 
-  // Proceed with fetching the location after the user confirms
   const fetchLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -86,56 +84,43 @@ const AddressInput = () => {
           const { latitude, longitude } = position.coords;
           setLatitude(latitude);
           setLongitude(longitude);
-
-          try {
-            // Reverse geocode the latitude and longitude using OpenCage API
-            const response = await axios.get(
-              `https://api.opencagedata.com/geocode/v1/json`,
-              {
-                params: {
-                  key: API_KEY,
-                  q: `${latitude},${longitude}`,
-                  no_annotations: 1, // Don't include unnecessary annotations
-                },
-              }
-            );
-
-            if (response.data.results.length > 0) {
-              const location = response.data.results[0];
-              setAddress(location.formatted);
-              setCity(location.components.city || "");
-              setState(location.components.state || "");
-              setCountry(location.components.country || "");
-              setPostalCode(location.components.postcode || "");
-            } else {
-              alert("Could not retrieve address for the given coordinates.");
-            }
-          } catch (error) {
-            console.error("Error reverse geocoding:", error);
-            alert("Error fetching address from geolocation.");
-          }
         },
         (error) => {
           console.error("Error getting location:", error);
-          alert(
-            "Unable to retrieve your location. Please ensure location services are enabled."
-          );
+          alert("Unable to retrieve your location.");
         }
       );
     } else {
       alert("Geolocation is not supported by your browser.");
     }
-    setConfirmLocation(false); // Hide the confirmation prompt
+    setConfirmLocation(false);
   };
 
-  // Handle location confirmation
   const handleConfirmLocation = () => {
-    fetchLocation(); // Proceed to fetch the location
+    fetchLocation();
   };
+
+  useEffect(() => {
+    if (reverseGeocodeData && reverseGeocodeData.results.length > 0) {
+      const result = reverseGeocodeData.results[0];
+      setCity(result.components.city || "");
+      setState(result.components.state || "");
+      setCountry(result.components.country || "");
+      setPostalCode(result.components.postcode || "");
+      setAddress(result.formatted || "");
+    }
+  }, [reverseGeocodeData]);
+
+  if (isReverseGeocodeLoading) {
+    return <p>is Loading</p>;
+  }
+
+  if (isReverseGeocodeError) {
+    toast.error("something went wrong");
+  }
 
   return (
     <div className="space-y-4">
-      {/* Address input */}
       <input
         type="text"
         name="address"
@@ -145,7 +130,16 @@ const AddressInput = () => {
         className="w-full px-4 py-2 border border-gray-300 rounded-md"
       />
 
-      {/* Display address suggestions */}
+      {isGeocodeLoading && address && (
+        <div className="mt-2 text-gray-500">Loading address suggestions...</div>
+      )}
+
+      {/* {isGeocodeError && address && (
+        <div className="mt-2 text-red-500">
+          Failed to load address suggestions.
+        </div>
+      )} */}
+
       {suggestions.length > 0 && (
         <div className="mt-2 border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {suggestions.map((suggestion, index) => (
@@ -160,7 +154,6 @@ const AddressInput = () => {
         </div>
       )}
 
-      {/* Editable address fields */}
       <div className="space-y-4 mt-4">
         <input
           type="text"
@@ -196,7 +189,6 @@ const AddressInput = () => {
         />
       </div>
 
-      {/* Latitude and Longitude Display */}
       <div className="space-y-2 mt-4">
         <input
           type="number"
@@ -216,7 +208,6 @@ const AddressInput = () => {
         />
       </div>
 
-      {/* Get Latitude and Longitude Button */}
       <button
         className="w-full bg-blue-500 text-white py-2 px-4 rounded-md mt-4"
         onClick={handleGetLocation}
@@ -228,7 +219,6 @@ const AddressInput = () => {
         continue
       </Button>
 
-      {/* Location confirmation prompt */}
       {confirmLocation && (
         <div className="mt-4 text-center p-4 border border-gray-300 rounded-md shadow-md">
           <p>
