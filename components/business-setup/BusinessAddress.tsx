@@ -5,6 +5,11 @@ import {
 } from "@/store/proxy-apis/proxy-api";
 import Button from "../UI/Button";
 import { toast } from "react-toastify";
+import { useAddBusinessAddressMutation } from "@/store/features/businessApiSetupSlice";
+import Input from "../UI/Input";
+import { useRouter } from "next/navigation";
+import { setCurrentStep } from "@/store/features/businessSetupSlice";
+import { useAppDispatch } from "@/store/hooks";
 
 interface AddressComponent {
   city?: string;
@@ -22,7 +27,7 @@ interface Location {
   };
 }
 
-const AddressInput = () => {
+const BusinessAddress = ({ current_step }: { current_step: number }) => {
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [state, setState] = useState<string>("");
@@ -32,12 +37,29 @@ const AddressInput = () => {
   const [longitude, setLongitude] = useState<number | null>(null);
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [confirmLocation, setConfirmLocation] = useState<boolean>(false);
+  const [addAddress, { isLoading }] = useAddBusinessAddressMutation();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  // Load saved address from localStorage on mount
+  useEffect(() => {
+    const savedAddress = localStorage.getItem("businessAddress");
+    if (savedAddress) {
+      const parsedAddress = JSON.parse(savedAddress);
+      setAddress(parsedAddress.address || "");
+      setCity(parsedAddress.city || "");
+      setState(parsedAddress.state || "");
+      setCountry(parsedAddress.country || "");
+      setPostalCode(parsedAddress.postalCode || "");
+      setLatitude(parsedAddress.latitude || null);
+      setLongitude(parsedAddress.longitude || null);
+    }
+  }, []);
 
   const {
     data: geocodeData,
     isLoading: isGeocodeLoading,
     isError: isGeocodeError,
-  } = useGeocodeQuery(address, { skip: address.length < 2 }); // Skip query if address length is less than 3
+  } = useGeocodeQuery(address, { skip: address.length < 2 });
 
   const {
     data: reverseGeocodeData,
@@ -100,14 +122,60 @@ const AddressInput = () => {
     fetchLocation();
   };
 
+  const handleContinue = () => {
+    if (
+      !address.trim() ||
+      !city.trim() ||
+      !state.trim() ||
+      !country.trim() ||
+      !postalCode.trim()
+    ) {
+      toast.error("Please fill in all the required fields.");
+      return;
+    }
+
+    console.log("Address:", address);
+    console.log("City:", city);
+    console.log("State:", state);
+    console.log("Country:", country);
+    console.log("Postal Code:", postalCode);
+    console.log("Latitude:", latitude);
+    console.log("Longitude:", longitude);
+
+    // Save data in localStorage
+    const businessAddress = {
+      address,
+      city,
+      state,
+      country,
+      postalCode,
+      latitude,
+      longitude,
+    };
+    localStorage.setItem("businessAddress", JSON.stringify(businessAddress));
+
+    addAddress(businessAddress)
+      .unwrap()
+      .then(() => {
+        dispatch(setCurrentStep(current_step + 1));
+        router.push("/business-setup/services");
+      })
+      .catch(() => {
+        toast.error("Please fill in all the required fields.");
+      });
+  };
+
   useEffect(() => {
     if (reverseGeocodeData && reverseGeocodeData.results.length > 0) {
       const result = reverseGeocodeData.results[0];
-      setCity(result.components.city || "");
+      setCity(
+        result.components.city || result.components._normalized_city || ""
+      );
       setState(result.components.state || "");
       setCountry(result.components.country || "");
       setPostalCode(result.components.postcode || "");
       setAddress(result.formatted || "");
+      console.log(result);
     }
   }, [reverseGeocodeData]);
 
@@ -116,12 +184,13 @@ const AddressInput = () => {
   }
 
   if (isReverseGeocodeError) {
-    toast.error("something went wrong");
+    toast.error("Something went wrong.");
   }
 
   return (
     <div className="space-y-4">
-      <input
+      <Input
+        id="text-address"
         type="text"
         name="address"
         placeholder="Start typing your address"
@@ -133,12 +202,6 @@ const AddressInput = () => {
       {isGeocodeLoading && address && (
         <div className="mt-2 text-gray-500">Loading address suggestions...</div>
       )}
-
-      {/* {isGeocodeError && address && (
-        <div className="mt-2 text-red-500">
-          Failed to load address suggestions.
-        </div>
-      )} */}
 
       {suggestions.length > 0 && (
         <div className="mt-2 border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
@@ -155,57 +218,62 @@ const AddressInput = () => {
       )}
 
       <div className="space-y-4 mt-4">
-        <input
+        <Input
+          id="text-city"
           type="text"
           name="city"
           value={city}
           placeholder="City"
           onChange={(e) => setCity(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
         />
-        <input
+
+        <Input
+          id="address-state"
           type="text"
           name="state"
           value={state}
           placeholder="State/Region"
           onChange={(e) => setState(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
         />
-        <input
+        <Input
+          id="address-contry"
           type="text"
           name="country"
           value={country}
           placeholder="Country"
           onChange={(e) => setCountry(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
         />
-        <input
+        <Input
+          id="address-postcode"
           type="text"
           name="postalCode"
           value={postalCode}
           placeholder="Postal Code"
           onChange={(e) => setPostalCode(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
         />
       </div>
 
       <div className="space-y-2 mt-4">
-        <input
-          type="number"
-          name="latitude"
-          value={latitude ?? ""}
-          onChange={(e) => setLatitude(parseFloat(e.target.value))}
-          placeholder="Latitude"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-        />
-        <input
-          type="number"
-          name="longitude"
-          value={longitude ?? ""}
-          onChange={(e) => setLongitude(parseFloat(e.target.value))}
-          placeholder="Longitude"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-        />
+        <div className="mb-4">
+          <Input
+            id="address-latitude"
+            type="number"
+            name="latitude"
+            value={latitude ?? ""}
+            onChange={(e) => setLatitude(parseFloat(e.target.value))}
+            placeholder="Latitude"
+          />
+        </div>
+        <div className="mt-4">
+          <Input
+            id="address-longitude"
+            type="number"
+            name="longitude"
+            value={longitude ?? ""}
+            onChange={(e) => setLongitude(parseFloat(e.target.value))}
+            placeholder="Longitude"
+          />
+        </div>
       </div>
 
       <button
@@ -215,8 +283,8 @@ const AddressInput = () => {
         Get My Address
       </button>
 
-      <Button el="button" primary>
-        continue
+      <Button el="button" loading={isLoading} primary onClick={handleContinue}>
+        Continue
       </Button>
 
       {confirmLocation && (
@@ -240,4 +308,4 @@ const AddressInput = () => {
   );
 };
 
-export default AddressInput;
+export default BusinessAddress;

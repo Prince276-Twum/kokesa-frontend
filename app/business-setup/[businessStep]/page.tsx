@@ -5,6 +5,7 @@ import {
   ServiceLocationOptions,
   StepProgress,
   BusinessAddress,
+  BusinessServices,
 } from "@/components/business-setup/";
 import { setCurrentStep } from "@/store/features/businessSetupSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -39,6 +40,13 @@ const stepContent = [
     subtitle: "Add location for clients to find you",
     path: "/business-setup/address",
   },
+
+  {
+    title: "Service Details",
+    subtitle: "Edit and add the details for this service",
+    path: "/business-setup/services",
+  },
+
   {
     title: "Set Your Working Hours",
     subtitle: "Define your business working hours",
@@ -85,7 +93,6 @@ function Page() {
 
   const { title, subtitle } = stepContent[currentStep - 1] || {};
 
-
   return (
     <main className=" relative md:pt-20">
       <div className="max-w-md mx-auto md:shadow-lg p-6 md:rounded-lg md:p-6">
@@ -109,8 +116,8 @@ function Page() {
           {currentStep === 1 && <SetupDetails />}
           {currentStep === 2 && <BusinessCategory />}
           {currentStep === 3 && <ServiceLocationOptions />}
-          {currentStep === 4 && <BusinessAddress />}
-          {currentStep === 5 && <div>Contact Information</div>}
+          {currentStep === 4 && <BusinessAddress current_step={currentStep} />}
+          {currentStep === 5 && <BusinessServices current_step={currentStep} />}
           <div className="mt-4 flex justify-between">
             <button
               onClick={handlePrevStep}
