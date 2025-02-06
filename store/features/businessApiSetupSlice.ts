@@ -95,6 +95,32 @@ const businessApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    addBusinessAddress: builder.mutation({
+      query: ({
+        address,
+        city,
+        state,
+        country,
+        postalCode,
+        latitude,
+        longitude,
+      }) => {
+        return {
+          url: "/business-address/",
+          method: "POST",
+          body: {
+            street_address: address,
+            city: city,
+            state_or_region: state,
+            country: country,
+            postal_code: postalCode,
+            latitude: latitude,
+            longitude: longitude,
+          },
+        };
+      },
+    }),
   }),
 });
 
@@ -102,4 +128,5 @@ export const {
   useGetBusinessQuery,
   useGetBusinessDetailQuery,
   useSetupBusinessMutation,
+  useAddBusinessAddressMutation,
 } = businessApiSlice;
