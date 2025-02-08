@@ -5,48 +5,49 @@ import {
   ServiceLocationOptions,
   StepProgress,
   BusinessAddress,
-  BusinessServices,
 } from "@/components/business-setup/";
-import { setCurrentStep } from "@/store/features/businessSetupSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { FaArrowLeft } from "react-icons/fa";
+import TravelFeeForm from "@/components/business-setup/TravelFeeForm";
+import { use } from "react";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/store/hooks";
+import { options } from "@/utils/common-varialbles";
 
-const stepContent = [
+interface Props {
+  params: Promise<{ businessStep: string }>;
+}
+
+const stepContentAll = [
   {
     title: "About You & Your Business",
     subtitle: "Tell us about yourself and your business",
     path: "/business-setup/details",
   },
-  // {
-  //   title: "Confirm 6 Digit code",
-  //   subtitle:
-  //     "A 6 digit code was sent to +233 22 12 34 56, enter the code to continue. ",
-  //   path: "/business-setup/location",
-  // },
   {
     title: "What business do you do?",
     subtitle: "Provide your business details",
     path: "/business-setup/category",
   },
-
   {
     title: "Add Service Location",
     subtitle: "Where do you work?",
-    path: "/business-setup/location",
+    path: "/business-setup/location-option",
   },
 
+  {
+    title: "Travel to Client’s Location",
+    subtitle: "Add location for clients to find you",
+    path: "/business-setup/travel-fee",
+  },
   {
     title: "Your Address",
     subtitle: "Add location for clients to find you",
     path: "/business-setup/address",
   },
-
   {
     title: "Service Details",
     subtitle: "Edit and add the details for this service",
     path: "/business-setup/services",
   },
-
   {
     title: "Set Your Working Hours",
     subtitle: "Define your business working hours",
@@ -59,46 +60,98 @@ const stepContent = [
   },
 ];
 
-function Page() {
-  const { currentStep } = useAppSelector((store) => store.businessSetup);
-  const dispatch = useAppDispatch();
+function Page({ params }: Props) {
+  const { businessStep } = use(params);
+  const { currentStep, businessLocationOption } = useAppSelector(
+    (store) => store.businessSetup
+  );
+  const router = useRouter();
+  const currentStepPath = businessStep || "details";
 
-  const handleNextStep = () => {
-    const nextStep = currentStep + 1;
-    // Update step in Redux
-    dispatch(setCurrentStep(nextStep));
+  let progressNumber = -1;
 
-    // Update URL without reload using history API
-    const newPath = stepContent[nextStep - 1]?.path;
-    if (newPath) {
-      window.history.pushState({}, "", newPath);
+  let stepContent = stepContentAll;
+
+  // Filter out the "Travel to Client’s Location" step if the condition is met
+  if (businessLocationOption === options[1].label) {
+    stepContent = stepContent.filter(
+      (step) => step.title !== "Travel to Client’s Location"
+    );
+  }
+
+  switch (currentStepPath) {
+    case "details":
+      progressNumber = -1;
+      break;
+    case "category":
+      progressNumber = 0.5;
+      break;
+    case "location-option":
+      progressNumber = 1;
+      break;
+    case "address":
+      progressNumber = 1.5;
+      break;
+    case "travel-fee":
+      progressNumber = 1.5;
+      break;
+
+    case "services":
+      progressNumber = 2;
+      break;
+    case "hours":
+      progressNumber = 2.5;
+      break;
+    case "contact":
+      progressNumber = 3;
+      break;
+  }
+  const renderStepContent = () => {
+    switch (currentStepPath) {
+      case "details":
+        return <SetupDetails />;
+      case "category":
+        return <BusinessCategory />;
+      case "location-option":
+        return <ServiceLocationOptions />;
+      case "address":
+        return <BusinessAddress current_step={currentStep} />;
+      case "services":
+        return 2;
+      case "hours":
+        return 2;
+      case "contact":
+        return 2;
+      case "travel-fee":
+        return <TravelFeeForm />;
+      default:
+        return <SetupDetails />;
     }
   };
 
   const handlePrevStep = () => {
-    const prevStep = currentStep - 1;
-    if (currentStep == 1) {
-      return;
-    } else {
-      // Update step in Redux
-      dispatch(setCurrentStep(prevStep));
-    }
-
-    // Update URL without reload using history API
-    const newPath = stepContent[prevStep - 1]?.path;
-    if (newPath) {
-      window.history.pushState({}, "", newPath);
+    const prevStep =
+      stepContent.findIndex(
+        (item) => item.path === `/business-setup/${currentStepPath}`
+      ) - 1;
+    if (prevStep >= 0) {
+      const newPath = stepContent[prevStep]?.path;
+      router.push(newPath);
     }
   };
 
-  const { title, subtitle } = stepContent[currentStep - 1] || {};
+  const currentStepDetails = stepContent.find(
+    (item) => item.path === `/business-setup/${currentStepPath}`
+  );
 
+  const title = currentStepDetails?.title || "";
+  const subtitle = currentStepDetails?.subtitle || "";
   return (
-    <main className=" relative md:pt-20">
+    <main className="relative md:pt-20">
       <div className="max-w-md mx-auto md:shadow-lg p-6 md:rounded-lg md:p-6">
         <div>
           <StepProgress
-            currentStep={currentStep == 2 ? 0.5 : currentStep - 2}
+            currentStep={progressNumber}
             steps={[
               "Business Info",
               "Location",
@@ -113,26 +166,7 @@ function Page() {
             subtitle={subtitle}
             onBack={handlePrevStep}
           />
-          {currentStep === 1 && <SetupDetails />}
-          {currentStep === 2 && <BusinessCategory />}
-          {currentStep === 3 && <ServiceLocationOptions />}
-          {currentStep === 4 && <BusinessAddress current_step={currentStep} />}
-          {currentStep === 5 && <BusinessServices current_step={currentStep} />}
-          <div className="mt-4 flex justify-between">
-            <button
-              onClick={handlePrevStep}
-              disabled={currentStep === 1}
-              className="flex items-center gap-2"
-            >
-              <FaArrowLeft /> Back
-            </button>
-            <button
-              onClick={handleNextStep}
-              disabled={currentStep === stepContent.length}
-            >
-              Next
-            </button>
-          </div>
+          {renderStepContent()}
         </div>
       </div>
     </main>

@@ -40,7 +40,9 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   );
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const dispatch = useAppDispatch();
-  const { data, isLoading, isError } = useGetBusinessDetailQuery();
+  const { data, isLoading, isError } = useGetBusinessDetailQuery(undefined, {
+    skip: currentStep == 1,
+  });
 
   useEffect(() => {
     const fetchCountryCode = async () => {
@@ -68,26 +70,24 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   }, [businessName, userName, phoneValue]);
 
   useEffect(() => {
-    if (currentStep === 1) {
-      if (detail.businessName && detail.userName && detail.phoneNumber) {
-        setBusinessName(detail.businessName);
-        setUserName(detail.userName);
-        setPhoneValue(detail.phoneNumber);
-      } else {
-        if (isLoading) return;
-        if (isError) {
-          // toast.error("Something went wrong");
-        }
-        if (data && Array.isArray(data) && data.length === 0) {
-          // No business profile exists, clear fields
-          setBusinessName("");
-          setUserName("");
-          setPhoneValue("");
-        } else if (data) {
-          setBusinessName(data?.business_name);
-          setUserName(data?.user_name);
-          setPhoneValue(data?.phone_number);
-        }
+    if (detail.businessName && detail.userName && detail.phoneNumber) {
+      setBusinessName(detail.businessName);
+      setUserName(detail.userName);
+      setPhoneValue(detail.phoneNumber);
+    } else {
+      if (isLoading) return;
+      if (isError) {
+        // toast.error("Something went wrong");
+      }
+      if (data && Array.isArray(data) && data.length === 0) {
+        // No business profile exists, clear fields
+        setBusinessName("");
+        setUserName("");
+        setPhoneValue("");
+      } else if (data) {
+        setBusinessName(data?.business_name);
+        setUserName(data?.user_name);
+        setPhoneValue(data?.phone_number);
       }
     }
   }, [currentStep, isLoading, isError, data, detail]);
