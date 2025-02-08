@@ -3,6 +3,7 @@ import { AiOutlineExclamationCircle } from "react-icons/ai";
 import Button from "../UI/Button";
 import { useSetupBusinessMutation } from "@/store/features/businessApiSetupSlice";
 import { useRouter } from "next/navigation";
+import { options } from "@/utils/common-varialbles";
 import {
   setBusinsessLocationOption,
   setCurrentStep,
@@ -17,17 +18,6 @@ const ServiceLocationOptions = () => {
     (store) => store.businessSetup
   );
   const router = useRouter();
-  const options = [
-    {
-      label: "At Your Place",
-      description: "Service provider travels to your home",
-    },
-    {
-      label: "At Business Location",
-      description: "You visit the service provider's location",
-    },
-    { label: "Both", description: "You can choose either option" },
-  ];
 
   useEffect(() => {
     console.log("use");
@@ -43,7 +33,15 @@ const ServiceLocationOptions = () => {
         .then(() => {
           dispatch(setBusinsessLocationOption(selectedOption));
           dispatch(setCurrentStep(4));
-          router.push("/business-setup/address");
+          if (
+            selectedOption == options[0].label ||
+            selectedOption == options[2].label
+          ) {
+            console.log("wwww");
+            router.push("/business-setup/travel-fee");
+          } else {
+            router.push("/business-setup/address");
+          }
         });
     }
   };

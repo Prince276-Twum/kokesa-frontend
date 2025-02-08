@@ -48,7 +48,7 @@ const BusinessCategory = () => {
       .unwrap()
       .then(() => {
         dispatch(setCurrentStep(3));
-        redirect("/business-setup/location-place");
+        redirect("/business-setup/location-option");
       });
   };
 
