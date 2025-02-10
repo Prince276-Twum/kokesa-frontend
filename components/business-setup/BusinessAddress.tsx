@@ -71,7 +71,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     isError: isReverseGeocodeError,
   } = useReverseGeocodeQuery(
     { latitude, longitude },
-    { skip: !longitude || !latitude || !useReverseGeocode }
+    { skip: !longitude || !latitude }
   );
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +184,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       setCountry(result.components.country || "");
       setPostalCode(result.components.postcode || "");
       setAddress(result.formatted || "");
-      setUseReverseGeocode(false);
     }
   }, [reverseGeocodeData, useReverseGeocode]);
 
