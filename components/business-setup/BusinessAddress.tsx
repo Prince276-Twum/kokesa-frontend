@@ -44,6 +44,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   const [useReverseGeocode, setUseReverseGeocode] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
+
   // Load saved address from localStorage on mount
   useEffect(() => {
     const savedAddress = localStorage.getItem("businessAddress");
@@ -117,8 +118,14 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           setLatitude(latitude);
           setLongitude(longitude);
         },
-        () => {
-          alert("Unable to retrieve your location.");
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            alert(
+              "Location access denied. Please enable it in your browser settings."
+            );
+          } else {
+            alert("Unable to retrieve your location.");
+          }
         }
       );
     } else {
@@ -184,15 +191,23 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       setCountry(result.components.country || "");
       setPostalCode(result.components.postcode || "");
       setAddress(result.formatted || "");
+      console.log("am inside reverse geocode", result);
     }
   }, [reverseGeocodeData, useReverseGeocode]);
 
+  useEffect(() => {
+    console.log("Latitude:", latitude, "Longitude:", longitude);
+  }, [latitude, longitude]);
+
+  const shouldFetch = Boolean(latitude && longitude && useReverseGeocode);
+  console.log("Fetching reverse geocode:", shouldFetch, latitude, longitude);
+
   if (isReverseGeocodeLoading) {
-    return <p>is Loading</p>;
+    return <p>Loading...</p>;
   }
 
   if (isReverseGeocodeError && useReverseGeocode) {
-    toast.error("Something went wrong.11");
+    toast.error("Something went wrong.");
   }
 
   return (
