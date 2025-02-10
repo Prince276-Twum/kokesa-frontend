@@ -16,6 +16,9 @@ interface AddressComponent {
   state?: string;
   country?: string;
   postcode?: string;
+  town?: string;
+  village?: string;
+  _normalized_city?: string;
 }
 
 interface Location {
@@ -38,6 +41,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [confirmLocation, setConfirmLocation] = useState<boolean>(false);
   const [addAddress, { isLoading }] = useAddBusinessAddressMutation();
+  const [useReverseGeocode, setUseReverseGeocode] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   // Load saved address from localStorage on mount
@@ -67,8 +71,10 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     isError: isReverseGeocodeError,
   } = useReverseGeocodeQuery(
     { latitude, longitude },
-    { skip: !latitude || !longitude }
+    { skip: !useReverseGeocode }
   );
+
+  console.log(useReverseGeocode);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -86,13 +92,20 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
 
   const handleSelectAddress = (selectedAddress: Location) => {
     setAddress(selectedAddress.formatted);
-    setCity(selectedAddress.components.city || "");
+    setCity(
+      selectedAddress.components.city ||
+        selectedAddress.components.town ||
+        selectedAddress.components.village ||
+        selectedAddress.components._normalized_city ||
+        ""
+    );
     setState(selectedAddress.components.state || "");
     setCountry(selectedAddress.components.country || "");
     setPostalCode(selectedAddress.components.postcode || "");
     setLatitude(selectedAddress.geometry.lat);
     setLongitude(selectedAddress.geometry.lng);
     setSuggestions([]);
+    console.log(selectedAddress);
   };
 
   const handleGetLocation = () => {
@@ -107,14 +120,14 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           setLatitude(latitude);
           setLongitude(longitude);
         },
-        (error) => {
-          console.error("Error getting location:", error);
+        () => {
           alert("Unable to retrieve your location.");
         }
       );
     } else {
       alert("Geolocation is not supported by your browser.");
     }
+    setUseReverseGeocode(true);
     setConfirmLocation(false);
   };
 
@@ -133,14 +146,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       toast.error("Please fill in all the required fields.");
       return;
     }
-
-    console.log("Address:", address);
-    console.log("City:", city);
-    console.log("State:", state);
-    console.log("Country:", country);
-    console.log("Postal Code:", postalCode);
-    console.log("Latitude:", latitude);
-    console.log("Longitude:", longitude);
 
     // Save data in localStorage
     const businessAddress = {
@@ -166,24 +171,31 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   };
 
   useEffect(() => {
-    if (reverseGeocodeData && reverseGeocodeData.results.length > 0) {
+    if (
+      reverseGeocodeData &&
+      reverseGeocodeData.results.length > 0 &&
+      useReverseGeocode
+    ) {
       const result = reverseGeocodeData.results[0];
       setCity(
-        result.components.city || result.components._normalized_city || ""
+        result.components.city ||
+          result.components.town ||
+          result.components._normalized_city ||
+          ""
       );
       setState(result.components.state || "");
       setCountry(result.components.country || "");
       setPostalCode(result.components.postcode || "");
       setAddress(result.formatted || "");
-      console.log(result);
     }
-  }, [reverseGeocodeData]);
+    setUseReverseGeocode(false);
+  }, [reverseGeocodeData, useReverseGeocode]);
 
   if (isReverseGeocodeLoading) {
     return <p>is Loading</p>;
   }
 
-  if (isReverseGeocodeError) {
+  if (isReverseGeocodeError && useReverseGeocode) {
     toast.error("Something went wrong.");
   }
 
@@ -223,7 +235,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           type="text"
           name="city"
           value={city}
-          placeholder="City"
+          placeholder="Town/City"
           onChange={(e) => setCity(e.target.value)}
         />
 
