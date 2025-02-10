@@ -117,16 +117,14 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           const { latitude, longitude } = position.coords;
           setLatitude(latitude);
           setLongitude(longitude);
+
+          console.log("Latitude:", latitude, "Longitude:", longitude);
         },
         (error) => {
-          if (error.code === error.PERMISSION_DENIED) {
-            alert(
-              "Location access denied. Please enable it in your browser settings."
-            );
-          } else {
-            alert("Unable to retrieve your location.");
-          }
-        }
+          console.error("Geolocation error:", error);
+          alert("Unable to retrieve your location.");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       alert("Geolocation is not supported by your browser.");
@@ -203,6 +201,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   console.log("Fetching reverse geocode:", shouldFetch, latitude, longitude);
 
   if (isReverseGeocodeLoading) {
+    console.log("Loading reverse geocode...");
     return <p>Loading...</p>;
   }
 
