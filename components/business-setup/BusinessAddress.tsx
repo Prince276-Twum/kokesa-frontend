@@ -71,10 +71,8 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     isError: isReverseGeocodeError,
   } = useReverseGeocodeQuery(
     { latitude, longitude },
-    { skip: !useReverseGeocode }
+    { skip: !longitude || !latitude || !useReverseGeocode }
   );
-
-  console.log(useReverseGeocode);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -105,7 +103,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     setLatitude(selectedAddress.geometry.lat);
     setLongitude(selectedAddress.geometry.lng);
     setSuggestions([]);
-    console.log(selectedAddress);
   };
 
   const handleGetLocation = () => {
@@ -127,11 +124,11 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     } else {
       alert("Geolocation is not supported by your browser.");
     }
-    setUseReverseGeocode(true);
     setConfirmLocation(false);
   };
 
   const handleConfirmLocation = () => {
+    setUseReverseGeocode(true);
     fetchLocation();
   };
 
@@ -187,8 +184,8 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       setCountry(result.components.country || "");
       setPostalCode(result.components.postcode || "");
       setAddress(result.formatted || "");
+      setUseReverseGeocode(false);
     }
-    setUseReverseGeocode(false);
   }, [reverseGeocodeData, useReverseGeocode]);
 
   if (isReverseGeocodeLoading) {
@@ -196,7 +193,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   }
 
   if (isReverseGeocodeError && useReverseGeocode) {
-    toast.error("Something went wrong.");
+    toast.error("Something went wrong.11");
   }
 
   return (
@@ -310,7 +307,9 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           </Button>
           <button
             className="bg-red-500 text-white py-2 px-4 rounded-md mt-2"
-            onClick={() => setConfirmLocation(false)}
+            onClick={() => {
+              setConfirmLocation(false);
+            }}
           >
             No, Cancel
           </button>
