@@ -7,6 +7,7 @@ export interface BusinessResponse {
   is_business_complete: boolean;
   current_step: number;
   created_at: string;
+  service_location: string;
 }
 
 interface BusinessDetailResponse {
@@ -121,6 +122,20 @@ const businessApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    addTravelInfo: builder.mutation({
+      query: ({distance, travelFee})=> {
+        return {
+          url: "/business-travel/",
+          method: "POST",
+          body: {
+            travel_distance: distance,
+            travel_fee: travelFee
+
+          }
+        }
+      }
+    })
   }),
 });
 
@@ -129,4 +144,5 @@ export const {
   useGetBusinessDetailQuery,
   useSetupBusinessMutation,
   useAddBusinessAddressMutation,
+  useAddTravelInfoMutation
 } = businessApiSlice;

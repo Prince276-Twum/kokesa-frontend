@@ -9,7 +9,8 @@ import { useAddBusinessAddressMutation } from "@/store/features/businessApiSetup
 import Input from "../UI/Input";
 import { useRouter } from "next/navigation";
 import { setCurrentStep } from "@/store/features/businessSetupSlice";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { LocationOptions } from "@/utils/common-varialbles";
 
 interface AddressComponent {
   city?: string;
@@ -44,6 +45,9 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   const [useReverseGeocode, setUseReverseGeocode] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { businessLocationOption } = useAppSelector(
+    (store) => store.businessSetup
+  );
 
   // Load saved address from localStorage on mount
   useEffect(() => {
@@ -117,8 +121,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           const { latitude, longitude } = position.coords;
           setLatitude(latitude);
           setLongitude(longitude);
-
-          console.log("Latitude:", latitude, "Longitude:", longitude);
         },
         (error) => {
           console.error("Geolocation error:", error);
@@ -165,7 +167,15 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       .unwrap()
       .then(() => {
         dispatch(setCurrentStep(current_step + 1));
-        router.push("/business-setup/services");
+
+        if (
+          businessLocationOption == LocationOptions[0].label ||
+          businessLocationOption == LocationOptions[2].label
+        ) {
+          router.push("travel-fee");
+        } else {
+          router.push("services");
+        }
       })
       .catch(() => {
         toast.error("Please fill in all the required fields.");
@@ -189,19 +199,10 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       setCountry(result.components.country || "");
       setPostalCode(result.components.postcode || "");
       setAddress(result.formatted || "");
-      console.log("am inside reverse geocode", result);
     }
   }, [reverseGeocodeData, useReverseGeocode]);
 
-  useEffect(() => {
-    console.log("Latitude:", latitude, "Longitude:", longitude);
-  }, [latitude, longitude]);
-
-  const shouldFetch = Boolean(latitude && longitude && useReverseGeocode);
-  console.log("Fetching reverse geocode:", shouldFetch, latitude, longitude);
-
   if (isReverseGeocodeLoading) {
-    console.log("Loading reverse geocode...");
     return <p>Loading...</p>;
   }
 

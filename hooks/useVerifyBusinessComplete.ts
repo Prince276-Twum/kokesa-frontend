@@ -3,6 +3,7 @@ import {
   setCurrentStep,
   setBusinessComplete,
   setFinishBusinessLoading,
+  setBusinsessLocationOption,
 } from "@/store/features/businessSetupSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect } from "react";
@@ -30,6 +31,8 @@ function useVerifyBusinessComplete() {
         dispatch(setBusinessComplete(false));
         dispatch(setCurrentStep(data.current_step));
       }
+
+      dispatch(setBusinsessLocationOption(data.service_location));
     }
 
     if (isError) {
