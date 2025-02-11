@@ -1,29 +1,73 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { NumericFormat } from "react-number-format";
 import Input from "../UI/Input";
 import Button from "../UI/Button";
-import { useAppDispatch } from "@/store/hooks"; // Import the Redux hook
-import { setCurrentStep } from "@/store/features/businessSetupSlice"; // Import the action
+import { useAppSelector } from "@/store/hooks"; // Import Redux hooks
+import { useAddTravelInfoMutation } from "@/store/features/businessApiSetupSlice";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import countries from "world-countries";
+import currencySymbolMap from "currency-symbol-map";
 
 export default function TravelFeeForm() {
   const [travelOption, setTravelOption] = useState("free");
   const [fixedPrice, setFixedPrice] = useState("");
   const [distance, setDistance] = useState("");
-  const dispatch = useAppDispatch();
+  const [currencySymbol, setCurrencySymbol] = useState("$"); // Default currency symbol
+  const [countryCode, setCountryCode] = useState<string | undefined>(); // State for country code
+  const [addTravel] = useAddTravelInfoMutation();
+
+  const { businessLocationOption } = useAppSelector(
+    (store) => store.businessSetup
+  );
+  const router = useRouter();
+
+  // Function to get currency symbol and country code
+  const getCountryInfo = (countryName: string) => {
+    const country = countries.find((c) => c.name.common === countryName);
+
+    if (!country) return { currencySymbol: "$", code: undefined };
+
+    const currencyCode = Object.keys(country.currencies)[0]; // Get currency code
+    return {
+      currencySymbol: currencySymbolMap(currencyCode) || "$", // Get symbol
+      code: country.cca2, // Get country code (e.g., "US", "GH", "NG")
+    };
+  };
+
+  useEffect(() => {
+    const savedAddress = localStorage.getItem("businessAddress");
+    if (savedAddress) {
+      const parsedAddress = JSON.parse(savedAddress);
+
+      const { currencySymbol, code } = getCountryInfo(parsedAddress.country);
+      setCurrencySymbol(currencySymbol);
+      setCountryCode(code); // Set country code
+    }
+  }, []);
 
   const handleContinue = () => {
-    // Update the Redux state to move to the address form
-    dispatch(setCurrentStep(5)); // Set the next step (address form)
+    if ((travelOption !== "free" && !fixedPrice) || !distance) {
+      toast.error("All fields are required");
+      return;
+    }
 
-    // You could also set additional data like travelOption, distance, and fixedPrice in the Redux store, if needed
-    // Example:
-    // dispatch(setTravelFeeDetails({ travelOption, distance, fixedPrice }));
+    const travelFee = travelOption === "free" ? 0 : fixedPrice;
 
-    // Update the URL using history.pushState without reloading
-    window.history.pushState({}, "", "/business-setup/address");
+    addTravel({ distance, travelFee, countryCode }) // Include countryCode in API request
+      .unwrap()
+      .then(() => {
+        if (businessLocationOption === "address") {
+          router.push("address");
+        } else {
+          router.push("services");
+        }
+      })
+      .catch(() => {});
   };
 
   return (
-    <div className="">
+    <div>
       <div className="p-4 border rounded-lg space-y-6 mb-8">
         <label className="block">How many kilometers can you travel?</label>
         <Input
@@ -69,14 +113,16 @@ export default function TravelFeeForm() {
 
         {travelOption === "fixed" && (
           <div>
-            <label className="block mb-6">Enter Fixed Price</label>
-            <Input
-              id="travel-fee"
-              type="number"
-              placeholder="Enter price"
+            <label className="block mb-1">Enter Fixed Price</label>
+            {/* Numeric format with dynamic currency symbol */}
+            <NumericFormat
+              id="travel-fixed-fee"
               value={fixedPrice}
-              onChange={(e) => setFixedPrice(e.target.value)}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onValueChange={(values) => setFixedPrice(values.value)}
+              thousandSeparator={true}
+              prefix={`${currencySymbol}  `}
+              customInput={Input}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
             />
           </div>
         )}
@@ -86,7 +132,7 @@ export default function TravelFeeForm() {
         el="button"
         primary
         className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-        onClick={handleContinue} // Call the handleContinue function
+        onClick={handleContinue}
       >
         Continue
       </Button>

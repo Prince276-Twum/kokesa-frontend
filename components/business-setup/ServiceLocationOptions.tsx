@@ -1,30 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import Button from "../UI/Button";
 import { useSetupBusinessMutation } from "@/store/features/businessApiSetupSlice";
 import { useRouter } from "next/navigation";
-import { options } from "@/utils/common-varialbles";
+import { LocationOptions } from "@/utils/common-varialbles";
 import {
   setBusinsessLocationOption,
   setCurrentStep,
 } from "@/store/features/businessSetupSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks";
 
 const ServiceLocationOptions = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [setupBusiness, { isLoading }] = useSetupBusinessMutation();
   const dispatch = useAppDispatch();
-  const { businessLocationOption } = useAppSelector(
-    (store) => store.businessSetup
-  );
-  const router = useRouter();
 
-  useEffect(() => {
-    console.log("use");
-    if (businessLocationOption) {
-      setSelectedOption(businessLocationOption);
-    }
-  }, [businessLocationOption]);
+  const router = useRouter();
 
   const handleContinue = () => {
     if (selectedOption) {
@@ -33,15 +24,7 @@ const ServiceLocationOptions = () => {
         .then(() => {
           dispatch(setBusinsessLocationOption(selectedOption));
           dispatch(setCurrentStep(4));
-          if (
-            selectedOption == options[0].label ||
-            selectedOption == options[2].label
-          ) {
-            console.log("wwww");
-            router.push("/business-setup/travel-fee");
-          } else {
-            router.push("/business-setup/address");
-          }
+          router.push("address");
         });
     }
   };
@@ -49,7 +32,7 @@ const ServiceLocationOptions = () => {
   return (
     <div>
       <div className="flex flex-col gap-4">
-        {options.map((option, index) => (
+        {LocationOptions.map((option, index) => (
           <div key={index}>
             <button
               className={`border text-left rounded-md   p-4 w-full ${
