@@ -10,7 +10,7 @@ import TravelFeeForm from "@/components/business-setup/TravelFeeForm";
 import { use } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
-import { options } from "@/utils/common-varialbles";
+import { LocationOptions } from "@/utils/common-varialbles";
 
 interface Props {
   params: Promise<{ businessStep: string }>;
@@ -34,14 +34,14 @@ const stepContentAll = [
   },
 
   {
-    title: "Travel to Client’s Location",
-    subtitle: "Add location for clients to find you",
-    path: "/business-setup/travel-fee",
-  },
-  {
     title: "Your Address",
     subtitle: "Add location for clients to find you",
     path: "/business-setup/address",
+  },
+  {
+    title: "Travel to Client’s Location",
+    subtitle: "Add location for clients to find you",
+    path: "/business-setup/travel-fee",
   },
   {
     title: "Service Details",
@@ -72,11 +72,10 @@ function Page({ params }: Props) {
 
   let stepContent = stepContentAll;
 
-  // Filter out the "Travel to Client’s Location" step if the condition is met
-  if (businessLocationOption === options[1].label) {
-    stepContent = stepContent.filter(
-      (step) => step.title !== "Travel to Client’s Location"
-    );
+  if (businessLocationOption == LocationOptions[1].label) {
+    stepContent = stepContent.filter((step) => {
+      return step.title !== "Travel to Client’s Location";
+    });
   }
 
   switch (currentStepPath) {
