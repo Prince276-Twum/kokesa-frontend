@@ -62,6 +62,15 @@ const authApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    refresh: builder.mutation({
+      query: () => {
+        return {
+          url: "/jwt/refresh/",
+          method: "POST",
+        };
+      },
+    }),
+
     verify: builder.mutation({
       query: () => {
         return {
@@ -79,4 +88,5 @@ export const {
   useLoginMutation,
   useGoogleAuthMutation,
   useVerifyMutation,
+  useRefreshMutation,
 } = authApiSlice;
