@@ -12,24 +12,33 @@ function useVerify() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    verify(undefined)
-      .unwrap()
-      .then(() => {
-        dispatch(setAuth());
-      })
-      .catch(() => {
-        refresh(undefined)
-          .unwrap()
-          .then(() => {
-            dispatch(setAuth());
-          })
-          .catch(() => {
-            dispatch(logout());
-          });
-      })
-      .finally(() => {
-        dispatch(finishInitialLoad());
-      });
+    const checkAuth = async () => {
+      try {
+        console.log("Running verification...");
+        // Step 1: Attempt to verify the token
+        await verify(undefined).unwrap();
+        dispatch(setAuth()); // Token is valid
+      } catch (verifyError) {
+        console.log("Verify failed, trying refresh...");
+        try {
+          // Step 2: If verify fails, attempt to refresh the token
+          const refreshResponse = await refresh(undefined).unwrap();
+          if (refreshResponse) {
+            console.log("is in");
+            dispatch(setAuth()); // Token refreshed successfully
+            // Step 3: Re-run verify after refreshing
+          }
+        } catch (refreshError) {
+          console.log("Refresh failed, logging out...");
+          // Step 4: If both verify and refresh fail, log out the user
+          dispatch(logout());
+        }
+      } finally {
+        dispatch(finishInitialLoad()); // Mark the initial load as finished
+      }
+    };
+
+    checkAuth();
   }, [dispatch, verify, refresh]);
 
   return null;

@@ -13,6 +13,7 @@ function RequireAuth({ children }: Props) {
     return <>spinner</>;
   }
 
+  console.log(isAuthenticated);
   if (!isAuthenticated) {
     redirect("/auth/login");
   }

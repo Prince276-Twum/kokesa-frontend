@@ -174,7 +174,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
         ) {
           router.push("travel-fee");
         } else {
-          router.push("services");
+          router.push("team-size");
         }
       })
       .catch(() => {
