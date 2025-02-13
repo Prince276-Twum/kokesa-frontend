@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import Input from "../UI/Input";
 import Button from "../UI/Button";
-import { useAppSelector } from "@/store/hooks"; // Import Redux hooks
 import { useAddTravelInfoMutation } from "@/store/features/businessApiSetupSlice";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -17,9 +16,6 @@ export default function TravelFeeForm() {
   const [countryCode, setCountryCode] = useState<string | undefined>(); // State for country code
   const [addTravel] = useAddTravelInfoMutation();
 
-  const { businessLocationOption } = useAppSelector(
-    (store) => store.businessSetup
-  );
   const router = useRouter();
 
   // Function to get currency symbol and country code
@@ -57,11 +53,7 @@ export default function TravelFeeForm() {
     addTravel({ distance, travelFee, countryCode }) // Include countryCode in API request
       .unwrap()
       .then(() => {
-        if (businessLocationOption === "address") {
-          router.push("address");
-        } else {
-          router.push("services");
-        }
+        router.push("team-size");
       })
       .catch(() => {});
   };

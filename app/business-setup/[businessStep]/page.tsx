@@ -5,12 +5,14 @@ import {
   ServiceLocationOptions,
   StepProgress,
   BusinessAddress,
+  BusinessServices,
 } from "@/components/business-setup/";
 import TravelFeeForm from "@/components/business-setup/TravelFeeForm";
 import { use } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import { LocationOptions } from "@/utils/common-varialbles";
+import TeamSize from "@/components/business-setup/TeamSize";
 
 interface Props {
   params: Promise<{ businessStep: string }>;
@@ -43,10 +45,22 @@ const stepContentAll = [
     subtitle: "Add location for clients to find you",
     path: "/business-setup/travel-fee",
   },
+
+  {
+    title: "What’s your team size?",
+    subtitle: "Select the number of team/s available",
+    path: "/business-setup/team-size",
+  },
   {
     title: "Service Details",
     subtitle: "Edit and add the details for this service",
     path: "/business-setup/services",
+  },
+
+  {
+    title: "Service Details",
+    subtitle: "Edit and add the details for this service",
+    path: "/business-setup/add-service",
   },
   {
     title: "Set Your Working Hours",
@@ -94,15 +108,19 @@ function Page({ params }: Props) {
     case "travel-fee":
       progressNumber = 1.5;
       break;
-
-    case "services":
+    case "team-size":
       progressNumber = 2;
-      break;
-    case "hours":
+    case "services":
       progressNumber = 2.5;
       break;
-    case "contact":
+    case "add-service":
+      progressNumber = 2.5;
+      break;
+    case "hours":
       progressNumber = 3;
+      break;
+    case "contact":
+      progressNumber = 3.5;
       break;
   }
   const renderStepContent = () => {
@@ -115,8 +133,12 @@ function Page({ params }: Props) {
         return <ServiceLocationOptions />;
       case "address":
         return <BusinessAddress current_step={currentStep} />;
+      case "team-size":
+        return <TeamSize />;
       case "services":
-        return 2;
+        return <BusinessServices />;
+      case "add-service":
+        return <BusinessServices addService={businessStep} />;
       case "hours":
         return 2;
       case "contact":
