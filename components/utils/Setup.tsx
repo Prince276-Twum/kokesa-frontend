@@ -4,7 +4,6 @@ import React from "react";
 
 function Setup() {
   useVerify();
-  console.log("why are you");
   return <></>;
 }
 
