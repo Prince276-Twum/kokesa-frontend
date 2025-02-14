@@ -8,6 +8,8 @@ export interface BusinessResponse {
   current_step: number;
   created_at: string;
   service_location: string;
+  user_name: string;
+  phone_number: string;
 }
 
 interface BusinessDetailResponse {
@@ -38,9 +40,9 @@ type SetupBusinessRequestBody =
 
 const businessApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getBusiness: builder.query<BusinessResponse, void>({
+    retrieveBusiness: builder.query<BusinessResponse[], void>({
       query: () => ({
-        url: "/business/me",
+        url: "/business/",
         method: "GET",
       }),
     }),
@@ -90,7 +92,7 @@ const businessApiSlice = apiSlice.injectEndpoints({
         }
 
         return {
-          url: "/business/setup_detail/",
+          url: "/business/",
           method: "POST",
           body: body,
         };
@@ -124,25 +126,23 @@ const businessApiSlice = apiSlice.injectEndpoints({
     }),
 
     addTravelInfo: builder.mutation({
-      query: ({distance, travelFee})=> {
+      query: ({ distance, travelFee }) => {
         return {
           url: "/business-travel/",
           method: "POST",
           body: {
             travel_distance: distance,
-            travel_fee: travelFee
-
-          }
-        }
-      }
-    })
+            travel_fee: travelFee,
+          },
+        };
+      },
+    }),
   }),
 });
 
 export const {
-  useGetBusinessQuery,
-  useGetBusinessDetailQuery,
+  useRetrieveBusinessQuery,
   useSetupBusinessMutation,
   useAddBusinessAddressMutation,
-  useAddTravelInfoMutation
+  useAddTravelInfoMutation,
 } = businessApiSlice;
