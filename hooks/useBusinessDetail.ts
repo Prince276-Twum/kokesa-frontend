@@ -1,5 +1,5 @@
 import {
-  useGetBusinessDetailQuery,
+  useRetrieveBusinessQuery,
   useSetupBusinessMutation,
 } from "@/store/features/businessApiSetupSlice";
 import {
@@ -40,7 +40,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   );
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const dispatch = useAppDispatch();
-  const { data, isLoading, isError } = useGetBusinessDetailQuery(undefined, {
+  const { data, isLoading, isError } = useRetrieveBusinessQuery(undefined, {
     skip: currentStep == 1,
   });
 
@@ -85,9 +85,10 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
         setUserName("");
         setPhoneValue("");
       } else if (data) {
-        setBusinessName(data?.business_name);
-        setUserName(data?.user_name);
-        setPhoneValue(data?.phone_number);
+        const businessData = data[0];
+        setBusinessName(businessData?.business_name);
+        setUserName(businessData?.user_name);
+        setPhoneValue(businessData?.phone_number);
       }
     }
   }, [currentStep, isLoading, isError, data, detail]);
