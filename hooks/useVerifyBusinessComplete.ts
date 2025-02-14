@@ -24,7 +24,8 @@ function useVerifyBusinessComplete() {
   useEffect(() => {
     if (isLoading) return;
 
-    if (data) {
+    if (data && data.length > 0) {
+      console.log(data);
       const businessData = data[0];
       if (businessData.is_business_complete) {
         dispatch(setBusinessComplete(true));
@@ -34,9 +35,12 @@ function useVerifyBusinessComplete() {
       }
 
       dispatch(setBusinsessLocationOption(businessData.service_location));
+    } else {
+      dispatch(setBusinessComplete(false));
     }
 
     if (isError) {
+      console.log(error);
       if (
         error?.data?.detail === "No BusinessProfile matches the given query."
       ) {
