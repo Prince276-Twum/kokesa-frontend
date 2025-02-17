@@ -6,12 +6,20 @@ interface BusinessDetail {
   phoneNumber: string | undefined;
 }
 
+interface Service {
+  name: string;
+  type: { value: string; label: string } | null; // Allow null for clearing
+  groupLabel: string;
+  duration: { hours: number; minutes: number }; // Service duration
+  price: number;
+}
 interface initialStateType {
   isSetupComplete: boolean;
   currentStep: number;
   isLoading: boolean;
   detail: BusinessDetail;
   businessLocationOption: string;
+  services: { editingIndex: null | number; service: Service[] };
 }
 
 const initialState: initialStateType = {
@@ -20,6 +28,7 @@ const initialState: initialStateType = {
   isLoading: true,
   businessLocationOption: "",
   detail: { businessName: "", userName: "", phoneNumber: "" },
+  services: { editingIndex: null, service: [] },
 };
 
 const businessSetupSlice = createSlice({
@@ -45,11 +54,26 @@ const businessSetupSlice = createSlice({
     setBusinsessLocationOption(state, actions: PayloadAction<string>) {
       state.businessLocationOption = actions.payload;
     },
+
+    addBusinessService(state, actions: PayloadAction<Service[]>) {
+      state.services.service = actions.payload;
+    },
+
+    updateBusinessService(state, actions: PayloadAction<Service>) {
+      if (state.services.editingIndex === null) return;
+      state.services.service[state.services.editingIndex] = actions.payload;
+    },
+    addServiceEditIndex(state, actions: PayloadAction<number | null>) {
+      state.services.editingIndex = actions.payload;
+    },
   },
 });
 
 export default businessSetupSlice;
 export const {
+  updateBusinessService,
+  addServiceEditIndex,
+  addBusinessService,
   setBusinsessLocationOption,
   setCurrentStep,
   setBusinessComplete,
