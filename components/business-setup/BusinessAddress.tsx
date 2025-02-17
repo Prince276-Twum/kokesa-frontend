@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { setCurrentStep } from "@/store/features/businessSetupSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { LocationOptions } from "@/utils/common-varialbles";
+import { capitalizeFirstLetterOfEachWord } from "@/utils/capitalized-words";
 
 interface AddressComponent {
   city?: string;
@@ -76,6 +77,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     isError: isReverseGeocodeError,
   } = useReverseGeocodeQuery(
     { latitude, longitude },
+
     { skip: !longitude || !latitude }
   );
 
@@ -150,17 +152,23 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       toast.error("Please fill in all the required fields.");
       return;
     }
+    capitalizeFirstLetterOfEachWord(address);
 
+    const capitalizedAddress = capitalizeFirstLetterOfEachWord(address);
+    const capitalizedCity = capitalizeFirstLetterOfEachWord(city);
+    const capitalizedState = capitalizeFirstLetterOfEachWord(state);
+    const capitalizedCountry = capitalizeFirstLetterOfEachWord(country);
     // Save data in localStorage
     const businessAddress = {
-      address,
-      city,
-      state,
-      country,
-      postalCode,
+      address: capitalizedAddress,
+      city: capitalizedCity,
+      state: capitalizedState,
+      country: capitalizedCountry.trim(),
+      postalCode: postalCode.toUpperCase().trim(),
       latitude,
       longitude,
     };
+
     localStorage.setItem("businessAddress", JSON.stringify(businessAddress));
 
     addAddress(businessAddress)
@@ -272,7 +280,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
           name="postalCode"
           value={postalCode}
           placeholder="Postal Code"
-          onChange={(e) => setPostalCode(e.target.value)}
+          onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
         />
       </div>
 

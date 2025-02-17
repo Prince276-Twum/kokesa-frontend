@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import Button from "../UI/Button";
 import { useSetupBusinessMutation } from "@/store/features/businessApiSetupSlice";
@@ -8,14 +8,20 @@ import {
   setBusinsessLocationOption,
   setCurrentStep,
 } from "@/store/features/businessSetupSlice";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const ServiceLocationOptions = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [setupBusiness, { isLoading }] = useSetupBusinessMutation();
   const dispatch = useAppDispatch();
+  const { businessLocationOption } = useAppSelector(
+    (store) => store.businessSetup
+  );
 
   const router = useRouter();
+  useEffect(() => {
+    setSelectedOption(businessLocationOption);
+  }, [businessLocationOption]);
 
   const handleContinue = () => {
     if (selectedOption) {
