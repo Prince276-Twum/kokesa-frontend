@@ -1,46 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NumericFormat } from "react-number-format";
 import Input from "../UI/Input";
 import Button from "../UI/Button";
 import { useAddTravelInfoMutation } from "@/store/features/businessApiSetupSlice";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import countries from "world-countries";
-import currencySymbolMap from "currency-symbol-map";
+import useCurrencyInfo from "@/hooks/useCurrencyInfo";
 
 export default function TravelFeeForm() {
   const [travelOption, setTravelOption] = useState("free");
   const [fixedPrice, setFixedPrice] = useState("");
   const [distance, setDistance] = useState("");
-  const [currencySymbol, setCurrencySymbol] = useState("$"); // Default currency symbol
-  const [countryCode, setCountryCode] = useState<string | undefined>(); // State for country code
   const [addTravel] = useAddTravelInfoMutation();
 
+  const { currencyCode, currencySymbol, countryCode } = useCurrencyInfo();
+
+  console.log("Currency Code: ", currencyCode);
+  console.log("Currency Symbol: ", currencySymbol);
+  console.log("Country Code: ", countryCode);
+
   const router = useRouter();
-
-  // Function to get currency symbol and country code
-  const getCountryInfo = (countryName: string) => {
-    const country = countries.find((c) => c.name.common === countryName);
-
-    if (!country) return { currencySymbol: "$", code: undefined };
-
-    const currencyCode = Object.keys(country.currencies)[0]; // Get currency code
-    return {
-      currencySymbol: currencySymbolMap(currencyCode) || "$", // Get symbol
-      code: country.cca2, // Get country code (e.g., "US", "GH", "NG")
-    };
-  };
-
-  useEffect(() => {
-    const savedAddress = localStorage.getItem("businessAddress");
-    if (savedAddress) {
-      const parsedAddress = JSON.parse(savedAddress);
-
-      const { currencySymbol, code } = getCountryInfo(parsedAddress.country);
-      setCurrencySymbol(currencySymbol);
-      setCountryCode(code); // Set country code
-    }
-  }, []);
 
   const handleContinue = () => {
     if ((travelOption !== "free" && !fixedPrice) || !distance) {
@@ -112,7 +91,7 @@ export default function TravelFeeForm() {
               value={fixedPrice}
               onValueChange={(values) => setFixedPrice(values.value)}
               thousandSeparator={true}
-              prefix={`${currencySymbol}  `}
+              prefix={`${currencyCode}  `}
               customInput={Input}
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
             />

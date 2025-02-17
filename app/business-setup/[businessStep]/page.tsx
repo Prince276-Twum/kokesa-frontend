@@ -136,9 +136,9 @@ function Page({ params }: Props) {
       case "team-size":
         return <TeamSize />;
       case "services":
-        return <BusinessServices />;
+        return <BusinessServices addServices={false} />;
       case "add-service":
-        return <BusinessServices addService={businessStep} />;
+        return <BusinessServices addServices={true} />;
       case "hours":
         return 2;
       case "contact":

@@ -46,11 +46,20 @@ const facialAndSkinCare = [
   { label: "Charcoal Peel Off Mask", value: "Charcoal Peel Off Mask" },
 ];
 
-export const serviceType = [
+interface ServiceOption {
+  value: string;
+  label: string;
+}
+
+interface GroupedServiceOption {
+  label: string; // The group label
+  options: ServiceOption[]; // The list of services under this group
+}
+
+export const serviceType: GroupedServiceOption[] = [
   {
     label: "Haircuts & Styling",
     options: haircutsAndStyling,
-    color: "#00B8D9",
   },
 
   {
