@@ -46,9 +46,9 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   const [useReverseGeocode, setUseReverseGeocode] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { businessLocationOption } = useAppSelector(
-    (store) => store.businessSetup
-  );
+  const {
+    businessInfo: { businessLocationOption },
+  } = useAppSelector((store) => store.businessSetup);
 
   // Load saved address from localStorage on mount
   useEffect(() => {
