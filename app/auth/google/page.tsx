@@ -28,7 +28,6 @@ function GoogleAuthPage() {
         .then(() => {
           dispatch(setAuth());
           router.push("/dashboard");
-          toast.success("Logged in successfully!");
         })
         .catch((error) => {
           const status = (error as { status?: number })?.status || 500;
@@ -44,11 +43,9 @@ function GoogleAuthPage() {
         .finally(() => {
           effectRan.current = true;
         });
-    }
-
-    else{
-      toast.error("something went wrong")
-      router.push("login")
+    } else {
+      toast.error("something went wrong");
+      router.push("login");
     }
   }, [googleSignIn, dispatch, router, searchParams]);
 

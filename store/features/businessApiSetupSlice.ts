@@ -126,13 +126,14 @@ const businessApiSlice = apiSlice.injectEndpoints({
     }),
 
     addTravelInfo: builder.mutation({
-      query: ({ distance, travelFee }) => {
+      query: ({ distance, travelFee, currencyCode }) => {
         return {
           url: "/business-travel/",
           method: "POST",
           body: {
             travel_distance: distance,
             travel_fee: travelFee,
+            currency: currencyCode
           },
         };
       },

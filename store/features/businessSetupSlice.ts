@@ -4,6 +4,7 @@ interface BusinessDetail {
   businessName: string;
   userName: string;
   phoneNumber: string | undefined;
+  businessLocationOption?: string;
 }
 
 interface Service {
@@ -17,8 +18,7 @@ interface initialStateType {
   isSetupComplete: boolean;
   currentStep: number;
   isLoading: boolean;
-  detail: BusinessDetail;
-  businessLocationOption: string;
+  businessInfo: BusinessDetail;
   services: { editingIndex: null | number; service: Service[] };
 }
 
@@ -26,8 +26,12 @@ const initialState: initialStateType = {
   isSetupComplete: false,
   currentStep: 1,
   isLoading: true,
-  businessLocationOption: "",
-  detail: { businessName: "", userName: "", phoneNumber: "" },
+  businessInfo: {
+    businessName: "",
+    userName: "",
+    phoneNumber: "",
+    businessLocationOption: "",
+  },
   services: { editingIndex: null, service: [] },
 };
 
@@ -48,11 +52,7 @@ const businessSetupSlice = createSlice({
     },
 
     setBusinessDetail(state, actions: PayloadAction<BusinessDetail>) {
-      state.detail = actions.payload;
-    },
-
-    setBusinsessLocationOption(state, actions: PayloadAction<string>) {
-      state.businessLocationOption = actions.payload;
+      state.businessInfo = actions.payload;
     },
 
     addBusinessService(state, actions: PayloadAction<Service[]>) {
@@ -74,7 +74,6 @@ export const {
   updateBusinessService,
   addServiceEditIndex,
   addBusinessService,
-  setBusinsessLocationOption,
   setCurrentStep,
   setBusinessComplete,
   setFinishBusinessLoading,
