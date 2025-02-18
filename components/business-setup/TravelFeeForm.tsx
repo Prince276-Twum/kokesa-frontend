@@ -29,7 +29,7 @@ export default function TravelFeeForm() {
 
     const travelFee = travelOption === "free" ? 0 : fixedPrice;
 
-    addTravel({ distance, travelFee, countryCode }) // Include countryCode in API request
+    addTravel({ distance, travelFee, currencyCode }) // Include countryCode in API request
       .unwrap()
       .then(() => {
         router.push("team-size");

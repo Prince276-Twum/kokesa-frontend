@@ -29,7 +29,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   const [setupBusiness, { isLoading: isBusinessLoading }] =
     useSetupBusinessMutation();
   const router = useRouter();
-  const { currentStep, detail } = useAppSelector(
+  const { currentStep, businessInfo } = useAppSelector(
     (store) => store.businessSetup
   );
   const [businessName, setBusinessName] = useState("");
@@ -70,28 +70,34 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   }, [businessName, userName, phoneValue]);
 
   useEffect(() => {
-    if (detail.businessName && detail.userName && detail.phoneNumber) {
-      setBusinessName(detail.businessName);
-      setUserName(detail.userName);
-      setPhoneValue(detail.phoneNumber);
-    } else {
-      if (isLoading) return;
-      if (isError) {
-        // toast.error("Something went wrong");
-      }
-      if (data && Array.isArray(data) && data.length === 0) {
-        // No business profile exists, clear fields
-        setBusinessName("");
-        setUserName("");
-        setPhoneValue("");
-      } else if (data) {
-        const businessData = data[0];
-        setBusinessName(businessData?.business_name);
-        setUserName(businessData?.user_name);
-        setPhoneValue(businessData?.phone_number);
-      }
-    }
-  }, [currentStep, isLoading, isError, data, detail]);
+    setBusinessName(businessInfo.businessName);
+    setPhoneValue(businessInfo.phoneNumber);
+    setUserName(businessInfo.userName);
+  }, [businessInfo]);
+
+  // useEffect(() => {
+  //   if (detail.businessName && detail.userName && detail.phoneNumber) {
+  //     setBusinessName(detail.businessName);
+  //     setUserName(detail.userName);
+  //     setPhoneValue(detail.phoneNumber);
+  //   } else {
+  //     if (isLoading) return;
+  //     if (isError) {
+  //       // toast.error("Something went wrong");
+  //     }
+  //     if (data && Array.isArray(data) && data.length === 0) {
+  //       // No business profile exists, clear fields
+  //       setBusinessName("");
+  //       setUserName("");
+  //       setPhoneValue("");
+  //     } else if (data) {
+  //       const businessData = data[0];
+  //       setBusinessName(businessData?.business_name);
+  //       setUserName(businessData?.user_name);
+  //       setPhoneValue(businessData?.phone_number);
+  //     }
+  //   }
+  // }, [currentStep, isLoading, isError, data, detail]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

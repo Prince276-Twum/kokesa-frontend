@@ -10,7 +10,7 @@ function RequireAuth({ children }: Props) {
   const { isAuthenticated, isLoading } = useAppSelector((store) => store.auth);
 
   if (isLoading) {
-    return <>spinner</>;
+    return <>spinner........</>;
   }
 
   console.log(isAuthenticated);

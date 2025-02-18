@@ -76,16 +76,17 @@ const stepContentAll = [
 
 function Page({ params }: Props) {
   const { businessStep } = use(params);
-  const { currentStep, businessLocationOption } = useAppSelector(
-    (store) => store.businessSetup
-  );
+  const {
+    currentStep,
+    businessInfo: { businessLocationOption },
+  } = useAppSelector((store) => store.businessSetup);
   const router = useRouter();
   const currentStepPath = businessStep || "details";
 
   let progressNumber = -1;
 
   let stepContent = stepContentAll;
-
+  console.log(businessLocationOption);
   if (businessLocationOption == LocationOptions[1].label) {
     stepContent = stepContent.filter((step) => {
       return step.title !== "Travel to Client’s Location";

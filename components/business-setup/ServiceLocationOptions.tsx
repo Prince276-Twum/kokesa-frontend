@@ -5,30 +5,33 @@ import { useSetupBusinessMutation } from "@/store/features/businessApiSetupSlice
 import { useRouter } from "next/navigation";
 import { LocationOptions } from "@/utils/common-varialbles";
 import {
-  setBusinsessLocationOption,
+  setBusinessDetail,
   setCurrentStep,
 } from "@/store/features/businessSetupSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const ServiceLocationOptions = () => {
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState<string | undefined>("");
   const [setupBusiness, { isLoading }] = useSetupBusinessMutation();
   const dispatch = useAppDispatch();
-  const { businessLocationOption } = useAppSelector(
-    (store) => store.businessSetup
-  );
+  const { businessInfo } = useAppSelector((store) => store.businessSetup);
 
   const router = useRouter();
   useEffect(() => {
-    setSelectedOption(businessLocationOption);
-  }, [businessLocationOption]);
+    setSelectedOption(businessInfo.businessLocationOption);
+  }, [businessInfo.businessLocationOption]);
 
   const handleContinue = () => {
     if (selectedOption) {
       setupBusiness({ currentStep: 3, serviceLocation: selectedOption })
         .unwrap()
         .then(() => {
-          dispatch(setBusinsessLocationOption(selectedOption));
+          dispatch(
+            setBusinessDetail({
+              businessLocationOption: selectedOption,
+              ...businessInfo,
+            })
+          );
           dispatch(setCurrentStep(4));
           router.push("address");
         });

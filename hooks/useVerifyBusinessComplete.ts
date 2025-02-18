@@ -3,7 +3,7 @@ import {
   setCurrentStep,
   setBusinessComplete,
   setFinishBusinessLoading,
-  setBusinsessLocationOption,
+  setBusinessDetail,
 } from "@/store/features/businessSetupSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect } from "react";
@@ -31,11 +31,27 @@ function useVerifyBusinessComplete() {
         dispatch(setBusinessComplete(true));
       } else if (!businessData.is_business_complete) {
         dispatch(setBusinessComplete(false));
+
+        console.log(data);
+
+        dispatch(
+          setBusinessDetail({
+            businessName: businessData.business_name,
+            userName: businessData.user_name,
+            phoneNumber: businessData.phone_number,
+            businessLocationOption: businessData.service_location,
+          })
+        );
         dispatch(setCurrentStep(businessData.current_step));
       }
-
-      dispatch(setBusinsessLocationOption(businessData.service_location));
     } else {
+      dispatch(
+        setBusinessDetail({
+          businessName: "",
+          userName: "",
+          phoneNumber: "",
+        })
+      );
       dispatch(setBusinessComplete(false));
     }
 
