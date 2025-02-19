@@ -61,7 +61,7 @@ const CustomLabel: React.FC<CustomLabelProps> = ({
   );
 };
 
-const WorkingHours: React.FC = () => {
+const BusinessWorkingHours = () => {
   const { workingHours } = useAppSelector((store) => store.businessSetup);
   const [editingDay, setEditingDay] = useState<Day | null>(null);
   const [startTime, setStartTime] = useState<TimeProp>({
@@ -422,4 +422,4 @@ const WorkingHours: React.FC = () => {
   );
 };
 
-export default WorkingHours;
+export default BusinessWorkingHours;

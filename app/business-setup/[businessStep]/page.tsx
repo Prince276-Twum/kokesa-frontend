@@ -6,7 +6,7 @@ import {
   StepProgress,
   BusinessAddress,
   BusinessServices,
-  WorkingHours,
+  BusinessWorkingHours,
 } from "@/components/business-setup/";
 import TravelFeeForm from "@/components/business-setup/TravelFeeForm";
 import { use } from "react";
@@ -142,7 +142,7 @@ function Page({ params }: Props) {
       case "add-service":
         return <BusinessServices addServices={true} />;
       case "hours":
-        return <WorkingHours />;
+        return <BusinessWorkingHours />;
       case "contact":
         return 2;
       case "travel-fee":
