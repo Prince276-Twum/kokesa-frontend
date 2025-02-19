@@ -7,6 +7,16 @@ interface BusinessDetail {
   businessLocationOption?: string;
 }
 
+interface WorkingHours {
+  Monday: { enabled: boolean; start: string; end: string };
+  Tuesday: { enabled: boolean; start: string; end: string };
+  Wednesday: { enabled: boolean; start: string; end: string };
+  Thursday: { enabled: boolean; start: string; end: string };
+  Friday: { enabled: boolean; start: string; end: string };
+  Saturday: { enabled: boolean; start: string; end: string };
+  Sunday: { enabled: boolean; start: string; end: string };
+}
+
 interface Service {
   name: string;
   type: { value: string; label: string } | null; // Allow null for clearing
@@ -20,6 +30,7 @@ interface initialStateType {
   isLoading: boolean;
   businessInfo: BusinessDetail;
   services: { editingIndex: null | number; service: Service[] };
+  workingHours: WorkingHours;
 }
 
 const initialState: initialStateType = {
@@ -33,6 +44,15 @@ const initialState: initialStateType = {
     businessLocationOption: "",
   },
   services: { editingIndex: null, service: [] },
+  workingHours: {
+    Monday: { enabled: true, start: "09:00", end: "17:00" },
+    Tuesday: { enabled: true, start: "09:00", end: "17:00" },
+    Wednesday: { enabled: true, start: "09:00", end: "17:00" },
+    Thursday: { enabled: true, start: "09:00", end: "17:00" },
+    Friday: { enabled: true, start: "09:00", end: "17:00" },
+    Saturday: { enabled: true, start: "09:00", end: "17:00" },
+    Sunday: { enabled: false, start: "09:00", end: "17:00" },
+  },
 };
 
 const businessSetupSlice = createSlice({
