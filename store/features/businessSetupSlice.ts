@@ -49,13 +49,13 @@ const initialState: initialStateType = {
   },
   services: { editingIndex: null, service: [] },
   workingHours: {
-    Monday: { enabled: true, start: "09:20", end: "17:40" },
-    Tuesday: { enabled: true, start: "09:00", end: "17:00" },
-    Wednesday: { enabled: true, start: "09:00", end: "17:00" },
-    Thursday: { enabled: true, start: "09:00", end: "17:00" },
-    Friday: { enabled: true, start: "09:00", end: "17:00" },
-    Saturday: { enabled: true, start: "09:00", end: "17:00" },
-    Sunday: { enabled: false, start: "09:00", end: "17:00" },
+    Monday: { enabled: true, start: "09:20", end: "17:40", breaks: [] },
+    Tuesday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    Wednesday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    Thursday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    Friday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    Saturday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
+    Sunday: { enabled: false, start: "09:00", end: "17:00", breaks: [] },
   },
 };
 
