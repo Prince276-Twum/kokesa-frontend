@@ -6,15 +6,19 @@ interface BusinessDetail {
   phoneNumber: string | undefined;
   businessLocationOption?: string;
 }
+interface Break {
+  start: string;
+  end: string;
+}
 
-interface WorkingHours {
-  Monday: { enabled: boolean; start: string; end: string };
-  Tuesday: { enabled: boolean; start: string; end: string };
-  Wednesday: { enabled: boolean; start: string; end: string };
-  Thursday: { enabled: boolean; start: string; end: string };
-  Friday: { enabled: boolean; start: string; end: string };
-  Saturday: { enabled: boolean; start: string; end: string };
-  Sunday: { enabled: boolean; start: string; end: string };
+export interface WorkingHours {
+  Monday: { enabled: boolean; start: string; end: string; breaks: Break[] };
+  Tuesday: { enabled: boolean; start: string; end: string; breaks: [] };
+  Wednesday: { enabled: boolean; start: string; end: string; breaks: [] };
+  Thursday: { enabled: boolean; start: string; end: string; breaks: [] };
+  Friday: { enabled: boolean; start: string; end: string; breaks: [] };
+  Saturday: { enabled: boolean; start: string; end: string; breaks: [] };
+  Sunday: { enabled: boolean; start: string; end: string; breaks: [] };
 }
 
 interface Service {
@@ -45,7 +49,7 @@ const initialState: initialStateType = {
   },
   services: { editingIndex: null, service: [] },
   workingHours: {
-    Monday: { enabled: true, start: "09:00", end: "17:00" },
+    Monday: { enabled: true, start: "09:20", end: "17:40" },
     Tuesday: { enabled: true, start: "09:00", end: "17:00" },
     Wednesday: { enabled: true, start: "09:00", end: "17:00" },
     Thursday: { enabled: true, start: "09:00", end: "17:00" },

@@ -1,6 +1,12 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-const Switch = ({ checked, onCheckedChange, className }) => {
+interface Props {
+  checked?: boolean;
+  onCheckedChange?: () => void;
+  className?: ReactNode;
+}
+
+const Switch = ({ checked, onCheckedChange, className }: Props) => {
   return (
     <div className={`relative inline-flex items-center ${className}`}>
       <input
