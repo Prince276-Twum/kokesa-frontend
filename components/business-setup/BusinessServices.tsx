@@ -19,6 +19,7 @@ import {
   updateBusinessService,
 } from "@/store/features/businessSetupSlice";
 import { NumericFormat } from "react-number-format";
+import Button from "../UI/Button";
 
 // Define type for service options
 interface ServiceDurationOption {
@@ -142,7 +143,7 @@ const BusinessServices = ({ addServices }: Props) => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleOnSave = () => {
     if (serviceDetails.name && serviceDetails.price) {
       const updatedServices = [...services.service, { ...serviceDetails }];
       localStorage.setItem("services", JSON.stringify(updatedServices));
@@ -176,6 +177,10 @@ const BusinessServices = ({ addServices }: Props) => {
       setServiceDetails(services.service[services.editingIndex]);
     }
   }, [services.editingIndex, services.service]);
+
+  const handleSubmit = () => {
+    router.push("hours");
+  };
 
   return (
     <div className="p-4 space-y-4">
@@ -221,6 +226,10 @@ const BusinessServices = ({ addServices }: Props) => {
             <FaPlus className="w-5 h-5 mr-3" />
             Add Service
           </button>
+
+          <Button el="button" onClick={handleSubmit} primary>
+            Next
+          </Button>
         </>
       )}
       {isAddService && (
@@ -316,7 +325,7 @@ const BusinessServices = ({ addServices }: Props) => {
               </button>
             ) : (
               <button
-                onClick={handleSubmit}
+                onClick={handleOnSave}
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-4 font-medium transition-colors"
               >
                 Save
