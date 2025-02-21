@@ -2,17 +2,21 @@ import React, { ReactNode } from "react";
 
 interface Props {
   checked?: boolean;
-  onCheckedChange?: () => void;
+  onClick?: () => void;
   className?: ReactNode;
 }
 
-const Switch = ({ checked, onCheckedChange, className }: Props) => {
+const Switch = ({ checked, onClick, className }: Props) => {
+  console.log(checked, 23);
   return (
-    <div className={`relative inline-flex items-center ${className}`}>
+    <div
+      onClick={onClick}
+      className={`relative inline-flex items-center ${className}`}
+    >
       <input
         type="checkbox"
         checked={checked}
-        onChange={onCheckedChange}
+        onChange={onClick}
         className="sr-only"
       />
       <div

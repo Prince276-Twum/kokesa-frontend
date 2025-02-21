@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { useAppSelector } from "@/store/hooks";
 import Select from "react-select";
 import Button from "../UI/Button";
 import Switch from "../UI/Switch";
 import { timeIntervals } from "@/utils/times";
-import { type WorkingHours } from "@/store/features/businessSetupSlice";
+import {
+  toggleDay,
+  updateWorkingHour,
+} from "@/store/features/businessSetupSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { CustomLabel } from "../common/CustomLable";
+import { FaChevronRight } from "react-icons/fa6";
+import { useAddBusinessWorkingHoursMutation } from "@/store/features/businessApiSetupSlice";
 
-interface TimeProp {
+export interface TimeProp {
   value: string;
   label: string;
 }
@@ -20,50 +26,12 @@ interface BreakTime extends Break {
   startProp: TimeProp;
 }
 
-interface CustomLabelProps {
-  label: string;
-  startTimes: TimeProp;
-  isOption: boolean;
-}
-
-type Day = keyof WorkingHours;
-
-// Custom Label Component
-const CustomLabel: React.FC<CustomLabelProps> = ({
-  label,
-  startTimes,
-  isOption,
-}) => {
-  const calculateHourLabels = (time: TimeProp): string => {
-    const [startHour, startMin] = startTimes.value.split(":").map(Number);
-    const [endHour, endMin] = time.value.split(":").map(Number);
-
-    const startTotalMinutes = startHour * 60 + startMin;
-    const endTotalMinutes = endHour * 60 + endMin;
-
-    let diffMinutes = endTotalMinutes - startTotalMinutes;
-    if (diffMinutes < 0) diffMinutes += 24 * 60;
-
-    const hoursDifference = Math.floor(diffMinutes / 60);
-    const minutesDifference = diffMinutes % 60;
-
-    return `${hoursDifference}h ${minutesDifference}m`;
-  };
-
-  const hourLeft = calculateHourLabels({ value: label, label });
-  return (
-    <div className="flex items-center flex-col">
-      <span className="font-semibold">{label}</span>
-      {isOption && startTimes.value && (
-        <span className="text-sm text-gray-500">{hourLeft}</span>
-      )}
-    </div>
-  );
-};
-
 const BusinessWorkingHours = () => {
-  const { workingHours } = useAppSelector((store) => store.businessSetup);
-  const [editingDay, setEditingDay] = useState<Day | null>(null);
+  const dispatch = useAppDispatch();
+  const workingHours = useAppSelector(
+    (store) => store.businessSetup.workingHours
+  );
+  const [editingDay, setEditingDay] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<TimeProp>({
     value: "",
     label: "",
@@ -72,6 +40,7 @@ const BusinessWorkingHours = () => {
   const [breakTimes, setBreakTimes] = useState<BreakTime[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showBreakInput, setShowBreakInput] = useState(false);
+  const [addWorkingDay, { isLoading }] = useAddBusinessWorkingHoursMutation();
 
   const timeToMinutes = (time: string): number => {
     const [hours, minutes] = time.split(":").map(Number);
@@ -120,18 +89,21 @@ const BusinessWorkingHours = () => {
     );
   };
 
-  const handleEdit = (day: Day): void => {
+  const handleEdit = (day: string): void => {
+    const dayData = workingHours.find((h) => h.day_of_week === day);
+    if (!dayData) return;
+
     setStartTime({
-      value: workingHours[day].start,
-      label: workingHours[day].start,
+      value: dayData.start_time,
+      label: dayData.start_time,
     });
     setEndTime({
-      value: workingHours[day].end,
-      label: workingHours[day].end,
+      value: dayData.end_time,
+      label: dayData.end_time,
     });
 
     const initialBreaks: BreakTime[] =
-      workingHours[day].breaks?.map((break_) => ({
+      dayData.breaks?.map((break_) => ({
         start: break_.start,
         end: break_.end,
         startProp: { value: break_.start, label: break_.start },
@@ -142,6 +114,10 @@ const BusinessWorkingHours = () => {
     setShowBreakInput(false);
   };
 
+  const handleToggle = (day: string): void => {
+    console.log("WOW");
+    dispatch(toggleDay(day));
+  };
   const addBreakTime = (): void => {
     setShowBreakInput(true);
     setBreakTimes([
@@ -186,13 +162,14 @@ const BusinessWorkingHours = () => {
       return;
     }
 
-    console.log("Saving:", {
-      day: editingDay,
-      start: startTime.value,
-      end: endTime.value,
-      breaks: validBreakTimes,
-    });
-
+    dispatch(
+      updateWorkingHour({
+        day: editingDay,
+        start: startTime.value,
+        end: endTime.value,
+        breaks: validBreakTimes,
+      })
+    );
     setIsModalOpen(false);
     setEditingDay(null);
   };
@@ -222,45 +199,46 @@ const BusinessWorkingHours = () => {
   };
 
   const handleNext = (): void => {
-    const formattedData = Object.entries(workingHours).reduce<WorkingHours>(
-      (acc, [day, hours]) => ({
-        ...acc,
-        [day]: {
-          enabled: hours.enabled,
-          start: hours.start,
-          end: hours.end,
-          breaks: hours.breaks || [],
-        },
-      }),
-      {} as WorkingHours
-    );
-
-    console.log("Working Hours Configuration:", formattedData);
+    console.log("Working Hours Configuration:", workingHours);
+    addWorkingDay({ workingDays: workingHours });
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="">
       <h2 className="text-xl font-semibold mb-4">Working Hours Setup</h2>
       <>
-        {Object.entries(workingHours).map(([day, hours]) => (
-          <div key={day} className="mb-4 p-4 border rounded">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">{day}</span>
-              <div className="flex items-center gap-4">
-                <Switch checked={hours.enabled} />
-                <Button
-                  el="button"
-                  primary
-                  onClick={() => handleEdit(day as Day)}
-                >
-                  Edit
-                </Button>
-              </div>
+        {workingHours.map((hours) => (
+          <div
+            key={hours.day_of_week}
+            className="mb-4 p-4 border rounded flex justify-between items-center"
+          >
+            <div className="flex gap-6">
+              <Switch
+                checked={hours.enabled}
+                onClick={() => handleToggle(hours.day_of_week)}
+              />
+              <span className="font-medium">{hours.day_of_week}</span>
             </div>
+
             {hours.enabled && (
-              <div className="mt-2 text-sm text-gray-600">
+              <div className="mt-2 text-sm text-gray-600 flex flex-col">
                 <div>
-                  Hours: {hours.start} - {hours.end}
+                  <div className="flex items-center gap-2">
+                    <p className="flex gap-2 items-center">
+                      <span className="px-3 py-1 border rounded-md focus:ring-1 focus:ring-blue-500">
+                        {hours.start_time}
+                      </span>
+                      <span className="text-gray-500">to</span>
+
+                      <span className="px-3 py-1 border rounded-md focus:ring-1 focus:ring-blue-500">
+                        {hours.end_time}
+                      </span>
+                    </p>
+                    <FaChevronRight
+                      size={20}
+                      onClick={() => handleEdit(hours.day_of_week)}
+                    />
+                  </div>
                 </div>
                 {hours.breaks?.length > 0 && (
                   <div className="mt-1">
@@ -278,7 +256,13 @@ const BusinessWorkingHours = () => {
           </div>
         ))}
 
-        <Button onClick={handleNext} el="button" primary>
+        <Button
+          loading={isLoading}
+          onClick={handleNext}
+          el="button"
+          primary
+          rounded
+        >
           Next
         </Button>
       </>
