@@ -133,7 +133,19 @@ const businessApiSlice = apiSlice.injectEndpoints({
           body: {
             travel_distance: distance,
             travel_fee: travelFee,
-            currency: currencyCode
+            currency: currencyCode,
+          },
+        };
+      },
+    }),
+
+    addBusinessWorkingHours: builder.mutation({
+      query: ({ workingDays }) => {
+        return {
+          url: "/business-hours/",
+          method: "POST",
+          body: {
+            working_hours: workingDays,
           },
         };
       },
@@ -146,4 +158,5 @@ export const {
   useSetupBusinessMutation,
   useAddBusinessAddressMutation,
   useAddTravelInfoMutation,
+  useAddBusinessWorkingHoursMutation,
 } = businessApiSlice;

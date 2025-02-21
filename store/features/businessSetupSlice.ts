@@ -6,20 +6,32 @@ interface BusinessDetail {
   phoneNumber: string | undefined;
   businessLocationOption?: string;
 }
-interface Break {
+interface BreakTime {
   start: string;
   end: string;
 }
 
-export interface WorkingHours {
-  Monday: { enabled: boolean; start: string; end: string; breaks: Break[] };
-  Tuesday: { enabled: boolean; start: string; end: string; breaks: [] };
-  Wednesday: { enabled: boolean; start: string; end: string; breaks: [] };
-  Thursday: { enabled: boolean; start: string; end: string; breaks: [] };
-  Friday: { enabled: boolean; start: string; end: string; breaks: [] };
-  Saturday: { enabled: boolean; start: string; end: string; breaks: [] };
-  Sunday: { enabled: boolean; start: string; end: string; breaks: [] };
+interface UpdateWorkingHourPayload {
+  day: string;
+  start: string;
+  end: string;
+  breaks: BreakTime[];
 }
+
+type WorkingHoursType = {
+  day_of_week:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
+  enabled: boolean;
+  start_time: string; // Format: "HH:mm"
+  end_time: string; // Format: "HH:mm"
+  breaks: BreakTime[];
+};
 
 interface Service {
   name: string;
@@ -34,7 +46,7 @@ interface initialStateType {
   isLoading: boolean;
   businessInfo: BusinessDetail;
   services: { editingIndex: null | number; service: Service[] };
-  workingHours: WorkingHours;
+  workingHours: WorkingHoursType[];
 }
 
 const initialState: initialStateType = {
@@ -48,15 +60,57 @@ const initialState: initialStateType = {
     businessLocationOption: "",
   },
   services: { editingIndex: null, service: [] },
-  workingHours: {
-    Monday: { enabled: true, start: "09:20", end: "17:40", breaks: [] },
-    Tuesday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
-    Wednesday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
-    Thursday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
-    Friday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
-    Saturday: { enabled: true, start: "09:00", end: "17:00", breaks: [] },
-    Sunday: { enabled: false, start: "09:00", end: "17:00", breaks: [] },
-  },
+  workingHours: [
+    {
+      day_of_week: "Monday",
+      enabled: true,
+      start_time: "09:20",
+      end_time: "17:40",
+      breaks: [],
+    },
+    {
+      day_of_week: "Tuesday",
+      enabled: true,
+      start_time: "09:00",
+      end_time: "17:00",
+      breaks: [],
+    },
+    {
+      day_of_week: "Wednesday",
+      enabled: true,
+      start_time: "09:00",
+      end_time: "17:00",
+      breaks: [],
+    },
+    {
+      day_of_week: "Thursday",
+      enabled: true,
+      start_time: "09:00",
+      end_time: "17:00",
+      breaks: [],
+    },
+    {
+      day_of_week: "Friday",
+      enabled: true,
+      start_time: "09:00",
+      end_time: "17:00",
+      breaks: [],
+    },
+    {
+      day_of_week: "Saturday",
+      enabled: true,
+      start_time: "09:00",
+      end_time: "17:00",
+      breaks: [],
+    },
+    {
+      day_of_week: "Sunday",
+      enabled: false,
+      start_time: "09:00",
+      end_time: "17:00",
+      breaks: [],
+    },
+  ],
 };
 
 const businessSetupSlice = createSlice({
@@ -90,6 +144,31 @@ const businessSetupSlice = createSlice({
     addServiceEditIndex(state, actions: PayloadAction<number | null>) {
       state.services.editingIndex = actions.payload;
     },
+
+    updateWorkingHour: (
+      state,
+      action: PayloadAction<UpdateWorkingHourPayload>
+    ) => {
+      const { day, start, end, breaks } = action.payload;
+      const workingHour = state.workingHours.find(
+        (hour) => hour.day_of_week === day
+      );
+      if (workingHour) {
+        workingHour.start_time = start;
+        workingHour.end_time = end;
+        workingHour.breaks = breaks;
+      }
+    },
+
+    toggleDay: (state, action: PayloadAction<string>) => {
+      console.log(action.payload);
+      const day = state.workingHours.find(
+        (hour) => hour.day_of_week === action.payload
+      );
+      if (day) {
+        day.enabled = !day.enabled;
+      }
+    },
   },
 });
 
@@ -102,4 +181,6 @@ export const {
   setBusinessComplete,
   setFinishBusinessLoading,
   setBusinessDetail,
+  updateWorkingHour,
+  toggleDay,
 } = businessSetupSlice.actions;
