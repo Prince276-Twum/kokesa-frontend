@@ -13,7 +13,7 @@ export default {
         foreground: "var(--foreground)",
 
         primary: {
-          base: "#0B0A0A", // Black
+          base: "#eb5017", // Black
         },
         secondary: {
           contrast: "#FFFFFF", // White
