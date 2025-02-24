@@ -5,35 +5,35 @@ import classnames from "classnames";
 
 type ButtonVariation =
   | {
-      primary: true;
+      primary?: true;
       danger?: never;
       success?: never;
       secondary?: never;
       warning?: never;
     }
   | {
-      danger: true;
+      danger?: true;
       primary?: never;
       success?: never;
       secondary?: never;
       warning?: never;
     }
   | {
-      success: true;
+      success?: true;
       primary?: never;
       danger?: never;
       secondary?: never;
       warning?: never;
     }
   | {
-      secondary: true;
+      secondary?: true;
       primary?: never;
       danger?: never;
       success?: never;
       warning?: never;
     }
   | {
-      warning: true;
+      warning?: true;
       primary?: never;
       danger?: never;
       success?: never;
@@ -76,8 +76,7 @@ function Button({
   ...rest
 }: Props) {
   const classes = classnames(
-    "  disabled:cursor-not-allowed  disabled:opacity-50 px-4 py-2 text-base md:px-6 md:py-2 md:text-lg w-full flex justify-center items-center gap-2" +
-      className,
+    ` disabled:cursor-not-allowed  disabled:opacity-50 px-4 py-2 text-base md:px-6 md:py-2 md:text-lg w-full flex justify-center items-center gap-2 ${className} `,
     {
       "opacity-80 cursor-not-allowed": loading,
       "bg-primary-base text-white": primary,
@@ -85,15 +84,16 @@ function Button({
       "bg-green-500 text-white": success,
       "bg-red-500 text-white": danger,
       "bg-yellow-400 text-white": warning,
-      "rounded-md": rounded,
+      "rounded-[80px]": rounded,
       "rounded-full": rounded && primary, // Example custom rule
-      "bg-white": outline,
-      "text-blue-500": outline && primary,
+      "bg-white text-primary-base": outline,
+      "text-white text-primary-base": outline && primary,
       "text-gray-900": outline && secondary,
       "text-green-500": outline && success,
       "text-yellow-400": outline && warning,
       "text-red-500": outline && danger,
-    }
+    },
+    className
   );
 
   const { href, el } = rest;

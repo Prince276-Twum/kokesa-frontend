@@ -1,0 +1,41 @@
+name: CI Workflow for Kokesa
+
+on: [push]
+
+jobs:
+  Unit-Tests:
+    name: Unit Testing For Kokesa App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Run Jest tests
+        run: npm test
+  E2E-Test:
+    runs-on: ubuntu-latest
+    needs: Unit-Tests
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Set up Node.js (v20)
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Cypress Tests with Recording
+        uses: cypress-io/github-action@v4
+        with:
+          build: npm run build
+          start: npm run start
+          wait-on: "http://localhost:3000"
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}

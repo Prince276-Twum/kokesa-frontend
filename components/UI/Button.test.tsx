@@ -5,7 +5,11 @@ import Button from "./Button";
 
 describe("Button", () => {
   it("renders the button with children", () => {
-    render(<Button el="button" primary>Click Me</Button>);
+    render(
+      <Button el="button" primary>
+        Click Me
+      </Button>
+    );
     const button = screen.getByRole("button", { name: /Click Me/i });
     expect(button).toBeInTheDocument();
   });
@@ -21,27 +25,47 @@ describe("Button", () => {
   });
 
   it("applies the correct classes based on props", () => {
-    render(<Button el="button" primary>Primary Button</Button>);
+    render(
+      <Button el="button" primary>
+        Primary Button
+      </Button>
+    );
     const button = screen.getByRole("button", { name: /Primary Button/i });
     expect(button).toHaveClass("bg-primary-base text-white");
 
-    render(<Button el="button" secondary>Secondary Button</Button>);
+    render(
+      <Button el="button" secondary>
+        Secondary Button
+      </Button>
+    );
     const buttonSecondary = screen.getByRole("button", {
       name: /Secondary Button/i,
     });
     expect(buttonSecondary).toHaveClass("bg-gray-500 text-white");
 
-    render(<Button el="button" success>Success Button</Button>);
+    render(
+      <Button el="button" success>
+        Success Button
+      </Button>
+    );
     const buttonSuccess = screen.getByRole("button", {
       name: /Success Button/i,
     });
     expect(buttonSuccess).toHaveClass("bg-green-500 text-white");
 
-    render(<Button el="button" danger>Danger Button</Button>);
+    render(
+      <Button el="button" danger>
+        Danger Button
+      </Button>
+    );
     const buttonDanger = screen.getByRole("button", { name: /Danger Button/i });
     expect(buttonDanger).toHaveClass("bg-red-500 text-white");
 
-    render(<Button el="button" warning>Warning Button</Button>);
+    render(
+      <Button el="button" warning>
+        Warning Button
+      </Button>
+    );
     const buttonWarning = screen.getByRole("button", {
       name: /Warning Button/i,
     });
@@ -55,7 +79,7 @@ describe("Button", () => {
     const buttonRounded = screen.getByRole("button", {
       name: /Rounded Button/i,
     });
-    expect(buttonRounded).toHaveClass("rounded-md text-white");
+    expect(buttonRounded).toHaveClass("rounded-[80px] text-white");
 
     render(
       <Button el="button" outline primary>
@@ -65,6 +89,6 @@ describe("Button", () => {
     const buttonOutlinedPrimary = screen.getByRole("button", {
       name: /Outlined Primary Button/i,
     });
-    expect(buttonOutlinedPrimary).toHaveClass("bg-white text-blue-500");
+    expect(buttonOutlinedPrimary).toHaveClass("bg-white text-primary-base");
   });
 });

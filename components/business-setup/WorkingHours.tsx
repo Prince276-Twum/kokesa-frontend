@@ -28,9 +28,7 @@ interface BreakTime extends Break {
 
 const BusinessWorkingHours = () => {
   const dispatch = useAppDispatch();
-  const workingHours = useAppSelector(
-    (store) => store.businessSetup.workingHours
-  );
+  const { workingHours } = useAppSelector((store) => store.businessSetup);
   const [editingDay, setEditingDay] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<TimeProp>({
     value: "",
