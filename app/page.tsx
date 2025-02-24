@@ -2,10 +2,9 @@ import Footer from "@/components/common/Footer";
 import NavBar from "@/components/common/NavBar";
 import Features from "@/components/homepage/Features";
 import Hero from "@/components/homepage/Hero";
-import Button from "@/components/UI/Button";
 import HeroImg from "@/public/kokesa-hero.jpeg";
-import StatsAndReviews from "@/components/homepage/Reviews";
 import BusinessStats from "@/components/homepage/BusinessStats";
+import Reviews from "@/components/homepage/Reviews";
 
 export default function Home() {
   return (
@@ -32,7 +31,7 @@ export default function Home() {
       <main>
         <Features />
         <BusinessStats />
-        <StatsAndReviews />
+        <Reviews />
       </main>
       <Footer />
     </header>

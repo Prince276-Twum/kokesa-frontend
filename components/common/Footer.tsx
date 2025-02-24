@@ -1,6 +1,5 @@
 // components/Footer.tsx
 import React from "react";
-import Link from "next/link";
 import { FaInstagram, FaTwitter } from "react-icons/fa";
 import { footerLinks } from "@/constant";
 import FooterSection from "./FooterSection";

@@ -2,7 +2,6 @@ import React, { ComponentPropsWithoutRef, ReactNode } from "react";
 import Link from "next/link";
 import { GoSync } from "react-icons/go";
 import classnames from "classnames";
-import classNames from "classnames";
 
 type ButtonVariation =
   | {
