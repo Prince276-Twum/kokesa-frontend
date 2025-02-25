@@ -28,8 +28,8 @@ const ServiceLocationOptions = () => {
         .then(() => {
           dispatch(
             setBusinessDetail({
-              businessLocationOption: selectedOption,
               ...businessInfo,
+              businessLocationOption: selectedOption,
             })
           );
           dispatch(setCurrentStep(4));

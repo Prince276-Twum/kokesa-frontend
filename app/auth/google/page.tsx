@@ -27,7 +27,7 @@ function GoogleAuthPage() {
         .unwrap()
         .then(() => {
           dispatch(setAuth());
-          router.push("/dashboard");
+          router.push("/business/dashboard");
         })
         .catch((error) => {
           const status = (error as { status?: number })?.status || 500;
