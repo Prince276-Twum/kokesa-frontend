@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { CustomLabel } from "../common/CustomLable";
 import { FaChevronRight } from "react-icons/fa6";
 import { useAddBusinessWorkingHoursMutation } from "@/store/features/businessApiSetupSlice";
+import { useRouter } from "next/navigation";
 
 export interface TimeProp {
   value: string;
@@ -39,6 +40,7 @@ const BusinessWorkingHours = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showBreakInput, setShowBreakInput] = useState(false);
   const [addWorkingDay, { isLoading }] = useAddBusinessWorkingHoursMutation();
+  const router = useRouter();
 
   const timeToMinutes = (time: string): number => {
     const [hours, minutes] = time.split(":").map(Number);
@@ -198,7 +200,14 @@ const BusinessWorkingHours = () => {
 
   const handleNext = (): void => {
     console.log("Working Hours Configuration:", workingHours);
-    addWorkingDay({ workingDays: workingHours });
+    addWorkingDay({ workingDays: workingHours })
+      .unwrap()
+      .then(() => {
+        router.push("business-goals");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
