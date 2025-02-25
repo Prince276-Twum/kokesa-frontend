@@ -109,6 +109,7 @@ function Page({ params }: Props) {
 
     if (stepIndex === -1) stepIndex = 0;
 
+    // Convert to percentage (add 1 because steps are 0-indexed)
     const percentage = Math.floor(((stepIndex + 1) / stepContent.length) * 100);
     return Math.min(percentage, 100); // Cap at 100%
   };
@@ -166,12 +167,12 @@ function Page({ params }: Props) {
     ) === 0;
 
   return (
-    <main className="relative min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-4 px-3 md:py-16 md:px-0">
+    <main className="relative min-h-screen bg-white md:bg-gradient-to-b md:from-gray-50 md:to-gray-100 py-0 px-0 md:py-16 md:px-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="max-w-lg mx-auto bg-white shadow-md md:shadow-xl rounded-xl overflow-hidden"
+        className="max-w-lg mx-auto bg-white border-0 shadow-none md:shadow-xl md:rounded-xl overflow-hidden"
       >
         <div className="relative">
           {/* Progress indicator */}
@@ -184,14 +185,16 @@ function Page({ params }: Props) {
 
           {/* Step indicator chips */}
           <div className="flex justify-between px-4 md:px-8 -mt-2.5">
-            {[0, 25, 50, 75, 100].map((step) => (
+            {[0, 25, 50, 75, 100].map((step, index) => (
               <div
                 key={step}
                 className={`h-4 w-4 md:h-5 md:w-5 rounded-full border-2 border-white ${
                   calculateProgressPercentage() >= step
                     ? "bg-orange-500"
                     : "bg-gray-200"
-                } shadow-sm transition-all duration-300`}
+                } ${index === 0 ? "ml-0.5" : ""} ${
+                  index === 4 ? "mr-0.5" : ""
+                } transition-all duration-300`}
               ></div>
             ))}
           </div>
@@ -205,20 +208,20 @@ function Page({ params }: Props) {
                 onClick={handlePrevStep}
                 className="flex items-center text-gray-500 hover:text-orange-500 mb-4 md:mb-6 transition-colors group"
               >
-                <IoArrowBack className="text-sm md:text-base mr-1 md:mr-1.5 group-hover:-translate-x-0.5 transition-transform" />
+                <IoArrowBack className="text-sm md:text-base mr-1.5 md:mr-1.5 group-hover:-translate-x-0.5 transition-transform" />
                 <span className="text-xs md:text-sm font-medium">Back</span>
               </button>
             )}
 
             <div className="flex items-start">
-              <div className="inline-flex shrink-0 mr-3 bg-orange-50 text-orange-500 p-2.5 md:p-3 rounded-lg">
+              <div className="inline-flex shrink-0 mr-3 bg-orange-50 text-orange-500 p-2.5 md:p-3 rounded-md">
                 <span className="text-lg md:text-xl">{icon}</span>
               </div>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800 leading-tight">
                   {title}
                 </h1>
-                <p className="text-xs md:text-sm text-gray-500 mt-1">
+                <p className="text-xs md:text-sm text-gray-500 mt-1 leading-snug">
                   {subtitle}
                 </p>
               </div>
@@ -237,8 +240,8 @@ function Page({ params }: Props) {
           </motion.div>
 
           {/* Step indicator text */}
-          <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center">
-            <div className="text-xs text-gray-400 font-medium mb-1 md:mb-0">
+          <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-50 md:border-gray-100 flex justify-between items-center">
+            <div className="text-xs text-gray-400 font-medium">
               Step{" "}
               {stepContent.findIndex(
                 (item) =>
