@@ -9,6 +9,7 @@ import { apiSlice } from "./service/apiSlice";
 const businessPersistConfig = {
   key: "businessSetup",
   storage,
+  blacklist: ["isLoading"],
 };
 
 const persistedBusinessSetupReducer = persistReducer(

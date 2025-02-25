@@ -31,7 +31,7 @@ function LoginForm() {
         .unwrap()
         .then(() => {
           dispatch(setAuth());
-          router.push("/dashboard");
+          router.push("/business/dashboard");
         })
         .catch(() => {
           toast.error("failed to sign in");

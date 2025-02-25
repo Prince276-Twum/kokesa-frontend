@@ -6,3 +6,4 @@ export { default as BusinessAddress } from "./BusinessAddress";
 export { default as BusinessServices } from "./BusinessServices";
 export { default as TravelFeeForm } from "./TravelFeeForm";
 export { default as BusinessWorkingHours } from "./WorkingHours";
+export { default as BusinessGoals } from "./BusinessGoals";

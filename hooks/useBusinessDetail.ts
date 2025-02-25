@@ -119,7 +119,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
             })
           );
           dispatch(setCurrentStep(2));
-          router.push("/business-setup/category");
+          router.push("category");
         })
         .catch(() => {
           toast.error("Something went wrong");
