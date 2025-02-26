@@ -50,11 +50,11 @@ function NavBar() {
             </li>
             <li>
               <Button
-                className="py-2 px-6 text-base font-semibold hover:bg-[#FF6B3D] transition-colors"
+                className="py-2 px-6 text-base font-semibold   transition-colors"
                 href="auth/registration"
                 el="anchor"
                 rounded
-                outline
+                primary
               >
                 Sign up
               </Button>
