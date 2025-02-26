@@ -98,12 +98,10 @@ const ReviewCard: React.FC<{ review: ReviewData }> = ({ review }) => (
 
 const Reviews: React.FC = () => {
   return (
-    <section className="py-16 md:py-20 bg-gray-50">
+    <section className="section bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl lg:text-4xl font-semibold mb-4">
-            Reviews from business owners on Kokesa
-          </h2>
+          <h2 className="heading-h2">Reviews from business owners on Kokesa</h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Join thousands of satisfied business owners who have transformed
             their booking experience

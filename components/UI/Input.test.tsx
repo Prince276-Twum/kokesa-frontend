@@ -88,7 +88,7 @@ describe("Input Component", () => {
 
     // After focusing, the label should move
     expect(labelElement).toHaveClass(
-      "peer-focus:-top-2.5 peer-focus:text-blue-500"
+      "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-700"
     );
   });
 });

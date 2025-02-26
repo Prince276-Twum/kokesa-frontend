@@ -59,52 +59,99 @@ select {
   @apply max-w-[1280px] mx-auto;
 }
 
-/* Header Text - For titles and headers */
-.text-header {
-  @apply text-2xl md:text-[1.5rem] text-center font-extrabold md:font-bold;
-}
+@layer components {
+  /* Layout Containers */
+  .container-main {
+    @apply max-w-screen-xl mx-auto px-6 lg:px-8;
+  }
 
-/* Subheading Text - For subtitles or smaller headings */
-.text-subheader {
-  @apply text-xl md:text-lg font-semibold;
-}
+  .container-content {
+    @apply max-w-screen-lg mx-auto px-6 lg:px-8;
+  }
 
-/* Body Text - For regular paragraphs and content */
-.text-body {
-  @apply text-base md:text-lg text-gray-800 leading-relaxed;
-}
+  .container-narrow {
+    @apply max-w-screen-md mx-auto px-6 lg:px-8;
+  }
 
-/* Small Text - For smaller text like footnotes or captions */
-.text-small {
-  @apply text-sm text-gray-500;
-}
+  /* Sections */
+  .section {
+    @apply py-20;
+  }
 
-/* Link Text - For links, buttons, or clickable items */
-.text-link {
-  @apply text-blue-500 hover:text-blue-600 focus:outline-none;
-}
+  .section-gray {
+    @apply bg-gray-50;
+  }
 
-/* Error Text - For validation errors, warnings, etc. */
-.text-error {
-  @apply text-red-600 font-medium;
-}
+  .section-dark {
+    @apply bg-gray-900;
+  }
 
-/* Success Text - For success or confirmation messages */
-.text-success {
-  @apply text-green-600 font-medium;
-}
+  /* Typography */
+  .heading-h1 {
+    @apply text-4xl sm:text-5xl lg:text-7xl font-semibold tracking-tight leading-[1.2];
+  }
 
-/* Muted Text - For less prominent or secondary information */
-.text-muted {
-  @apply text-gray-500 font-light;
-}
+  .heading-h2 {
+    @apply text-3xl lg:text-4xl font-semibold mb-4;
+  }
 
-/* Bold Text - For bold text */
-.text-bold {
-  @apply font-bold;
-}
+  .text-body {
+    @apply text-lg sm:text-xl lg:text-2xl;
+  }
 
-/* Italic Text - For italicized text */
-.text-italic {
-  @apply italic;
+  .text-body-light {
+    @apply text-gray-600;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply rounded-full font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-[#EB5017] text-white hover:bg-[#FF6B3D];
+  }
+
+  .btn-outline {
+    @apply border border-[#EB5017] text-[#EB5017] hover:bg-[#EB5017] hover:text-white;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
+  .btn-md {
+    @apply px-6 py-3;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-xl p-6;
+  }
+
+  .card-dark {
+    @apply bg-gray-900 text-white rounded-xl p-8;
+  }
+
+  /* Grid Layouts */
+  .grid-features {
+    @apply grid md:grid-cols-2 lg:grid-cols-3 gap-8;
+  }
+
+  .grid-stats {
+    @apply grid grid-cols-2 lg:grid-cols-4 gap-8;
+  }
+
+  /* Logo */
+  .logo-container {
+    @apply flex items-center gap-2;
+  }
+
+  .logo-icon {
+    @apply w-8 h-8 bg-gradient-to-br from-[#EB5017] to-[#FF6B3D] rounded-lg flex items-center justify-center transform rotate-45;
+  }
+
+  .logo-text {
+    @apply text-white text-xl font-semibold tracking-wide;
+  }
 }

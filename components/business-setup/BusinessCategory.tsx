@@ -19,7 +19,6 @@ const businessCategories = [
   "Makeup Artist",
   "Catering",
   "Event Planner",
-
   "Other",
 ];
 
@@ -62,21 +61,23 @@ const BusinessCategory = () => {
 
   return (
     <div>
-      <div className="flex flex-col items-start ">
+      <div className="flex flex-col items-start">
         {businessCategories.map((category) => (
           <button
-            className="flex w-full items-center text-body justify-between border-b-2 border-[#F5F7FA] py-6 hover:bg-gray-100"
+            className={`flex w-full items-center justify-between border-b-2 border-[#F5F7FA] py-6 text-gray-900 hover:bg-gray-50 transition-colors ${
+              selectedCategory === category ? "bg-gray-50 font-medium" : ""
+            }`}
             key={category}
             onClick={() => handleSelectCategory(category)}
           >
             <span>{category}</span>
-            <MdKeyboardArrowRight color="#717171" size={20} />
+            <MdKeyboardArrowRight className="text-gray-500" size={20} />
           </button>
         ))}
       </div>
 
       {selectedCategory === "Other" && (
-        <div>
+        <div className="mt-6">
           <Input
             type="text"
             id="businessCategory"
@@ -86,7 +87,7 @@ const BusinessCategory = () => {
           />
         </div>
       )}
-      <div className="mt-4">
+      <div className="mt-6">
         <Button
           el="button"
           primary
