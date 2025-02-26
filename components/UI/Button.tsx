@@ -76,24 +76,52 @@ function Button({
   ...rest
 }: Props) {
   const classes = classnames(
-    ` disabled:cursor-not-allowed  disabled:opacity-50 px-4 py-2 text-base md:px-6 md:py-2 md:text-lg w-full flex justify-center items-center gap-2 ${className} `,
+    `disabled:cursor-not-allowed disabled:opacity-50 px-4 py-2 text-base md:px-6 md:py-2 md:text-lg w-full flex justify-center items-center gap-2 transition-colors duration-200 ${className}`,
     {
       "opacity-80 cursor-not-allowed": loading,
-      "bg-primary-base text-white": primary,
-      "bg-gray-500 text-white": secondary,
-      "bg-green-500 text-white": success,
-      "bg-red-500 text-white": danger,
-      "bg-yellow-400 text-white": warning,
+
+      // Primary button
+      "bg-primary text-white hover:bg-primary-light": primary && !outline,
+
+      // Secondary button
+      "bg-gray-500 text-white hover:bg-gray-600": secondary && !outline,
+
+      // Success button
+      "bg-green-500 text-white hover:bg-green-600": success && !outline,
+
+      // Danger button
+      "bg-red-500 text-white hover:bg-red-600": danger && !outline,
+
+      // Warning button
+      "bg-yellow-400 text-white hover:bg-yellow-500": warning && !outline,
+
+      // Rounded styles
       "rounded-[80px]": rounded,
-      "rounded-full": rounded && primary, // Example custom rule
-      "bg-white text-primary-base": outline,
-      "text-white text-primary-base": outline && primary,
-      "text-gray-900": outline && secondary,
-      "text-green-500": outline && success,
-      "text-yellow-400": outline && warning,
-      "text-red-500": outline && danger,
-    },
-    className
+      "rounded-full": rounded && primary,
+
+      // Outline styles
+      "bg-white border-2": outline,
+
+      // Outline - Primary
+      "border-primary text-primary hover:bg-primary hover:text-white":
+        outline && primary,
+
+      // Outline - Secondary
+      "border-gray-500 text-gray-900 hover:bg-gray-500 hover:text-white":
+        outline && secondary,
+
+      // Outline - Success
+      "border-green-500 text-green-500 hover:bg-green-500 hover:text-white":
+        outline && success,
+
+      // Outline - Warning
+      "border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-white":
+        outline && warning,
+
+      // Outline - Danger
+      "border-red-500 text-red-500 hover:bg-red-500 hover:text-white":
+        outline && danger,
+    }
   );
 
   const { href, el } = rest;

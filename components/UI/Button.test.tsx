@@ -31,7 +31,7 @@ describe("Button", () => {
       </Button>
     );
     const button = screen.getByRole("button", { name: /Primary Button/i });
-    expect(button).toHaveClass("bg-primary-base text-white");
+    expect(button).toHaveClass("bg-primary text-white");
 
     render(
       <Button el="button" secondary>
@@ -89,6 +89,6 @@ describe("Button", () => {
     const buttonOutlinedPrimary = screen.getByRole("button", {
       name: /Outlined Primary Button/i,
     });
-    expect(buttonOutlinedPrimary).toHaveClass("bg-white text-primary-base");
+    expect(buttonOutlinedPrimary).toHaveClass("bg-white text-primary");
   });
 });
