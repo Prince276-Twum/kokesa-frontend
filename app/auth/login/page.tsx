@@ -1,12 +1,9 @@
 import LoginForm from "@/components/form/LoginForm";
 import Image from "next/image";
 import React from "react";
-import logo from "@/public/Vector.png";
 import alarmImg from "@/public/loginalarm.png";
 import type { Metadata } from "next";
-
-
-
+import KokesaLogo from "@/components/common/KokesaLogo";
 
 export const metadata: Metadata = {
   title: "Kokesa | Sign In",
@@ -32,7 +29,7 @@ function LoginPage() {
           <div className="max-w-md w-full mt-6 mx-auto mb-4">
             <div className="flex justify-center mb-12">
               <div className="bg-black  inline-block p-2 px-6  rounded-md">
-                <Image src={logo} alt="kokesa logo" />
+                <KokesaLogo />
               </div>
             </div>
             <h2 className=" text-2xl md:text-[2rem] text-center font-extrabold md:font-bold mb-4">
