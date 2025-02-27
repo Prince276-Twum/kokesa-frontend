@@ -45,7 +45,7 @@ describe("RegisterForm", () => {
     await user.type(emailInput, "invalid-email");
     await user.click(submitButton);
 
-    const errorElement = await screen.findByText((content, element) =>
+    const errorElement = await screen.findByText((content) =>
       content.includes("Please enter a valid email address.")
     );
     expect(errorElement).toBeInTheDocument();

@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaTimes, FaPlus, FaChevronRight } from "react-icons/fa";
 import Input from "../UI/Input";
-import { StylesConfig, GroupBase } from "react-select";
+import { StylesConfig } from "react-select";
 import { SingleValue } from "react-select";
 import useCurrencyInfo from "@/hooks/useCurrencyInfo";
 import {
@@ -18,7 +18,7 @@ import {
   addServiceEditIndex,
   updateBusinessService,
 } from "@/store/features/businessSetupSlice";
-import { NumericFormat, NumericFormatProps } from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import Button from "../UI/Button";
 
 // Define types
