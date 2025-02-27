@@ -12,7 +12,8 @@ import { useAddTravelInfoMutation } from "@/store/features/businessApiSetupSlice
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useCurrencyInfo from "@/hooks/useCurrencyInfo";
-import { MdMyLocation } from "react-icons/md";
+import { MdMyLocation, MdInfo, MdAttachMoney, MdNearMe } from "react-icons/md";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import "leaflet/dist/leaflet.css";
 
 // Ensure Leaflet is imported correctly
@@ -79,6 +80,7 @@ const TravelFeeForm: React.FC = () => {
         (position) => {
           setLatitude(position.coords.latitude);
           setLongitude(position.coords.longitude);
+          toast.success("Location detected successfully");
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -166,9 +168,11 @@ const TravelFeeForm: React.FC = () => {
       const marker = L.marker([latitude, longitude], {
         icon: L.divIcon({
           className: "custom-marker",
-          html: `<div style="background-color: #EB5017; width: 16px; height: 16px; border-radius: 50%;"></div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
+          html: `<div class="flex items-center justify-center w-6 h-6 bg-primary rounded-full border-2 border-white shadow-md">
+                  <div class="w-2 h-2 bg-white rounded-full"></div>
+                </div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12],
         }),
       }).addTo(map);
       markerRef.current = marker;
@@ -304,119 +308,211 @@ const TravelFeeForm: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg overflow-hidden bg-white shadow-md border border-gray-200">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-lg font-medium text-gray-900">Travel Distance</h3>
-          <p className="text-sm text-gray-500">
-            How far can you travel to provide your services?
-          </p>
-        </div>
-
-        {/* Map Container with unique ID */}
-        <div id={mapContainerId} className="w-full h-64 bg-gray-100"></div>
-
-        <div className="p-4 space-y-4">
+      {/* Map Section */}
+      <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
+        <div className="bg-primary-50 p-4 border-b border-primary-100">
           <div className="flex items-center">
-            <MdMyLocation className="text-primary mr-2" />
-            <p className="text-sm text-gray-600">
-              {latitude && longitude
-                ? "Your business location is shown on the map"
-                : locationError || "We couldn't detect your location"}
-            </p>
-          </div>
-
-          <div className="flex flex-col space-y-2">
-            <label
-              htmlFor="travel-distance"
-              className="text-sm font-medium text-gray-700"
-            >
-              Maximum Travel Distance (km)
-            </label>
-            <div className="relative mt-">
-              <div className="mt-4">
-                <Input
-                  id="travel-distance"
-                  type="text"
-                  placeholder="Enter distance in km"
-                  value={distance}
-                  onChange={handleDistanceChange}
-                />
-              </div>
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                km
-              </div>
+            <div className="rounded-full bg-primary-100 p-2 mr-3">
+              <FaMapMarkerAlt className="text-primary h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Service Area
+              </h3>
+              <p className="text-sm text-gray-600">
+                Define your travel radius to clients
+              </p>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="rounded-lg overflow-hidden bg-white shadow-md border border-gray-200">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-lg font-medium text-gray-900">Travel Fee</h3>
-          <p className="text-sm text-gray-500">
-            Do you charge for traveling to the client's location?
-          </p>
-        </div>
-
-        <div className="p-4 space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
-              <input
-                type="radio"
-                id="free"
-                value="free"
-                checked={travelOption === "free"}
-                onChange={() => setTravelOption("free")}
-                className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
-              />
-              <label htmlFor="free" className="ml-3 cursor-pointer flex-1">
-                <span className="font-medium text-gray-900">Free Travel</span>
-                <p className="text-sm text-gray-500">
-                  No additional charge for travel
+        {/* Map Container with improved height */}
+        <div id={mapContainerId} className="w-full h-72 bg-gray-100 relative">
+          {(!latitude || !longitude) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80 z-10">
+              <div className="text-center p-4">
+                <MdInfo className="text-yellow-500 text-4xl mx-auto mb-2" />
+                <p className="text-gray-700 font-medium">
+                  Detecting your location...
                 </p>
-              </label>
-            </div>
-
-            <div className="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
-              <input
-                type="radio"
-                id="fixed"
-                value="fixed"
-                checked={travelOption === "fixed"}
-                onChange={() => setTravelOption("fixed")}
-                className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
-              />
-              <label htmlFor="fixed" className="ml-3 cursor-pointer flex-1">
-                <span className="font-medium text-gray-900">Fixed Fee</span>
-                <p className="text-sm text-gray-500">
-                  Charge a flat rate per visit
-                </p>
-              </label>
-            </div>
-          </div>
-
-          {travelOption === "fixed" && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <label
-                htmlFor="travel-fixed-fee"
-                className="block mb-2 text-sm font-medium text-gray-700"
-              >
-                Fixed Travel Fee
-              </label>
-              <NumericFormat
-                id="travel-fixed-fee"
-                value={fixedPrice}
-                onValueChange={(values) => setFixedPrice(values.value)}
-                thousandSeparator={true}
-                prefix={`${currencyCode} `}
-                placeholder={`${currencySymbol} 0.00`}
-                customInput={Input}
-              />
+                <button
+                  onClick={detectLocation}
+                  className="mt-3 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
             </div>
           )}
         </div>
+
+        <div className="p-5 space-y-5">
+          {/* Location status with improved styling */}
+          <div
+            className={`flex items-start p-3 rounded-lg ${
+              latitude && longitude
+                ? "bg-green-50 text-green-800"
+                : "bg-yellow-50 text-yellow-800"
+            }`}
+          >
+            <MdMyLocation
+              className={`mt-0.5 mr-2 flex-shrink-0 ${
+                latitude && longitude ? "text-green-500" : "text-yellow-500"
+              }`}
+              size={18}
+            />
+            <p className="text-sm">
+              {latitude && longitude
+                ? "Your business location has been detected and is shown on the map"
+                : locationError ||
+                  "We're having trouble detecting your location. Please check your location permissions."}
+            </p>
+          </div>
+
+          {/* Distance Input with better styling */}
+          <div>
+            <label
+              htmlFor="travel-distance"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              Maximum Travel Distance
+            </label>
+            <div className="relative">
+              <Input
+                id="travel-distance"
+                type="text"
+                placeholder="Enter distance"
+                value={distance}
+                onChange={handleDistanceChange}
+                cn="pr-12"
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gray-100 px-2 py-1 rounded text-sm font-medium text-gray-600">
+                km
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-gray-500 flex items-center">
+              <MdInfo className="mr-1" />
+              This will define how far you're willing to travel for appointments
+            </p>
+          </div>
+        </div>
       </div>
 
+      {/* Fee Section with improved design */}
+      <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
+        <div className="bg-primary-50 p-4 border-b border-primary-100">
+          <div className="flex items-center">
+            <div className="rounded-full bg-primary-100 p-2 mr-3">
+              <MdAttachMoney className="text-primary h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Travel Fee
+              </h3>
+              <p className="text-sm text-gray-600">
+                Set your travel pricing policy
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {/* Travel Fee Options with improved cards */}
+          <div className="grid grid-cols-1 gap-3">
+            <div
+              className={`flex items-start p-4 rounded-xl border-2 ${
+                travelOption === "free"
+                  ? "border-primary bg-primary-50"
+                  : "border-gray-200 hover:border-gray-300"
+              } transition-colors cursor-pointer`}
+              onClick={() => setTravelOption("free")}
+            >
+              <div className="mt-0.5">
+                <input
+                  type="radio"
+                  id="free"
+                  value="free"
+                  checked={travelOption === "free"}
+                  onChange={() => setTravelOption("free")}
+                  className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
+                />
+              </div>
+              <label htmlFor="free" className="ml-3 cursor-pointer flex-1">
+                <span className="font-medium text-gray-900 block">
+                  Free Travel
+                </span>
+                <p className="text-sm text-gray-600 mt-1">
+                  You won't charge clients for your travel time or expenses
+                </p>
+              </label>
+            </div>
+
+            <div
+              className={`flex items-start p-4 rounded-xl border-2 ${
+                travelOption === "fixed"
+                  ? "border-primary bg-primary-50"
+                  : "border-gray-200 hover:border-gray-300"
+              } transition-colors cursor-pointer`}
+              onClick={() => setTravelOption("fixed")}
+            >
+              <div className="mt-0.5">
+                <input
+                  type="radio"
+                  id="fixed"
+                  value="fixed"
+                  checked={travelOption === "fixed"}
+                  onChange={() => setTravelOption("fixed")}
+                  className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
+                />
+              </div>
+              <label htmlFor="fixed" className="ml-3 cursor-pointer flex-1">
+                <span className="font-medium text-gray-900 block">
+                  Fixed Fee
+                </span>
+                <p className="text-sm text-gray-600 mt-1">
+                  Charge a consistent flat rate for travel to any client
+                  location
+                </p>
+              </label>
+            </div>
+          </div>
+
+          {/* Fixed Price Input with smooth transition */}
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              travelOption === "fixed"
+                ? "max-h-40 opacity-100"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            {travelOption === "fixed" && (
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 mt-3">
+                <label
+                  htmlFor="travel-fixed-fee"
+                  className="block mb-2 text-sm font-medium text-gray-700"
+                >
+                  Fixed Travel Fee Amount
+                </label>
+                <NumericFormat
+                  id="travel-fixed-fee"
+                  value={fixedPrice}
+                  onValueChange={(values) => setFixedPrice(values.value)}
+                  thousandSeparator={true}
+                  prefix={`${currencyCode} `}
+                  placeholder={`${currencySymbol} 0.00`}
+                  customInput={Input}
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  This amount will be added to every booking when you travel to
+                  a client
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Continue Button - Improved */}
       <Button
         el="button"
         primary
@@ -424,7 +520,9 @@ const TravelFeeForm: React.FC = () => {
         loading={isLoading}
         onClick={handleContinue}
         disabled={!latitude || !longitude}
+        className="w-full py-3.5 text-base font-medium shadow-sm mt-4"
       >
+        <MdNearMe className="mr-2" />
         Continue
       </Button>
     </div>

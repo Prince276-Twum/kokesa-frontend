@@ -1,9 +1,9 @@
-import LoginForm from "@/components/form/LoginForm";
-import Image from "next/image";
 import React from "react";
-import alarmImg from "@/public/loginalarm.png";
-import type { Metadata } from "next";
+import Image from "next/image";
+import LoginForm from "@/components/form/LoginForm";
 import KokesaLogo from "@/components/common/KokesaLogo";
+import type { Metadata } from "next";
+import alarmImg from "@/public/loginalarm.png";
 
 export const metadata: Metadata = {
   title: "Kokesa | Sign In",
@@ -13,37 +13,70 @@ export const metadata: Metadata = {
 
 function LoginPage() {
   return (
-    <main>
-      <div className="flex md:min-h-screen w-full">
-        <div className="flex-1 relative md:block hidden">
-          <Image
-            src={alarmImg}
-            alt="a 3D rendering of an abstract sculpture"
-            className=" object-cover w-full h-full "
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            fill
-          ></Image>
-        </div>
-
-        <div className="flex flex-col justify-center flex-1 w-full  p-6 md:p-12 lg:p-20 md:min-h-screen overflow-auto">
-          <div className="max-w-md w-full mt-6 mx-auto mb-4">
-            <div className="flex justify-center mb-12">
-              <div className="bg-black  inline-block p-2 px-6  rounded-md">
-                <KokesaLogo />
-              </div>
+    <div className="min-h-screen bg-white flex">
+      {/* Left Panel - Form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo */}
+          <div className="flex justify-center">
+            <div className="bg-black p-2.5 rounded-lg shadow-lg">
+              <KokesaLogo />
             </div>
-            <h2 className=" text-2xl md:text-[2rem] text-center font-extrabold md:font-bold mb-4">
-              Sign In
-            </h2>
           </div>
+
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Welcome back
+            </h1>
+            <p className="mt-3 text-gray-500">
+              Sign in to your account to continue
+            </p>
+          </div>
+
+          {/* Login Form */}
           <LoginForm />
+
+          {/* Registration Link */}
+          <div className="text-center text-sm">
+            <p className="text-gray-500">
+              Don't have an account?{" "}
+              <a
+                href="/auth/registration"
+                className="font-medium text-primary hover:text-primary-light transition-colors"
+              >
+                Create account
+              </a>
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div className="pt-6 text-center text-xs text-gray-400">
+            <p>© {new Date().getFullYear()} Kokesa. All rights reserved.</p>
+          </div>
         </div>
       </div>
-    </main>
+
+      {/* Right Panel - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-black/10 z-10"></div>
+        <div className="absolute left-10 bottom-10 text-white z-20 max-w-md">
+          <h2 className="text-3xl font-bold">Manage your business with ease</h2>
+          <p className="mt-3 text-white/80">
+            Access your dashboard, track appointments, and grow your business
+            all in one place.
+          </p>
+        </div>
+        <Image
+          src={alarmImg}
+          alt="Kokesa Platform"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
+    </div>
   );
-}
-{
-  /* Login with your email */
 }
 
 export default LoginPage;
