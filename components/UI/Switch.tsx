@@ -1,36 +1,45 @@
-import React, { ReactNode } from "react";
-
 interface Props {
   checked?: boolean;
   onClick?: () => void;
-  className?: ReactNode;
+  className?: string;
+  disabled?: boolean;
+  ariaLabel?: string;
 }
 
-const Switch = ({ checked, onClick, className }: Props) => {
-  console.log(checked, 23);
+const Switch = ({
+  checked = false,
+  onClick,
+  className = "",
+  disabled = false,
+  ariaLabel = "Toggle switch",
+}: Props) => {
   return (
-    <div
+    <button
+      role="switch"
+      aria-checked={checked}
+      aria-label={ariaLabel}
       onClick={onClick}
-      className={`relative inline-flex items-center ${className}`}
+      disabled={disabled}
+      className={`
+        relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer 
+        rounded-full border-2 border-transparent 
+        transition-colors duration-200 ease-in-out
+        focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+        ${checked ? "bg-primary" : "bg-gray-200"}
+        ${className}
+      `}
     >
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onClick}
-        className="sr-only"
+      <span
+        aria-hidden="true"
+        className={`
+          pointer-events-none inline-block h-5 w-5 rounded-full 
+          bg-white shadow-lg transform transition duration-200 ease-in-out
+          ${checked ? "translate-x-5" : "translate-x-0"}
+          ${disabled ? "cursor-not-allowed" : ""}
+        `}
       />
-      <div
-        className={`w-10 h-6 rounded-full transition-colors duration-300 ease-in-out ${
-          checked ? "bg-blue-500" : "bg-gray-300"
-        }`}
-      >
-        <span
-          className={`absolute left-0 w-6 h-6 bg-white rounded-full shadow transition-transform duration-300 ease-in-out ${
-            checked ? "translate-x-full" : ""
-          }`}
-        />
-      </div>
-    </div>
+    </button>
   );
 };
 
