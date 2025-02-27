@@ -160,6 +160,25 @@ const businessSetupSlice = createSlice({
       }
     },
 
+    updateMultipleWorkingHours: (
+      state,
+      action: PayloadAction<UpdateWorkingHourPayload[]>
+    ) => {
+      const updates = action.payload;
+
+      updates.forEach((update) => {
+        const dayIndex = state.workingHours.findIndex(
+          (day) => day.day_of_week === update.day
+        );
+
+        if (dayIndex !== -1 && state.workingHours[dayIndex].enabled) {
+          state.workingHours[dayIndex].start_time = update.start;
+          state.workingHours[dayIndex].end_time = update.end;
+          state.workingHours[dayIndex].breaks = update.breaks;
+        }
+      });
+    },
+
     toggleDay: (state, action: PayloadAction<string>) => {
       console.log(action.payload);
       const day = state.workingHours.find(
@@ -182,5 +201,6 @@ export const {
   setFinishBusinessLoading,
   setBusinessDetail,
   updateWorkingHour,
+  updateMultipleWorkingHours,
   toggleDay,
 } = businessSetupSlice.actions;

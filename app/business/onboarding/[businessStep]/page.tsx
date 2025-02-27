@@ -148,7 +148,12 @@ function Page({ params }: Props) {
       ) - 1;
     if (prevStep >= 0) {
       const newPath = stepContent[prevStep]?.path;
-      router.push(newPath);
+
+      if (newPath == "/business/onboarding/add-service") {
+        router.push("/business/onboarding/services");
+      } else {
+        router.push(newPath);
+      }
     }
   };
 

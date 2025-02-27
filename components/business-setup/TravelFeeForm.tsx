@@ -332,15 +332,16 @@ const TravelFeeForm: React.FC = () => {
             >
               Maximum Travel Distance (km)
             </label>
-            <div className="relative">
-              <Input
-                id="travel-distance"
-                type="text"
-                placeholder="Enter distance in km"
-                value={distance}
-                onChange={handleDistanceChange}
-                className="pr-10"
-              />
+            <div className="relative mt-">
+              <div className="mt-4">
+                <Input
+                  id="travel-distance"
+                  type="text"
+                  placeholder="Enter distance in km"
+                  value={distance}
+                  onChange={handleDistanceChange}
+                />
+              </div>
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                 km
               </div>
