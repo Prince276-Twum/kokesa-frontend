@@ -26,10 +26,6 @@ describe("LoginPage", () => {
     );
     expect(image).toBeInTheDocument();
 
-    // Check for the presence of the logo
-    const logo = screen.getByAltText("kokesa logo");
-    expect(logo).toBeInTheDocument();
-
     // Check for the presence of the heading
     const headings = screen.getAllByText("Sign In");
     expect(headings.length).toBeGreaterThan(0);

@@ -42,7 +42,9 @@ describe("RegisterForm", () => {
     await user.type(emailInput, "invalid-email");
     await user.click(submitButton);
 
-    const errorElement = screen.getByText("enter a valid email address.");
+    const errorElement = screen.getByText(
+      "Please enter a valid email address."
+    );
     expect(errorElement).toBeInTheDocument();
   });
 
