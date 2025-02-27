@@ -1,44 +1,80 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import RegisterForm from "@/components/form/RegisterForm";
 import KokesaLogo from "@/components/common/KokesaLogo";
 
-// Import images with more explicit types
+// Import image
 import regImage from "@/public/reg.jpeg";
 
 const RegistrationPage: React.FC = () => {
   return (
-    <main className="w-full md:min-h-screen flex">
-      {/* Image Section */}
-      <div className="relative hidden md:block flex-1">
-        <Image
-          className="object-cover w-full h-full"
-          src={regImage}
-          alt="Registration Image"
-          placeholder="blur"
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          fill
-        />
-      </div>
-
-      {/* Registration Form Section */}
-      <div className="flex-1 flex flex-col justify-center p-6 md:p-12 lg:p-20 md:min-h-screen overflow-auto">
-        <div className="w-full max-w-md py-6 mx-auto bg-white rounded-lg">
-          <div className="flex justify-center mb-12">
-            <div className="bg-black inline-block p-2 px-6 rounded-md">
+    <div className="min-h-screen bg-white flex">
+      {/* Left Panel - Form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo */}
+          <div className="flex justify-center">
+            <div className="bg-black p-2.5 rounded-lg shadow-lg">
               <KokesaLogo />
             </div>
           </div>
 
-          <h1 className="text-2xl md:text-[2rem] text-center font-extrabold md:font-bold mb-4">
-            Create an Account
-          </h1>
-        </div>
+          {/* Header */}
+          <div className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Create your account
+            </h1>
+            <p className="mt-3 text-gray-500">
+              Join thousands of users managing their business with Kokesa
+            </p>
+          </div>
 
-        <RegisterForm />
+          {/* Registration Form */}
+          <RegisterForm />
+
+          {/* Login Link */}
+          <div className="text-center text-sm">
+            <p className="text-gray-500">
+              Already have an account?{" "}
+              <Link
+                href="/auth/login"
+                className="font-medium text-primary hover:text-primary-light transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div className="pt-6 text-center text-xs text-gray-400">
+            <p>© {new Date().getFullYear()} Kokesa. All rights reserved.</p>
+          </div>
+        </div>
       </div>
-    </main>
+
+      {/* Right Panel - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-black/10 z-10"></div>
+        <div className="absolute left-10 bottom-10 text-white z-20 max-w-md">
+          <h2 className="text-3xl font-bold">
+            Streamline your business operations
+          </h2>
+          <p className="mt-3 text-white/80">
+            Join thousands of businesses that use Kokesa to increase efficiency
+            and drive growth.
+          </p>
+        </div>
+        <Image
+          src={regImage}
+          alt="Kokesa Platform"
+          fill
+          priority
+          placeholder="blur"
+          className="object-cover"
+        />
+      </div>
+    </div>
   );
 };
 

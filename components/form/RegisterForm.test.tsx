@@ -11,6 +11,7 @@ jest.mock("next/navigation", () => ({
     pathname: "",
     query: {},
     asPath: "",
+    push: jest.fn(),
   }),
 }));
 
@@ -21,12 +22,14 @@ describe("RegisterForm", () => {
         <RegisterForm />
       </CustomProvider>
     );
-    expect(screen.getByLabelText("Enter Your Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Enter Your Password")).toBeInTheDocument();
+    expect(screen.getByLabelText("Email address")).toBeInTheDocument();
+    expect(screen.getByLabelText("Create password")).toBeInTheDocument();
     expect(
-      screen.getByLabelText("I agree to the terms and conditions")
+      screen.getByLabelText(
+        "I agree to the Terms of Service and Privacy Policy"
+      )
     ).toBeInTheDocument();
-    expect(screen.getByText("Create An Account")).toBeInTheDocument();
+    expect(screen.getByText("Create Account")).toBeInTheDocument();
   });
 
   test("shows email error message on invalid email", async () => {
@@ -35,15 +38,15 @@ describe("RegisterForm", () => {
         <RegisterForm />
       </CustomProvider>
     );
-    const emailInput = screen.getByLabelText("Enter Your Email");
-    const submitButton = screen.getByText("Create An Account");
+    const emailInput = screen.getByLabelText("Email address");
+    const submitButton = screen.getByText("Create Account");
 
     await user.click(emailInput);
     await user.type(emailInput, "invalid-email");
     await user.click(submitButton);
 
-    const errorElement = screen.getByText(
-      "Please enter a valid email address."
+    const errorElement = await screen.findByText((content, element) =>
+      content.includes("Please enter a valid email address.")
     );
     expect(errorElement).toBeInTheDocument();
   });
@@ -54,7 +57,7 @@ describe("RegisterForm", () => {
         <RegisterForm />
       </CustomProvider>
     );
-    const passwordInput = screen.getByLabelText("Enter Your Password");
+    const passwordInput = screen.getByLabelText("Create password");
 
     await user.type(passwordInput, "short");
 
@@ -79,12 +82,33 @@ describe("RegisterForm", () => {
         <RegisterForm />
       </CustomProvider>
     );
-    const submitButton = screen.getByText("Create An Account");
+    const submitButton = screen.getByText("Create Account");
     fireEvent.click(submitButton);
 
-    expect(
-      screen.getByText("You must agree to the terms and conditions.")
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Please accept the terms and conditions to continue")
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("allows toggling password visibility", async () => {
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
+
+    const passwordInput = screen.getByLabelText("Create password");
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    const toggleButton = screen.getByLabelText("Show password");
+
+    await user.click(toggleButton);
+    expect(passwordInput).toHaveAttribute("type", "text");
+
+    await user.click(toggleButton);
+    expect(passwordInput).toHaveAttribute("type", "password");
   });
 
   test("submits the form successfully with valid inputs", async () => {
@@ -93,26 +117,42 @@ describe("RegisterForm", () => {
         <RegisterForm />
       </CustomProvider>
     );
-    const emailInput = screen.getByLabelText("Enter Your Email");
-    const passwordInput = screen.getByLabelText("Enter Your Password");
+    const emailInput = screen.getByLabelText("Email address");
+    const passwordInput = screen.getByLabelText("Create password");
     const termsCheckbox = screen.getByLabelText(
-      "I agree to the terms and conditions"
+      "I agree to the Terms of Service and Privacy Policy"
     );
-    const submitButton = screen.getByText("Create An Account");
+    const submitButton = screen.getByText("Create Account");
 
     await user.type(emailInput, "test@example.com");
-    await user.type(passwordInput, "ValidPassword12");
+    await user.type(passwordInput, "ValidPassword12!");
     await user.click(termsCheckbox);
     await user.click(submitButton);
 
-    expect(screen.queryByText("Invalid email address")).not.toBeInTheDocument();
-    expect(
-      screen.queryByText("Password must be at least 8 characters long")
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(
-        "You must agree to the terms and conditions before submitting."
-      )
-    ).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Invalid email address")
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Password must be at least 8 characters long")
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Please accept the terms and conditions to continue")
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test("handles Google sign-up button click", async () => {
+    render(
+      <CustomProvider>
+        <RegisterForm />
+      </CustomProvider>
+    );
+
+    const googleButton = screen.getByText("Continue with Google");
+    await user.click(googleButton);
+
+    // This just verifies the button is clickable
+    expect(googleButton).toBeInTheDocument();
   });
 });

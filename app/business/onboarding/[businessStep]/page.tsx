@@ -177,7 +177,7 @@ function Page({ params }: Props) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="max-w-lg mx-auto bg-white border-0 shadow-none md:shadow-xl md:rounded-xl overflow-hidden"
+        className="max-w-lg mx-auto bg-white border-0 shadow-none md:shadow-xl md:rounded-xl "
       >
         <div className="relative">
           {/* Progress indicator */}
