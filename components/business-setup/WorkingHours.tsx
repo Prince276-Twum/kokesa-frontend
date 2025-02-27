@@ -1,4 +1,3 @@
-// components/business-setup/BusinessWorkingHours.tsx
 import React, { useState } from "react";
 import Select from "react-select";
 import Button from "../UI/Button";
@@ -273,24 +272,12 @@ const BusinessWorkingHours = () => {
     }),
   };
 
-  // Day names with styling
-  // const getDayStyle = (day: string) => {
-  //   const firstLetter = day.charAt(0);
-  //   const restOfDay = day.slice(1).toLowerCase();
-  //   return (
-  //     <>
-  //       <span className="text-primary font-bold">{firstLetter}</span>
-  //       {restOfDay}
-  //     </>
-  //   );
-  // };
-
   return (
     <div className="space-y-6">
       {workingHours.map((hours) => (
         <div
           key={hours.day_of_week}
-          className={`p-4 rounded-xl border-2 transition-all flex justify-between items-center ${
+          className={`p-4 rounded-xl border-2 transition-all ${
             hours.enabled
               ? "border-gray-200 hover:border-gray-300"
               : "border-gray-100 bg-gray-50"
@@ -306,35 +293,40 @@ const BusinessWorkingHours = () => {
                 {hours.day_of_week}
               </span>
             </div>
+
+            {hours.enabled && (
+              <button
+                onClick={() => handleEdit(hours.day_of_week)}
+                className="text-primary hover:text-primary-light p-2 rounded-full hover:bg-primary-light/10 transition-colors flex-shrink-0"
+                aria-label="Edit working hours"
+                type="button"
+              >
+                <MdEdit size={18} />
+              </button>
+            )}
           </div>
 
           {hours.enabled && (
             <div className="mt-3 ml-12">
-              <div className="flex items-center justify-between gap-2 text-gray-700">
-                <MdAccessTime className="text-gray-400" size={16} />
-                <span className="px-2 py-1 bg-gray-50 border border-gray-200 rounded-md text-sm">
-                  {hours.start_time}
-                </span>
+              <div className="flex flex-wrap items-center gap-2 text-gray-700">
+                <div className="flex items-center">
+                  <MdAccessTime className="text-gray-400 mr-2" size={16} />
+                  <span className="px-2 py-1 bg-gray-50 border border-gray-200 rounded-md text-sm">
+                    {hours.start_time}
+                  </span>
+                </div>
                 <span className="text-gray-400">to</span>
                 <span className="px-2 py-1 bg-gray-50 border border-gray-200 rounded-md text-sm">
                   {hours.end_time}
                 </span>
-
-                {hours.enabled && (
-                  <button
-                    onClick={() => handleEdit(hours.day_of_week)}
-                    className="text-primary hover:text-primary-light p-2 rounded-full hover:bg-primary-light/10 transition-colors"
-                    aria-label="Edit working hours"
-                    type="button"
-                  >
-                    <MdEdit size={18} />
-                  </button>
-                )}
               </div>
 
               {hours.breaks?.length > 0 && (
                 <div className="mt-2 text-sm flex items-start gap-2">
-                  <FaMugHot className="text-gray-400 mt-1" size={14} />
+                  <FaMugHot
+                    className="text-gray-400 mt-1 flex-shrink-0"
+                    size={14}
+                  />
                   <div>
                     <span className="text-gray-500">Breaks:</span>
                     <div className="flex flex-wrap gap-2 mt-1">

@@ -21,7 +21,7 @@ import {
 import { NumericFormat } from "react-number-format";
 import Button from "../UI/Button";
 
-// Define type for service options
+// Define types
 interface ServiceDurationOption {
   value: number;
   label: string;
@@ -32,62 +32,140 @@ interface ServiceOption {
   label: string;
 }
 
-interface ServiceDetails {
+// This should match exactly the service type in your Redux store
+interface StoreService {
   name: string;
-  type: ServiceOption | null; // Allow null for clearing
-  groupLabel: string; // The group label for the selected service
-  duration: { hours: number; minutes: number }; // Service duration
+  type: ServiceOption | null;
+  groupLabel: string;
+  duration: { hours: number; minutes: number };
   price: number;
+  startAt: boolean; // Ensure startAt is defined
+}
+
+// Local interface with guaranteed startAt property for local state
+interface LocalService {
+  name: string;
+  type: ServiceOption | null;
+  groupLabel: string;
+  duration: { hours: number; minutes: number };
+  price: number;
+  startAt: boolean;
 }
 
 interface Props {
   addServices?: boolean;
 }
 
-const BusinessServices = ({ addServices }: Props) => {
+// Custom interface for our price input component
+interface PriceInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  id?: string;
+  cn?: string;
+}
+
+// Define a custom input component that works with NumericFormat
+const PriceInput: React.FC<PriceInputProps> = (props) => {
+  const { id, cn, ...rest } = props;
+
+  return (
+    <Input
+      id={id || "price-input"} // Provide a default ID to satisfy required prop
+      type="text"
+      cn={cn}
+      {...rest}
+    />
+  );
+};
+
+const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
   const { services } = useAppSelector((store) => store.businessSetup);
   const router = useRouter();
-  const [isAddService] = useState(addServices);
   const { currencyCode, currencySymbol } = useCurrencyInfo();
-  const [serviceDetails, setServiceDetails] = useState<ServiceDetails>({
+  const [serviceDetails, setServiceDetails] = useState<LocalService>({
     name: "",
-    type: null, // Initialize as null
-    groupLabel: "", // Empty label when no selection
+    type: null,
+    groupLabel: "",
     duration: { hours: 0, minutes: 40 }, // Default duration
     price: 25,
+    startAt: false,
   });
+  const [formError, setFormError] = useState<{
+    name?: string;
+    price?: string;
+  }>({});
   const dispatch = useAppDispatch();
 
+  // Styles for all selects
   const customStyles: StylesConfig<ServiceOption, false> = {
     control: (provided) => ({
       ...provided,
       backgroundColor: "white",
-      borderColor: "#4F46E5",
-      color: "black",
+      borderColor: "#e5e7eb",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      minHeight: "42px",
+      "&:hover": {
+        borderColor: "#d1d5db",
+      },
+      "&:focus-within": {
+        borderColor: "#EB5017",
+        boxShadow: "0 0 0 1px #EB5017",
+      },
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: "#9ca3af",
     }),
     singleValue: (provided) => ({
       ...provided,
-      color: "black",
+      color: "#1f2937",
     }),
     menu: (provided) => ({
       ...provided,
-      padding: "px",
+      borderRadius: "0.5rem",
+      boxShadow:
+        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      zIndex: 10,
+      maxHeight: "300px",
+      overflow: "visible",
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      maxHeight: "250px", // Make the menu taller
+      paddingTop: "4px",
+      paddingBottom: "4px",
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#e5e7eb" : "white",
-      color: "black",
-      borderBottom: "1px solid #d1d5db",
-      padding: "10px",
+      backgroundColor: state.isFocused ? "#FFECE5" : "white",
+      color: state.isFocused ? "#EB5017" : "#1f2937",
+      borderBottom: "1px solid #f3f4f6",
+      padding: "10px 12px",
+      cursor: "pointer",
+      "&:hover": {
+        backgroundColor: "#FFECE5",
+      },
+      "&:active": {
+        backgroundColor: "#EB5017",
+        color: "white",
+      },
     }),
     groupHeading: (provided) => ({
       ...provided,
-      padding: "1rem  10px",
-      color: "black",
+      padding: "1rem 12px",
+      color: "#4b5563",
       fontWeight: "600",
-      fontSize: "20px",
+      fontSize: "16px",
+      textTransform: "none",
+      letterSpacing: "normal",
+      backgroundColor: "#f9fafb",
     }),
   };
+
+  // Create typed duration styles and options
+  const durationStyles: StylesConfig<ServiceDurationOption, false> =
+    customStyles as any;
+  const hourOptions = serviceDurationHours as ServiceDurationOption[];
+  const minuteOptions = serviceDurationMin as ServiceDurationOption[];
 
   const handleServiceTypeChange = (
     selectedOption: SingleValue<ServiceOption>
@@ -107,15 +185,14 @@ const BusinessServices = ({ addServices }: Props) => {
         (option) => option.value === selectedOption.value
       );
       if (foundOption) {
-        groupLabel = group.label; // Get group label
+        groupLabel = group.label;
       }
     });
 
-    // Update state with selected option and group label
     setServiceDetails({
       ...serviceDetails,
       type: selectedOption,
-      groupLabel: groupLabel, // Store group label
+      groupLabel: groupLabel,
     });
   };
 
@@ -143,38 +220,69 @@ const BusinessServices = ({ addServices }: Props) => {
     });
   };
 
-  const handleOnSave = () => {
-    if (serviceDetails.name && serviceDetails.price) {
-      const updatedServices = [...services.service, { ...serviceDetails }];
-      localStorage.setItem("services", JSON.stringify(updatedServices));
-      setServiceDetails({
-        name: "",
-        type: null, // Reset type to null
-        groupLabel: "", // Reset group label
-        duration: { hours: 0, minutes: 40 },
-        price: 25,
-      });
-      dispatch(addBusinessService(updatedServices));
-      dispatch(addServiceEditIndex(null));
-      router.push("services");
+  const validateForm = (): boolean => {
+    const errors: { name?: string; price?: string } = {};
+
+    if (!serviceDetails.name.trim()) {
+      errors.name = "Service name is required";
     }
 
-    console.log(serviceDetails); // This will now log the group label as well
+    if (!serviceDetails.price || serviceDetails.price <= 0) {
+      errors.price = "Please enter a valid price";
+    }
+
+    setFormError(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleOnSave = () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    // Convert LocalService to StoreService for Redux
+    const serviceToSave: StoreService = { ...serviceDetails };
+
+    const updatedServices = [...services.service, serviceToSave];
+    localStorage.setItem("services", JSON.stringify(updatedServices));
+    setServiceDetails({
+      name: "",
+      type: null,
+      groupLabel: "",
+      duration: { hours: 0, minutes: 40 },
+      price: 25,
+      startAt: false,
+    });
+
+    dispatch(addBusinessService(updatedServices));
+    dispatch(addServiceEditIndex(null));
+    router.push("services");
   };
 
   const handleRemoveService = (index: number) => {
     const updatedServices = services.service.filter((_, i) => i !== index);
     dispatch(addBusinessService(updatedServices));
-
-    console.log(updatedServices);
     localStorage.setItem("services", JSON.stringify(updatedServices));
   };
 
-  console.log(services.editingIndex, "is outside");
-
   useEffect(() => {
-    if (services.editingIndex !== null) {
-      setServiceDetails(services.service[services.editingIndex]);
+    if (
+      services.editingIndex !== null &&
+      services.service[services.editingIndex]
+    ) {
+      const serviceToEdit = services.service[services.editingIndex];
+
+      // Convert StoreService to LocalService, ensuring startAt is defined
+      const editableService: LocalService = {
+        name: serviceToEdit.name,
+        type: serviceToEdit.type,
+        groupLabel: serviceToEdit.groupLabel,
+        duration: serviceToEdit.duration,
+        price: serviceToEdit.price,
+        startAt: serviceToEdit.startAt || false, // Default to false if missing
+      };
+
+      setServiceDetails(editableService);
     }
   }, [services.editingIndex, services.service]);
 
@@ -182,157 +290,319 @@ const BusinessServices = ({ addServices }: Props) => {
     router.push("hours");
   };
 
+  const formatDuration = (hours: number, minutes: number): string => {
+    if (hours === 0) {
+      return `${minutes} min`;
+    } else if (minutes === 0) {
+      return `${hours} ${hours === 1 ? "hour" : "hours"}`;
+    } else {
+      return `${hours}h ${minutes}m`;
+    }
+  };
+
+  // Helper function to safely find hour option
+  const findHourOption = (hours: number): ServiceDurationOption => {
+    return (
+      hourOptions.find((option) => option.value === hours) || hourOptions[0]
+    );
+  };
+
+  // Helper function to safely find minute option
+  const findMinuteOption = (minutes: number): ServiceDurationOption => {
+    return (
+      minuteOptions.find((option) => option.value === minutes) ||
+      minuteOptions[0]
+    );
+  };
+
   return (
-    <div className="p-4 space-y-4">
-      {!isAddService && (
+    <div className="space-y-5">
+      {!addServices && (
         <>
-          {services.service.map((service, index) => (
-            <div
-              key={index}
-              className="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50"
-            >
-              <div className="flex items-center">
+          <div className="space-y-3">
+            {services.service.length === 0 ? (
+              <div className="text-center p-8 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="bg-primary-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaPlus className="text-primary h-6 w-6" />
+                </div>
+                <h3 className="text-gray-700 font-medium mb-2">
+                  No services added yet
+                </h3>
+                <p className="text-gray-500 text-sm mb-4">
+                  Add your first service to continue
+                </p>
                 <button
-                  onClick={() => handleRemoveService(index)}
-                  className="hover:text-red-500"
-                >
-                  <FaTimes className="w-5 h-5 text-gray-400 mr-3" />
-                </button>
-                <span className="text-sm font-medium">{service.name}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="mr-2 text-lg font-bold">
-                  {currencySymbol}
-                  {service.price}
-                </span>
-                <FaChevronRight
-                  className="w-5 h-5 text-gray-400"
                   onClick={() => {
-                    dispatch(addServiceEditIndex(index));
+                    dispatch(addServiceEditIndex(null));
                     router.push("add-service");
                   }}
-                />
+                  className="px-4 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors"
+                >
+                  Add Your First Service
+                </button>
               </div>
-            </div>
-          ))}
+            ) : (
+              <>
+                {services.service.map((service, index) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-xl p-4 hover:border-primary hover:shadow-sm transition-all"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-1">
+                          <h3 className="font-medium text-gray-900">
+                            {service.name}
+                          </h3>
+                          {/* Use optional chaining for startAt since it might be undefined */}
+                          {service.startAt && (
+                            <span className="ml-2 text-xs bg-primary-50 text-primary px-2 py-0.5 rounded-full">
+                              Starting price
+                            </span>
+                          )}
+                        </div>
 
-          <button
-            onClick={() => {
-              dispatch(addServiceEditIndex(null));
-              router.push("add-service");
-            }}
-            className="w-full border rounded-lg p-4 flex items-center text-gray-500 hover:bg-gray-100 transition-colors"
-          >
-            <FaPlus className="w-5 h-5 mr-3" />
-            Add Service
-          </button>
+                        <div className="text-sm text-gray-500 flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+                          {service.type && (
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span>
+                              {service.type.label}
+                            </span>
+                          )}
+                          <span className="flex items-center">
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span>
+                            {formatDuration(
+                              service.duration.hours,
+                              service.duration.minutes
+                            )}
+                          </span>
+                        </div>
+                      </div>
 
-          <Button el="button" onClick={handleSubmit} primary>
-            Next
-          </Button>
-        </>
-      )}
-      {isAddService && (
-        <>
-          <div className="space-y-4">
-            <div>
-              <Input
-                id="service-name"
-                type="text"
-                placeholder="Service Name"
-                value={serviceDetails.name}
-                onChange={(e) =>
-                  setServiceDetails({ ...serviceDetails, name: e.target.value })
-                }
-              />
-            </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-gray-900 whitespace-nowrap">
+                          {currencySymbol}
+                          {service.price}
+                        </span>
+                        <div className="flex">
+                          <button
+                            onClick={() => handleRemoveService(index)}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                            aria-label="Remove service"
+                          >
+                            <FaTimes className="w-4 h-4" />
+                          </button>
 
-            {/* Service Type Selection */}
-            <div>
-              <Select
-                isClearable
-                styles={customStyles}
-                options={serviceType}
-                value={serviceDetails.type} // Set the selected value
-                onChange={handleServiceTypeChange} // Handle change
-              />
-            </div>
+                          <button
+                            onClick={() => {
+                              dispatch(addServiceEditIndex(index));
+                              router.push("add-service");
+                            }}
+                            className="p-2 text-gray-400 hover:text-primary hover:bg-primary-50 rounded-full transition-colors"
+                            aria-label="Edit service"
+                          >
+                            <FaChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
 
-            {/* Service Duration Selection */}
-            <div>
-              <label className="block text-sm text-gray-600 mb-2">
-                Service duration
-              </label>
-
-              <div className="flex gap-4">
-                <Select
-                  className="w-full"
-                  options={serviceDurationHours}
-                  value={serviceDurationHours.find(
-                    (item) => item.value === serviceDetails.duration.hours
-                  )}
-                  onChange={(selectedOption) =>
-                    handleDurationHour(selectedOption)
-                  }
-                />
-                <Select
-                  className="w-full"
-                  options={serviceDurationMin}
-                  value={serviceDurationMin.find(
-                    (item) => item.value === serviceDetails.duration.minutes
-                  )}
-                  onChange={(selectedOption) =>
-                    handleDurationMin(selectedOption)
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Price Input */}
-            <div className="flex gap-4 justify-between">
-              <NumericFormat
-                id="service-price"
-                placeholder="Price"
-                value={serviceDetails.price}
-                thousandSeparator
-                prefix={`${currencyCode} `}
-                customInput={Input}
-                onValueChange={(values) =>
-                  setServiceDetails({
-                    ...serviceDetails,
-                    price: Number(values.value),
-                  })
-                }
-              />
-              <div className="flex   w-full items-center space-x-2">
-                <label htmlFor="price-start-23">Start At</label>
-                <input
-                  className="h-4 w-4"
-                  id="price-start-23"
-                  type="checkbox"
-                />
-              </div>
-            </div>
-            {services.editingIndex !== null ? (
+            {services.service.length > 0 && (
               <button
                 onClick={() => {
-                  dispatch(updateBusinessService(serviceDetails));
-                  router.push("services");
+                  dispatch(addServiceEditIndex(null));
+                  router.push("add-service");
                 }}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-4 font-medium transition-colors"
+                className="w-full border border-dashed border-gray-300 rounded-xl p-4 flex items-center justify-center text-primary font-medium hover:bg-primary-50 hover:border-primary-300 transition-colors"
               >
-                Update
-              </button>
-            ) : (
-              <button
-                onClick={handleOnSave}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-4 font-medium transition-colors"
-              >
-                Save
+                <FaPlus className="w-4 h-4 mr-2" />
+                Add Another Service
               </button>
             )}
           </div>
+
+          <Button
+            el="button"
+            onClick={handleSubmit}
+            primary
+            rounded
+            className="w-full py-3 mt-6"
+            disabled={services.service.length === 0}
+          >
+            Continue
+          </Button>
         </>
+      )}
+
+      {addServices && (
+        <div className="space-y-5">
+          <div>
+            <label
+              htmlFor="service-name"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              Service Name
+            </label>
+            <Input
+              id="service-name"
+              type="text"
+              placeholder="e.g. Haircut, Manicure, Consultation"
+              value={serviceDetails.name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setServiceDetails({ ...serviceDetails, name: e.target.value })
+              }
+              cn={formError.name ? "border-red-500" : ""}
+            />
+            {formError.name && (
+              <p className="mt-1.5 text-sm text-red-500">{formError.name}</p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="service-type"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              Service Type
+            </label>
+            <Select<ServiceOption, false>
+              id="service-type"
+              isClearable
+              styles={customStyles}
+              options={serviceType}
+              value={serviceDetails.type}
+              onChange={handleServiceTypeChange}
+              placeholder="Select service type"
+              className="react-select-container"
+              classNamePrefix="react-select"
+              maxMenuHeight={300}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Service Duration
+            </label>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">
+                  Hours
+                </label>
+                <Select<ServiceDurationOption, false>
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  options={hourOptions}
+                  value={findHourOption(serviceDetails.duration.hours)}
+                  onChange={handleDurationHour}
+                  styles={durationStyles}
+                  maxMenuHeight={200}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">
+                  Minutes
+                </label>
+                <Select<ServiceDurationOption, false>
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  options={minuteOptions}
+                  value={findMinuteOption(serviceDetails.duration.minutes)}
+                  onChange={handleDurationMin}
+                  styles={durationStyles}
+                  maxMenuHeight={200}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="service-price"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              Price
+            </label>
+            <div className="flex gap-4 items-center">
+              <div className="flex-1">
+                <NumericFormat
+                  id="service-price"
+                  placeholder={`${currencyCode} 0.00`}
+                  value={serviceDetails.price}
+                  thousandSeparator
+                  prefix={`${currencyCode} `}
+                  customInput={PriceInput}
+                  onValueChange={(values) => {
+                    setServiceDetails({
+                      ...serviceDetails,
+                      price: Number(values.value),
+                    });
+                  }}
+                  className={formError.price ? "border-red-500" : ""}
+                />
+                {formError.price && (
+                  <p className="mt-1.5 text-sm text-red-500">
+                    {formError.price}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  id="price-start-toggle"
+                  name="price-start"
+                  type="checkbox"
+                  checked={serviceDetails.startAt}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setServiceDetails({
+                      ...serviceDetails,
+                      startAt: e.target.checked,
+                    })
+                  }
+                  className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                />
+                <label
+                  htmlFor="price-start-toggle"
+                  className="ml-2 block text-sm text-gray-700"
+                >
+                  Starting price
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {services.editingIndex !== null ? (
+            <Button
+              el="button"
+              onClick={() => {
+                if (!validateForm()) return;
+                // Convert LocalService to StoreService for Redux
+                const updatedService: StoreService = { ...serviceDetails };
+                dispatch(updateBusinessService(updatedService));
+                router.push("services");
+              }}
+              primary
+              rounded
+              className="w-full py-3 mt-6"
+            >
+              Update Service
+            </Button>
+          ) : (
+            <Button
+              el="button"
+              onClick={handleOnSave}
+              primary
+              rounded
+              className="w-full py-3 mt-6"
+            >
+              Save Service
+            </Button>
+          )}
+        </div>
       )}
     </div>
   );

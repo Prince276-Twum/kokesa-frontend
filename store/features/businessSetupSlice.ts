@@ -39,6 +39,7 @@ interface Service {
   groupLabel: string;
   duration: { hours: number; minutes: number }; // Service duration
   price: number;
+  startAt: boolean;
 }
 interface initialStateType {
   isSetupComplete: boolean;
