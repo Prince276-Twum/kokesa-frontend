@@ -5,7 +5,6 @@ import "react-phone-number-input/style.css";
 import CustomPhoneInput from "../UI/CustomPhoneInput";
 import Button from "../UI/Button";
 import useBusinessSetup from "@/hooks/useBusinessDetail";
-import { MdBusiness, MdPerson } from "react-icons/md";
 
 function SetupDetails() {
   const {
@@ -26,7 +25,6 @@ function SetupDetails() {
       <form onSubmit={onSubmit} className="w-full">
         <div className="mb-4">
           <Input
-            leftIcon={<MdBusiness size={20} />}
             type="text"
             id="business-name"
             placeholder="Business Name"
@@ -37,7 +35,6 @@ function SetupDetails() {
         </div>
         <div className="mb-4">
           <Input
-            leftIcon={<MdPerson size={20} />}
             id="your-name"
             placeholder="Your Name"
             cn="w-full"
@@ -69,43 +66,6 @@ function SetupDetails() {
           Continue
         </Button>
       </form>
-
-      <style jsx global>{`
-        .PhoneInput {
-          display: flex;
-          align-items: center;
-        }
-
-        .PhoneInputCountry {
-          position: relative;
-          align-self: stretch;
-          display: flex;
-          align-items: center;
-          margin-right: 0.5rem;
-          padding: 0 0.5rem;
-          border-right: 1px solid #e5e7eb;
-        }
-
-        .custom-phone-input input {
-          flex: 1;
-          min-width: 0;
-          border: 1px solid #e5e7eb;
-          border-radius: 0.5rem;
-          padding: 0.75rem 1rem;
-          font-size: 0.875rem;
-          transition: all 0.2s;
-        }
-
-        .custom-phone-input input:focus {
-          border-color: #6b7280;
-          outline: none;
-          box-shadow: 0 0 0 1px #6b7280;
-        }
-
-        .custom-phone-input input:hover {
-          border-color: #d1d5db;
-        }
-      `}</style>
     </div>
   );
 }
