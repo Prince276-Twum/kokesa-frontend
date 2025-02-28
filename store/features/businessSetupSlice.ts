@@ -41,7 +41,18 @@ interface Service {
   price: number;
   startAt: boolean;
 }
+interface BusinessAddress {
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  longitude: number | null;
+  latitude: number | null;
+}
+
 interface initialStateType {
+  businessAddress: BusinessAddress;
   isSetupComplete: boolean;
   currentStep: number;
   isLoading: boolean;
@@ -61,6 +72,16 @@ const initialState: initialStateType = {
     businessLocationOption: "",
   },
   services: { editingIndex: null, service: [] },
+
+  businessAddress: {
+    address: "",
+    city: "",
+    state: "",
+    country: "",
+    postalCode: "",
+    longitude: null,
+    latitude: null,
+  },
   workingHours: [
     {
       day_of_week: "Monday",
@@ -189,6 +210,9 @@ const businessSetupSlice = createSlice({
         day.enabled = !day.enabled;
       }
     },
+    setBusinessAddress: (state, action: PayloadAction<BusinessAddress>) => {
+      state.businessAddress = action.payload;
+    },
   },
 });
 
@@ -203,5 +227,6 @@ export const {
   setBusinessDetail,
   updateWorkingHour,
   updateMultipleWorkingHours,
+  setBusinessAddress,
   toggleDay,
 } = businessSetupSlice.actions;

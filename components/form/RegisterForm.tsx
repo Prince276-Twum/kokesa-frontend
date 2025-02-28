@@ -125,11 +125,9 @@ const RegisterForm: React.FC = () => {
         {/* Email field */}
         <div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MdEmail className="h-5 w-5 text-gray-400" />
-            </div>
             <Input
               id="email"
+              leftIcon={<MdEmail size={22} />}
               type="email"
               placeholder="Email address"
               value={email}
@@ -158,14 +156,12 @@ const RegisterForm: React.FC = () => {
         {/* Password field */}
         <div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MdLock className="h-5 w-5 text-gray-400" />
-            </div>
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="Create password"
               value={password}
+              leftIcon={<MdLock size={20} />}
               onChange={handlePasswordChange}
               cn={`pl-10 pr-10 py-3 rounded-xl shadow-sm ${
                 !isValid && showErrors

@@ -100,13 +100,7 @@ const TeamSizeSelector = () => {
         ))}
       </div>
 
-      <Button
-        el="button"
-        primary
-        rounded
-        onClick={handleContinue}
-        className="w-full py-4 text-lg font-medium"
-      >
+      <Button el="button" primary rounded onClick={handleContinue}>
         Continue
       </Button>
     </div>

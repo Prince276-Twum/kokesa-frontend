@@ -353,7 +353,6 @@ const BusinessWorkingHours = () => {
         el="button"
         primary
         rounded
-        className="w-full py-4 text-lg font-medium"
       >
         Continue
       </Button>

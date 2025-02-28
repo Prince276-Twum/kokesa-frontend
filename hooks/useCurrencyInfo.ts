@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import countries from "world-countries";
 import currencySymbolMap from "currency-symbol-map";
+import { useAppSelector } from "@/store/hooks";
 
 interface CountryInfo {
   currencySymbol: string;
@@ -29,6 +30,8 @@ const getCountryInfo = (countryName: string): CountryInfo => {
 };
 
 const useCurrencyInfo = () => {
+  const { businessAddress } = useAppSelector((store) => store.businessSetup);
+
   const [currencySymbol, setCurrencySymbol] = useState("$");
   const [currencyCode, setCurrencyCode] = useState<string | undefined>(
     undefined
@@ -36,11 +39,9 @@ const useCurrencyInfo = () => {
   const [countryCode, setCountryCode] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    const savedAddress = localStorage.getItem("businessAddress");
-    if (savedAddress) {
-      const parsedAddress = JSON.parse(savedAddress);
+    if (businessAddress) {
       const { currencySymbol, currencyCode, countryCode } = getCountryInfo(
-        parsedAddress.country
+        businessAddress.country
       );
       setCurrencySymbol(currencySymbol);
       setCurrencyCode(currencyCode);

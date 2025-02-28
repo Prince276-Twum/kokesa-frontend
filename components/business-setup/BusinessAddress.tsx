@@ -8,7 +8,10 @@ import { toast } from "react-toastify";
 import { useAddBusinessAddressMutation } from "@/store/features/businessApiSetupSlice";
 import Input from "../UI/Input";
 import { useRouter } from "next/navigation";
-import { setCurrentStep } from "@/store/features/businessSetupSlice";
+import {
+  setBusinessAddress,
+  setCurrentStep,
+} from "@/store/features/businessSetupSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { LocationOptions } from "@/utils/common-varialbles";
 import { capitalizeFirstLetterOfEachWord } from "@/utils/capitalized-words";
@@ -50,23 +53,21 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const {
+    businessAddress,
     businessInfo: { businessLocationOption },
   } = useAppSelector((store) => store.businessSetup);
 
   // Load saved address from localStorage on mount
   useEffect(() => {
-    const savedAddress = localStorage.getItem("businessAddress");
-    if (savedAddress) {
-      const parsedAddress = JSON.parse(savedAddress);
-      setAddress(parsedAddress.address || "");
-      setCity(parsedAddress.city || "");
-      setState(parsedAddress.state || "");
-      setCountry(parsedAddress.country || "");
-      setPostalCode(parsedAddress.postalCode || "");
-      setLatitude(parsedAddress.latitude || null);
-      setLongitude(parsedAddress.longitude || null);
-    }
-  }, []);
+    console.log(businessAddress);
+    setAddress(businessAddress.address || "");
+    setCity(businessAddress.city || "");
+    setState(businessAddress.state || "");
+    setCountry(businessAddress.country || "");
+    setPostalCode(businessAddress.postalCode || "");
+    setLatitude(businessAddress.latitude || null);
+    setLongitude(businessAddress.longitude || null);
+  }, [businessAddress]);
 
   const { data: geocodeData, isLoading: isGeocodeLoading } = useGeocodeQuery(
     address,
@@ -213,7 +214,7 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
       longitude,
     };
 
-    localStorage.setItem("businessAddress", JSON.stringify(businessAddress));
+    dispatch(setBusinessAddress(businessAddress));
 
     addAddress(businessAddress)
       .unwrap()
