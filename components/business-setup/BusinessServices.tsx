@@ -2,7 +2,6 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaTimes, FaPlus, FaChevronRight } from "react-icons/fa";
 import Input from "../UI/Input";
-import { StylesConfig } from "react-select";
 import { SingleValue } from "react-select";
 import useCurrencyInfo from "@/hooks/useCurrencyInfo";
 import {
@@ -11,7 +10,6 @@ import {
 } from "@/utils/common-varialbles";
 import { serviceType } from "@/data/business-service";
 
-import Select from "react-select";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   addBusinessService,
@@ -20,6 +18,9 @@ import {
 } from "@/store/features/businessSetupSlice";
 import { NumericFormat } from "react-number-format";
 import Button from "../UI/Button";
+
+// Import the FloatingSelect component
+import FloatingSelect from "../UI/FloatingSelect";
 
 // Define types
 interface ServiceDurationOption {
@@ -56,30 +57,10 @@ interface Props {
   addServices?: boolean;
 }
 
-// Custom interface for our price input component
-interface PriceInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  id?: string;
-  cn?: string;
-}
-
-// Define a custom input component that works with NumericFormat
-const PriceInput: React.FC<PriceInputProps> = (props) => {
-  const { id, cn, ...rest } = props;
-
-  return (
-    <Input
-      id={id || "price-input"} // Provide a default ID to satisfy required prop
-      type="text"
-      cn={cn}
-      {...rest}
-    />
-  );
-};
-
 const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
   const { services } = useAppSelector((store) => store.businessSetup);
   const router = useRouter();
-  const { currencyCode, currencySymbol } = useCurrencyInfo();
+  const { currencySymbol } = useCurrencyInfo();
   const [serviceDetails, setServiceDetails] = useState<LocalService>({
     name: "",
     type: null,
@@ -91,79 +72,17 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
   const [formError, setFormError] = useState<{
     name?: string;
     price?: string;
+    type?: string;
   }>({});
   const dispatch = useAppDispatch();
 
-  // Styles for all selects
-  const customStyles: StylesConfig<ServiceOption, false> = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: "white",
-      borderColor: "#e5e7eb",
-      borderRadius: "0.5rem",
-      boxShadow: "none",
-      minHeight: "42px",
-      "&:hover": {
-        borderColor: "#d1d5db",
-      },
-      "&:focus-within": {
-        borderColor: "#EB5017",
-        boxShadow: "0 0 0 1px #EB5017",
-      },
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: "#9ca3af",
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: "#1f2937",
-    }),
-    menu: (provided) => ({
-      ...provided,
-      borderRadius: "0.5rem",
-      boxShadow:
-        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-      zIndex: 10,
-      maxHeight: "300px",
-      overflow: "visible",
-    }),
-    menuList: (provided) => ({
-      ...provided,
-      maxHeight: "250px", // Make the menu taller
-      paddingTop: "4px",
-      paddingBottom: "4px",
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? "#FFECE5" : "white",
-      color: state.isFocused ? "#EB5017" : "#1f2937",
-      borderBottom: "1px solid #f3f4f6",
-      padding: "10px 12px",
-      cursor: "pointer",
-      "&:hover": {
-        backgroundColor: "#FFECE5",
-      },
-      "&:active": {
-        backgroundColor: "#EB5017",
-        color: "white",
-      },
-    }),
-    groupHeading: (provided) => ({
-      ...provided,
-      padding: "1rem 12px",
-      color: "#4b5563",
-      fontWeight: "600",
-      fontSize: "16px",
-      textTransform: "none",
-      letterSpacing: "normal",
-      backgroundColor: "#f9fafb",
-    }),
-  };
+  // Calculated disabled state for save/update button
+  const isSaveButtonDisabled =
+    !serviceDetails.name.trim() ||
+    !serviceDetails.type ||
+    !serviceDetails.price ||
+    serviceDetails.price <= 0;
 
-  // Create typed duration styles and options
-  const durationStyles: StylesConfig<ServiceDurationOption, false> =
-    customStyles as any;
   const hourOptions = serviceDurationHours as ServiceDurationOption[];
   const minuteOptions = serviceDurationMin as ServiceDurationOption[];
 
@@ -194,6 +113,13 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
       type: selectedOption,
       groupLabel: groupLabel,
     });
+
+    if (formError.type) {
+      setFormError({
+        ...formError,
+        type: undefined,
+      });
+    }
   };
 
   const handleDurationHour = (
@@ -221,7 +147,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
   };
 
   const validateForm = (): boolean => {
-    const errors: { name?: string; price?: string } = {};
+    const errors: { name?: string; price?: string; type?: string } = {};
 
     if (!serviceDetails.name.trim()) {
       errors.name = "Service name is required";
@@ -229,6 +155,10 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
 
     if (!serviceDetails.price || serviceDetails.price <= 0) {
       errors.price = "Please enter a valid price";
+    }
+
+    if (!serviceDetails.type) {
+      errors.type = "Service type is required";
     }
 
     setFormError(errors);
@@ -440,117 +370,96 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
       {addServices && (
         <div className="space-y-5">
           <div>
-            <label
-              htmlFor="service-name"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
-            >
-              Service Name
-            </label>
             <Input
               id="service-name"
               type="text"
-              placeholder="e.g. Haircut, Manicure, Consultation"
+              placeholder="Service Name"
               value={serviceDetails.name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setServiceDetails({ ...serviceDetails, name: e.target.value })
-              }
-              cn={formError.name ? "border-red-500" : ""}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setServiceDetails({ ...serviceDetails, name: e.target.value });
+                if (formError.name && e.target.value.trim()) {
+                  setFormError({
+                    ...formError,
+                    name: undefined,
+                  });
+                }
+              }}
+              error={formError.name}
             />
-            {formError.name && (
-              <p className="mt-1.5 text-sm text-red-500">{formError.name}</p>
-            )}
           </div>
 
           <div>
-            <label
-              htmlFor="service-type"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
-            >
-              Service Type
-            </label>
-            <Select<ServiceOption, false>
+            <FloatingSelect
               id="service-type"
-              isClearable
-              styles={customStyles}
               options={serviceType}
               value={serviceDetails.type}
               onChange={handleServiceTypeChange}
-              placeholder="Select service type"
-              className="react-select-container"
-              classNamePrefix="react-select"
+              placeholder="Service Type"
+              error={formError.type}
+              isClearable={true}
               maxMenuHeight={300}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Service Duration
-            </label>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Hours
-                </label>
-                <Select<ServiceDurationOption, false>
-                  className="react-select-container"
-                  classNamePrefix="react-select"
+                <FloatingSelect
+                  id="duration-hours"
                   options={hourOptions}
                   value={findHourOption(serviceDetails.duration.hours)}
                   onChange={handleDurationHour}
-                  styles={durationStyles}
+                  placeholder="Hours"
                   maxMenuHeight={200}
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
-                  Minutes
-                </label>
-                <Select<ServiceDurationOption, false>
-                  className="react-select-container"
-                  classNamePrefix="react-select"
+                <FloatingSelect
+                  id="duration-minutes"
                   options={minuteOptions}
                   value={findMinuteOption(serviceDetails.duration.minutes)}
                   onChange={handleDurationMin}
-                  styles={durationStyles}
+                  placeholder="Minutes"
                   maxMenuHeight={200}
                 />
               </div>
             </div>
           </div>
 
+          {/* Price section with horizontal layout */}
           <div>
-            <label
-              htmlFor="service-price"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
-            >
-              Price
-            </label>
-            <div className="flex gap-4 items-center">
-              <div className="flex-1">
+            <div className="grid grid-cols-2 gap-4 items-start">
+              <div>
+                {/* Price input */}
                 <NumericFormat
                   id="service-price"
-                  placeholder={`${currencyCode} 0.00`}
                   value={serviceDetails.price}
-                  thousandSeparator
-                  prefix={`${currencyCode} `}
-                  customInput={PriceInput}
                   onValueChange={(values) => {
+                    const numericValue = Number(values.value);
                     setServiceDetails({
                       ...serviceDetails,
-                      price: Number(values.value),
+                      price: numericValue,
                     });
+
+                    if (formError.price && numericValue > 0) {
+                      setFormError({
+                        ...formError,
+                        price: undefined,
+                      });
+                    }
                   }}
-                  className={formError.price ? "border-red-500" : ""}
+                  thousandSeparator={true}
+                  placeholder="Price"
+                  prefix={`${currencySymbol}  `}
+                  customInput={Input}
+                  error={formError.price}
+                  decimalScale={2}
+                  allowNegative={false}
                 />
-                {formError.price && (
-                  <p className="mt-1.5 text-sm text-red-500">
-                    {formError.price}
-                  </p>
-                )}
               </div>
 
-              <div className="flex items-center">
+              <div className="flex items-center h-full pt-3">
+                {/* Starting price checkbox */}
                 <input
                   id="price-start-toggle"
                   name="price-start"
@@ -587,6 +496,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
               primary
               rounded
               className="w-full py-3 mt-6"
+              disabled={isSaveButtonDisabled}
             >
               Update Service
             </Button>
@@ -597,6 +507,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
               primary
               rounded
               className="w-full py-3 mt-6"
+              disabled={isSaveButtonDisabled}
             >
               Save Service
             </Button>
