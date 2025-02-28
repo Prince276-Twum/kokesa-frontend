@@ -10,7 +10,7 @@ import {
 } from "@/components/business-setup/";
 import TravelFeeForm from "@/components/business-setup/TravelFeeForm";
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import { LocationOptions } from "@/utils/common-varialbles";
 import TeamSize from "@/components/business-setup/TeamSize";
@@ -88,6 +88,7 @@ function Page({ params }: Props) {
   const { businessStep } = use(params);
   const {
     currentStep,
+    isSetupComplete,
     businessInfo: { businessLocationOption },
   } = useAppSelector((store) => store.businessSetup);
   const router = useRouter();
@@ -113,6 +114,10 @@ function Page({ params }: Props) {
     const percentage = Math.floor(((stepIndex + 1) / stepContent.length) * 100);
     return Math.min(percentage, 100); // Cap at 100%
   };
+
+  if (isSetupComplete) {
+    redirect("/business/dashboard");
+  }
 
   const renderStepContent = () => {
     switch (currentStepPath) {
