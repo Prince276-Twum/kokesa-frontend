@@ -430,7 +430,6 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
             onClick={handleSubmit}
             primary
             rounded
-            className="w-full py-3 mt-6"
             disabled={services.service.length === 0}
           >
             Continue

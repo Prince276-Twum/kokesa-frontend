@@ -109,7 +109,6 @@ const ServiceLocationOptions = () => {
           rounded
           loading={isLoading}
           onClick={handleContinue}
-          className="py-4"
         >
           Continue
         </Button>

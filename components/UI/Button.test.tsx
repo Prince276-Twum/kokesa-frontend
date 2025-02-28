@@ -20,8 +20,8 @@ describe("Button", () => {
         Click Me
       </Button>
     );
-    const spinner = screen.getByTestId("spinner");
-    expect(spinner).toHaveClass("animate-spin");
+    const spinner = screen.getByTestId("loading-spinner");
+    expect(spinner).toHaveClass("inline-block");
   });
 
   it("applies the correct classes based on props", () => {

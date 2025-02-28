@@ -10,6 +10,17 @@ export interface BusinessResponse {
   service_location: string;
   user_name: string;
   phone_number: string;
+  business_address: [
+    {
+      street_address: string;
+      city: string;
+      state_or_region: string;
+      postal_code: string;
+      country: string;
+      latitude: string;
+      longitude: string;
+    }
+  ];
 }
 
 interface BusinessDetailResponse {
