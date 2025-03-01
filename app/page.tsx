@@ -2,38 +2,30 @@ import Footer from "@/components/common/Footer";
 import NavBar from "@/components/common/NavBar";
 import Features from "@/components/homepage/Features";
 import Hero from "@/components/homepage/Hero";
-import HeroImg from "@/public/kokesa-hero.jpeg";
 import BusinessStats from "@/components/homepage/BusinessStats";
 import Reviews from "@/components/homepage/Reviews";
 
 export default function Home() {
   return (
-    <header className="relative w-full ">
-      <div
-        className="absolute inset-0 w-full h-[600px] lg:h-[680px] "
-        style={{
-          backgroundImage: `url(${HeroImg.src})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40" />
-      </div>
+    <div className="flex flex-col min-h-screen">
+      {/* Header section with background */}
+      <div className="relative bg-secondary">
+        {/* The NavBar component has its own container */}
+        <NavBar />
 
-      <div className="relative">
-        <div className="py-6 px-6 lg:px-8  max-container">
-          <NavBar></NavBar>
-        </div>
+        {/* Hero section */}
         <Hero />
       </div>
 
-      <main>
+      {/* Main content */}
+      <main className="flex-grow">
         <Features />
         <BusinessStats />
         <Reviews />
       </main>
+
+      {/* Footer */}
       <Footer />
-    </header>
+    </div>
   );
 }
