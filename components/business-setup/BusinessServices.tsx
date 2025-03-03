@@ -396,6 +396,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
               onChange={handleServiceTypeChange}
               placeholder="Service Type"
               error={formError.type}
+              isSearchable={true}
               isClearable={true}
               maxMenuHeight={300}
             />

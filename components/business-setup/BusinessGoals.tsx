@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { MdCheck, MdStar } from "react-icons/md";
 import Button from "@/components/UI/Button";
+import { useRouter } from "next/navigation";
 
 interface OptionType {
   id: string;
@@ -10,9 +11,9 @@ interface OptionType {
   icon?: React.ReactNode;
 }
 
-const BusinessHelp: React.FC = () => {
+const BusinessGoal = () => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-
+  const router = useRouter();
   const toggleOption = (option: string): void => {
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter((item) => item !== option));
@@ -21,7 +22,10 @@ const BusinessHelp: React.FC = () => {
     }
   };
 
-  // Enhanced options with descriptions and icons
+  function handlesSubmit() {
+    router.push("live-date");
+  }
+
   const options: OptionType[] = [
     {
       id: "engage",
@@ -231,6 +235,7 @@ const BusinessHelp: React.FC = () => {
             el="button"
             primary
             rounded
+            onClick={handlesSubmit}
             disabled={selectedOptions.length === 0}
             className="px-8 py-3 min-w-[200px]"
           >
@@ -246,4 +251,4 @@ const BusinessHelp: React.FC = () => {
   );
 };
 
-export default BusinessHelp;
+export default BusinessGoal;
