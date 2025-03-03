@@ -1,3 +1,6 @@
+// serviceTypes.ts
+
+// Service options for different categories
 const haircutsAndStyling = [
   { label: "Skin Fade Taper Fade", value: "Skin Fade Taper Fade" },
   { label: "Buzz Cut", value: "Buzz Cut" },
@@ -46,24 +49,59 @@ const facialAndSkinCare = [
   { label: "Charcoal Peel Off Mask", value: "Charcoal Peel Off Mask" },
 ];
 
-interface ServiceOption {
+// Define the custom unassigned option
+export const customOption = { label: "Unassigned", value: "unassigned" };
+
+// Service option interface
+export interface ServiceOption {
   value: string;
   label: string;
 }
 
-interface GroupedServiceOption {
-  label: string; // The group label
-  options: ServiceOption[]; // The list of services under this group
+// Grouped option interface
+export interface GroupedServiceOption {
+  label: string;
+  options: ServiceOption[];
 }
 
+// Exportable service types array with all categories
 export const serviceType: GroupedServiceOption[] = [
+  {
+    label: "Other",
+    options: [customOption],
+  },
   {
     label: "Haircuts & Styling",
     options: haircutsAndStyling,
   },
-
   {
     label: "Beard & Facial Grooming",
     options: beardAndFacialGrooming,
   },
+  {
+    label: "Hair & Beard Coloring",
+    options: hairAndBeardColoring,
+  },
+  {
+    label: "Hair & Scalp Treatments",
+    options: hairAndScalpTreatments,
+  },
+  {
+    label: "Facial & Skin Care",
+    options: facialAndSkinCare,
+  },
+  {
+    label: "Other",
+    options: [customOption],
+  },
 ];
+
+// For backward compatibility with existing code
+// export const flatServiceOptions: ServiceOption[] = [
+//   ...haircutsAndStyling,
+//   ...beardAndFacialGrooming,
+//   ...hairAndBeardColoring,
+//   ...hairAndScalpTreatments,
+//   ...facialAndSkinCare,
+//   customOption,
+// ];

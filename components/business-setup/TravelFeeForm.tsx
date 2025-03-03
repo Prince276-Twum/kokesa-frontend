@@ -13,8 +13,9 @@ import { useRouter } from "next/navigation";
 import useCurrencyInfo from "@/hooks/useCurrencyInfo";
 import { MdInfo } from "react-icons/md";
 import "leaflet/dist/leaflet.css";
-import Select from "react-select";
 import { NumericFormat } from "react-number-format";
+import FloatingTextarea from "../UI/FloatingTextArea";
+import FloatingSelect from "../UI/FloatingSelect";
 
 // Ensure Leaflet is imported correctly
 import * as L from "leaflet";
@@ -33,160 +34,8 @@ const priceTypeOptions = [
 ];
 
 // Custom floating label Select component
-const FloatingSelect = ({
-  options,
-  value,
-  onChange,
-  placeholder,
-  id,
-  error,
-}: any) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const selectRef = useRef(null);
-
-  // Custom styles for React Select
-  const selectStyles = {
-    control: (provided: any, state: any) => ({
-      ...provided,
-      border: `1px solid ${
-        error ? "#f56565" : state.isFocused ? "#6B7280" : "#e5e7eb"
-      }`,
-      borderRadius: "0.375rem",
-      boxShadow: "none",
-      padding: "2px 0",
-      minHeight: "42px",
-      "&:hover": {
-        borderColor: "#d1d5db",
-      },
-      backgroundColor: "transparent",
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? "#f3f4f6" : "white",
-      color: "#1a1a1a",
-      padding: "8px 12px",
-      "&:hover": {
-        backgroundColor: "#f9fafb",
-      },
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      borderRadius: "0.375rem",
-      boxShadow:
-        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-      zIndex: 9999,
-    }),
-    menuPortal: (provided: any) => ({
-      ...provided,
-      zIndex: 9999,
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: "#1a1a1a",
-      fontWeight: 500,
-    }),
-    valueContainer: (provided: any) => ({
-      ...provided,
-      padding: "2px 12px",
-    }),
-    indicatorSeparator: () => ({
-      display: "none",
-    }),
-    dropdownIndicator: (provided: any) => ({
-      ...provided,
-      color: "#9ca3af",
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: "#9ca3af",
-    }),
-  };
-
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-
-  return (
-    <div className="relative w-full">
-      <Select
-        id={id}
-        ref={selectRef}
-        options={options}
-        value={value}
-        onChange={onChange}
-        styles={selectStyles}
-        isSearchable={false}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder=""
-        className="peer"
-        classNamePrefix="react-select"
-        menuPortalTarget={document.body}
-        menuPosition="fixed"
-      />
-      <label
-        htmlFor={id}
-        className={`absolute left-3 bg-white px-1 text-sm transition-all
-        ${error ? "text-red-500" : "text-gray-500"}
-        ${
-          isFocused || value
-            ? "-top-2.5 text-sm text-gray-700"
-            : "top-2 text-gray-400 text-base"
-        }
-        z-10`}
-      >
-        {placeholder}
-      </label>
-
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-  );
-};
 
 // Custom floating label TextArea component
-const FloatingTextarea = ({
-  value,
-  onChange,
-  placeholder,
-  id,
-  error,
-  rows = 3,
-}: any) => {
-  return (
-    <div className="relative w-full">
-      <textarea
-        id={id}
-        value={value}
-        onChange={onChange}
-        rows={rows}
-        className={`peer block w-full rounded-lg border ${
-          error ? "border-red-400" : "border-gray-300"
-        } bg-transparent text-sm text-gray-900 transition-all duration-200 
-        focus:border-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-400 
-        hover:border-gray-400 px-4 pt-3 pb-2`}
-        placeholder=""
-      />
-      <label
-        htmlFor={id}
-        className={`absolute left-3 -top-2.5 bg-white px-1 text-sm ${
-          error ? "text-red-500" : "text-gray-500"
-        } transition-all peer-placeholder-shown:top-2 
-        peer-placeholder-shown:left-3 
-        peer-placeholder-shown:text-gray-400 
-        peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:left-3 peer-focus:text-sm 
-        peer-focus:text-gray-700 z-10`}
-      >
-        {placeholder}
-      </label>
-
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-  );
-};
 
 const TravelFeeForm: React.FC = () => {
   const [travelOption, setTravelOption] = useState<TravelFeeOption>("free");
@@ -523,7 +372,13 @@ const TravelFeeForm: React.FC = () => {
         <div>
           <NumericFormat
             id="fee-amount"
-            value={travelOption === "free" ? "0" : feeAmount}
+            value={
+              travelOption === "free"
+                ? "0"
+                : travelOption == "varies"
+                ? "-"
+                : feeAmount
+            }
             onValueChange={handleFeeAmountChange}
             thousandSeparator={true}
             decimalScale={2}
@@ -533,7 +388,7 @@ const TravelFeeForm: React.FC = () => {
             disabled={travelOption === "free" || travelOption === "varies"}
             cn={
               travelOption === "free" || travelOption === "varies"
-                ? "bg-gray-50"
+                ? "bg-gray-100 text-gray-400 opacity-70 blur-[0.5px] cursor-not-allowed"
                 : ""
             }
             allowNegative={false}
