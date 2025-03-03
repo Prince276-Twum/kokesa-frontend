@@ -23,6 +23,7 @@
     "currency-symbol-map": "^5.1.0",
     "framer-motion": "^12.4.7",
     "leaflet": "^1.9.4",
+    "lucide-react": "^0.477.0",
     "next": "15.1.2",
     "punycode": "^2.3.1",
     "react": "^19.0.0",

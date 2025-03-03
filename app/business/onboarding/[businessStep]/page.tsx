@@ -16,6 +16,7 @@ import { LocationOptions } from "@/utils/common-varialbles";
 import TeamSize from "@/components/business-setup/TeamSize";
 import { IoArrowBack } from "react-icons/io5";
 import { motion } from "framer-motion";
+import LiveDate from "@/components/business-setup/LiveDate";
 
 interface Props {
   params: Promise<{ businessStep: string }>;
@@ -82,6 +83,12 @@ const stepContentAll = [
     path: "/business/onboarding/business-goals",
     icon: "🎯",
   },
+  {
+    title: "When do you want your profile to go live?",
+    subtitle: "Select when you want your profile to go live",
+    path: "/business/onboarding/live-date",
+    icon: "��",
+  },
 ];
 
 function Page({ params }: Props) {
@@ -141,6 +148,8 @@ function Page({ params }: Props) {
         return <TravelFeeForm />;
       case "business-goals":
         return <BusinessGoals />;
+      case "live-date":
+        return <LiveDate />;
       default:
         return <SetupDetails />;
     }
