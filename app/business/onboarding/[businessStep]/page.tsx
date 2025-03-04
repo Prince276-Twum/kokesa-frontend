@@ -16,7 +16,7 @@ import { LocationOptions } from "@/utils/common-varialbles";
 import TeamSize from "@/components/business-setup/TeamSize";
 import { IoArrowBack } from "react-icons/io5";
 import { motion } from "framer-motion";
-import LiveDate from "@/components/business-setup/LiveDate";
+import LiveDate from "@/components/business-setup/ProfileLaunch";
 
 interface Props {
   params: Promise<{ businessStep: string }>;

@@ -37,7 +37,6 @@ function StepProgress({
         </div>
       </div>
 
-      {/* Progress dots */}
       <div className="flex justify-center mb-2">
         {steps.map((_, index) => (
           <div key={index} className="flex items-center">
@@ -47,13 +46,12 @@ function StepProgress({
               }`}
             />
             {index < steps.length - 1 && (
-              <div className="w-4" /> // spacing between dots
+              <div className="w-4" /> 
             )}
           </div>
         ))}
       </div>
 
-      {/* Subtitle */}
       <p className="mb-8 text-small">{subtitle}</p>
     </div>
   );

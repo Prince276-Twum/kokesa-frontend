@@ -17,6 +17,7 @@ interface FloatingSelectProps<
   maxMenuHeight?: number;
   isClearable?: boolean;
   isSearchable?: boolean;
+  isDisabled?: boolean;
 }
 
 // Custom floating label Select component with improved styling
@@ -29,6 +30,7 @@ function FloatingSelect<
   value,
   onChange,
   placeholder,
+  isDisabled,
   id,
   error,
   styles: propStyles,
@@ -134,6 +136,7 @@ function FloatingSelect<
         menuPortalTarget={document.body}
         menuPosition="fixed"
         maxMenuHeight={maxMenuHeight}
+        isDisabled={isDisabled}
       />
       <label
         htmlFor={id}

@@ -57,7 +57,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     businessInfo: { businessLocationOption },
   } = useAppSelector((store) => store.businessSetup);
 
-  // Load saved address from localStorage on mount
   useEffect(() => {
     console.log(businessAddress);
     setAddress(businessAddress.address || "");
@@ -83,11 +82,9 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     { skip: !longitude || !latitude }
   );
 
-  // Update suggestions when new geocode data arrives
   useEffect(() => {
     if (geocodeData && geocodeData.results && address.length >= 2) {
       setSuggestions(geocodeData.results);
-      // Only show suggestions if the user is actively typing
       if (isUserTyping) {
         setShowSuggestions(true);
       }
@@ -99,17 +96,13 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     setAddress(query);
     setIsUserTyping(true);
 
-    // Show suggestions as soon as user types at least 2 characters
     if (query.length >= 2) {
-      // Always show the suggestions panel if there's a search query, even while loading
       setShowSuggestions(true);
 
-      // If we already have results, show them immediately
       if (geocodeData && geocodeData.results) {
         setSuggestions(geocodeData.results);
       }
     } else {
-      // Hide suggestions if query is too short
       setSuggestions([]);
       setShowSuggestions(false);
     }
@@ -123,19 +116,16 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   };
 
   const handleAddressBlur = () => {
-    // Add a small delay before setting isUserTyping to false to allow click events to process
     setTimeout(() => {
       setIsUserTyping(false);
     }, 200);
   };
 
   const handleSelectAddress = (selectedAddress: Location) => {
-    // First close the dropdown and clear suggestions
     setShowSuggestions(false);
     setSuggestions([]);
     setIsUserTyping(false);
 
-    // Then update state with the selected address data
     setTimeout(() => {
       setAddress(selectedAddress.formatted);
       setCity(
@@ -154,7 +144,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
   };
 
   const handleUseCurrentLocation = () => {
-    // Close suggestions dropdown when opening location confirmation modal
     setShowSuggestions(false);
     setSuggestions([]);
     setIsUserTyping(false);
@@ -203,7 +192,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     const capitalizedState = capitalizeFirstLetterOfEachWord(state);
     const capitalizedCountry = capitalizeFirstLetterOfEachWord(country);
 
-    // Save data in localStorage
     const businessAddress = {
       address: capitalizedAddress,
       city: capitalizedCity,
@@ -255,7 +243,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     }
   }, [reverseGeocodeData, useReverseGeocode]);
 
-  // Close suggestions when clicking outside the address container
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const element = event.target as HTMLElement;
@@ -270,7 +257,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
     };
   }, []);
 
-  // Error handling for reverse geocode
   useEffect(() => {
     if (isReverseGeocodeError && useReverseGeocode) {
       toast.error("Something went wrong with location lookup.");
@@ -325,7 +311,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
               </div>
             </div>
 
-            {/* Modern Address Suggestions Dropdown */}
             {showSuggestions && (
               <div className="absolute z-40 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                 {isGeocodeLoading ? (
@@ -461,7 +446,6 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
         </>
       )}
 
-      {/* Confirm Location Modal */}
       {confirmLocation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-md p-6">

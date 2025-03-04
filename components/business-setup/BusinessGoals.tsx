@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MdCheck, MdStar } from "react-icons/md";
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
+import { useSaveBusinessGoalsMutation } from "@/store/features/businessApiSetupSlice"; // Import the mutation hook
 
 interface OptionType {
   id: string;
@@ -14,6 +15,11 @@ interface OptionType {
 const BusinessGoal = () => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const router = useRouter();
+
+  // Use the RTK Query mutation hook
+  const [saveBusinessGoals, { isLoading, error }] =
+    useSaveBusinessGoalsMutation();
+
   const toggleOption = (option: string): void => {
     if (selectedOptions.includes(option)) {
       setSelectedOptions(selectedOptions.filter((item) => item !== option));
@@ -22,8 +28,26 @@ const BusinessGoal = () => {
     }
   };
 
-  function handlesSubmit() {
-    router.push("live-date");
+  async function handleSubmit() {
+    try {
+      const formData = {
+        engage_clients: selectedOptions.includes("engage"),
+        selling_products: selectedOptions.includes("selling"),
+        track_statistics: selectedOptions.includes("track"),
+        get_more_clients: selectedOptions.includes("get-clients"),
+        low_processing_fees: selectedOptions.includes("low-fees"),
+        other_reasons: selectedOptions.includes("other"),
+        other_description: selectedOptions.includes("other") ? "" : null,
+      };
+
+      await saveBusinessGoals(formData)
+        .unwrap()
+        .then(() => {
+          router.push("live-date");
+        });
+    } catch (err) {
+      console.error("Failed to save business goals:", err);
+    }
   }
 
   const options: OptionType[] = [
@@ -230,16 +254,22 @@ const BusinessGoal = () => {
           ))}
         </div>
 
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            An error occurred while saving your selections. Please try again.
+          </div>
+        )}
+
         <div className="flex justify-center">
           <Button
             el="button"
             primary
             rounded
-            onClick={handlesSubmit}
-            disabled={selectedOptions.length === 0}
+            onClick={handleSubmit}
+            disabled={selectedOptions.length === 0 || isLoading}
             className="px-8 py-3 min-w-[200px]"
           >
-            Continue
+            {isLoading ? "Saving..." : "Continue"}
           </Button>
         </div>
       </div>

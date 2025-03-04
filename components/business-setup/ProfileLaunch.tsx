@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Calendar, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import FloatingSelect from "../UI/FloatingSelect";
 import Button from "../UI/Button";
+import { setAdditionalInformation } from "@/store/features/businessSetupSlice";
+import { useAddAdditionalInformationMutation } from "@/store/features/businessApiSetupSlice";
 
 // Define a more strict type for the option
 type LiveDateOption = {
@@ -10,7 +13,6 @@ type LiveDateOption = {
   label: string;
 };
 
-// Generate options for live date selection
 const generateLiveDateOptions = (): LiveDateOption[] => {
   return [
     {
@@ -46,17 +48,17 @@ const generateLiveDateOptions = (): LiveDateOption[] => {
 
 function ProfileLaunch() {
   const router = useRouter();
+  const dispatch = useDispatch();
+
   const [selectedLiveDate, setSelectedLiveDate] =
     useState<LiveDateOption | null>(null);
   const [isReadyToLaunch, setIsReadyToLaunch] = useState(false);
 
-  // Handler for date selection
   const handleDateChange = (selectedOption: LiveDateOption | null) => {
     setSelectedLiveDate(selectedOption);
     setIsReadyToLaunch(!!selectedOption);
   };
-
-  // Calculate actual live date based on selection
+  const [addAdditionalInfo] = useAddAdditionalInformationMutation();
   const calculateLiveDate = (): Date | null => {
     if (!selectedLiveDate) return null;
 
@@ -72,7 +74,6 @@ function ProfileLaunch() {
     }
   };
 
-  // Format date with more readable output
   const formatLiveDate = (date: Date | null): string => {
     if (!date) return "";
 
@@ -85,11 +86,41 @@ function ProfileLaunch() {
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Handle dashboard navigation
   const handleLaunchProfile = () => {
-    console.log(selectedLiveDate);
-    // Here you might want to add any necessary save/update logic before redirecting
-    router.push("/business/dashboard");
+    if (!selectedLiveDate) return;
+
+    const calculatedDate = calculateLiveDate();
+    const formattedDate = calculatedDate ? calculatedDate.toISOString() : "";
+
+    const currentDate = new Date();
+    const isLaunched =
+      selectedLiveDate.value === "now" ||
+      (calculatedDate && calculatedDate <= currentDate);
+
+    dispatch(
+      setAdditionalInformation({
+        activationDate: formattedDate,
+        activationOption: selectedLiveDate.value,
+        isLaunched: isLaunched || undefined,
+      })
+    );
+
+    console.log("Dispatched to Redux:", {
+      activation_date: formattedDate,
+      activation_option: selectedLiveDate.value,
+      is_launched: isLaunched,
+    });
+
+    addAdditionalInfo({
+      isLaunched: isLaunched,
+      activationDate: formattedDate,
+      activationOption: selectedLiveDate.value,
+    })
+      .unwrap()
+      .then(() => {
+        router.push("/business/dashboard");
+      })
+      .catch(() => {});
   };
 
   return (
