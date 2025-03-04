@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { FaTimes, FaPlus, FaChevronRight } from "react-icons/fa";
+import { FaTimes, FaPlus, FaChevronRight, FaSpinner } from "react-icons/fa";
 import Input from "../UI/Input";
 import { SingleValue } from "react-select";
 import useCurrencyInfo from "@/hooks/useCurrencyInfo";
@@ -14,15 +14,19 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   addBusinessService,
   addServiceEditIndex,
-  updateBusinessService,
+  updateBusinessService as updateBusinessServiceAction,
 } from "@/store/features/businessSetupSlice";
 import { NumericFormat } from "react-number-format";
 import Button from "../UI/Button";
 
-// Import the FloatingSelect component
 import FloatingSelect from "../UI/FloatingSelect";
+import {
+  useSaveBusinessServiceMutation,
+  useUpdateServiceMutation,
+  useDeleteServiceMutation,
+} from "@/store/features/businessApiSetupSlice";
+import { toast } from "react-toastify"; // Make sure to install this package
 
-// Define types
 interface ServiceDurationOption {
   value: number;
   label: string;
@@ -33,24 +37,36 @@ interface ServiceOption {
   label: string;
 }
 
-// This should match exactly the service type in your Redux store
 interface StoreService {
-  name: string;
-  type: ServiceOption | null;
-  groupLabel: string;
-  duration: { hours: number; minutes: number };
-  price: number;
-  startAt: boolean; // Ensure startAt is defined
-}
-
-// Local interface with guaranteed startAt property for local state
-interface LocalService {
+  id: number | null;
   name: string;
   type: ServiceOption | null;
   groupLabel: string;
   duration: { hours: number; minutes: number };
   price: number;
   startAt: boolean;
+}
+
+interface LocalService {
+  id: number | null;
+  name: string;
+  type: ServiceOption | null;
+  groupLabel: string;
+  duration: { hours: number; minutes: number };
+  price: number;
+  startAt: boolean;
+}
+
+interface ServiceApiPayload {
+  id?: number;
+  service_name: string;
+  type: string;
+  type_label: string;
+  service_group: string;
+  duration_hours: number;
+  duration_minutes: number;
+  price: number;
+  is_starting_price: boolean;
 }
 
 interface Props {
@@ -62,10 +78,11 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
   const router = useRouter();
   const { currencySymbol } = useCurrencyInfo();
   const [serviceDetails, setServiceDetails] = useState<LocalService>({
+    id: null,
     name: "",
     type: null,
     groupLabel: "",
-    duration: { hours: 0, minutes: 40 }, // Default duration
+    duration: { hours: 0, minutes: 40 },
     price: 25,
     startAt: false,
   });
@@ -73,11 +90,26 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
     name?: string;
     price?: string;
     type?: string;
+    general?: string;
   }>({});
   const dispatch = useAppDispatch();
 
-  // Calculated disabled state for save/update button
+  // API mutation hooks with loading and error states
+  const [saveBusinessService, { isLoading: isSaving }] =
+    useSaveBusinessServiceMutation();
+  const [updateBusinessServiceMutation, { isLoading: isUpdating }] =
+    useUpdateServiceMutation();
+  const [deleteBusinessService] = useDeleteServiceMutation();
+
+  // Track which service is being deleted (for loading indicator)
+  const [deletingServiceIndex, setDeletingServiceIndex] = useState<
+    number | null
+  >(null);
+
+  const isLoading = isSaving || isUpdating;
+
   const isSaveButtonDisabled =
+    isLoading ||
     !serviceDetails.name.trim() ||
     !serviceDetails.type ||
     !serviceDetails.price ||
@@ -165,17 +197,9 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleOnSave = () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    // Convert LocalService to StoreService for Redux
-    const serviceToSave: StoreService = { ...serviceDetails };
-
-    const updatedServices = [...services.service, serviceToSave];
-    localStorage.setItem("services", JSON.stringify(updatedServices));
+  const resetForm = () => {
     setServiceDetails({
+      id: null,
       name: "",
       type: null,
       groupLabel: "",
@@ -183,16 +207,78 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
       price: 25,
       startAt: false,
     });
-
-    dispatch(addBusinessService(updatedServices));
-    dispatch(addServiceEditIndex(null));
-    router.push("services");
+    setFormError({});
   };
 
-  const handleRemoveService = (index: number) => {
-    const updatedServices = services.service.filter((_, i) => i !== index);
-    dispatch(addBusinessService(updatedServices));
-    localStorage.setItem("services", JSON.stringify(updatedServices));
+  const handleOnSave = async () => {
+    if (!validateForm() || isLoading) {
+      return;
+    }
+
+    try {
+      const servicePayload: ServiceApiPayload = {
+        service_name: serviceDetails.name,
+        type: serviceDetails.type?.value || "",
+        type_label: serviceDetails.type?.label || "",
+        service_group: serviceDetails.groupLabel,
+        duration_hours: serviceDetails.duration.hours,
+        duration_minutes: serviceDetails.duration.minutes,
+        price: serviceDetails.price,
+        is_starting_price: serviceDetails.startAt || false,
+      };
+
+      const response = await saveBusinessService(servicePayload).unwrap();
+
+      // Update the service with the ID from the response
+      const serviceToSave: StoreService = {
+        ...serviceDetails,
+        id: response.id || null,
+      };
+
+      const updatedServices = [...services.service, serviceToSave];
+      localStorage.setItem("services", JSON.stringify(updatedServices));
+
+      dispatch(addBusinessService(updatedServices));
+      dispatch(addServiceEditIndex(null));
+      resetForm();
+
+      toast.success("Service added successfully!");
+      router.push("services");
+    } catch (error) {
+      console.error("Failed to save service:", error);
+      toast.error("Failed to save service. Please try again.");
+      setFormError({
+        ...formError,
+        general: "An error occurred while saving. Please try again.",
+      });
+    }
+  };
+
+  const handleRemoveService = async (index: number) => {
+    try {
+      const serviceToRemove = services.service[index];
+
+      // If the service has an ID, it exists on the backend, so delete it
+      if (serviceToRemove.id) {
+        await deleteBusinessService(serviceToRemove.id)
+          .unwrap()
+          .then(() => {
+            setDeletingServiceIndex(index);
+            const updatedServices = services.service.filter(
+              (_, i) => i !== index
+            );
+            dispatch(addBusinessService(updatedServices));
+            localStorage.setItem("services", JSON.stringify(updatedServices));
+
+            toast.success("Service removed successfully");
+          });
+      }
+    } catch (error) {
+      console.error("Failed to delete service:", error);
+      toast.error("Failed to remove service. Please try again.");
+    } finally {
+      setDeletingServiceIndex(null);
+    }
   };
 
   useEffect(() => {
@@ -202,22 +288,94 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
     ) {
       const serviceToEdit = services.service[services.editingIndex];
 
-      // Convert StoreService to LocalService, ensuring startAt is defined
       const editableService: LocalService = {
+        id: serviceToEdit.id || null,
         name: serviceToEdit.name,
         type: serviceToEdit.type,
         groupLabel: serviceToEdit.groupLabel,
         duration: serviceToEdit.duration,
         price: serviceToEdit.price,
-        startAt: serviceToEdit.startAt || false, // Default to false if missing
+        startAt: serviceToEdit.startAt || false,
       };
 
       setServiceDetails(editableService);
     }
   }, [services.editingIndex, services.service]);
 
-  const handleSubmit = () => {
-    router.push("hours");
+  const handleSubmit = async () => {
+    if (services.service.length === 0) {
+      return;
+    }
+
+    try {
+      const businessServicesData = {
+        services: services.service.map((service) => ({
+          id: service.id,
+          service_name: service.name,
+          type: service.type?.value || "",
+          type_label: service.type?.label || "",
+          service_group: service.groupLabel,
+          duration_hours: service.duration.hours,
+          duration_minutes: service.duration.minutes,
+          price: service.price,
+          is_starting_price: service.startAt || false,
+        })),
+      };
+
+      // This should be a different endpoint to save multiple services at once
+      // For now, we'll continue with the existing approach
+      await saveBusinessService(businessServicesData.services);
+
+      toast.success("Services saved successfully!");
+      router.push("hours");
+    } catch (error) {
+      console.error("Failed to save services:", error);
+      toast.error("Failed to save services. Please try again.");
+    }
+  };
+
+  const updateServiceHandler = async () => {
+    if (!validateForm() || isLoading) return;
+
+    try {
+      // If the service has an ID, update it on the backend
+      if (serviceDetails.id) {
+        const serviceData: ServiceApiPayload = {
+          id: serviceDetails.id,
+          service_name: serviceDetails.name,
+          type: serviceDetails.type?.value || "",
+          type_label: serviceDetails.type?.label || "",
+          service_group: serviceDetails.groupLabel,
+          duration_hours: serviceDetails.duration.hours,
+          duration_minutes: serviceDetails.duration.minutes,
+          price: serviceDetails.price,
+          is_starting_price: serviceDetails.startAt || false,
+        };
+
+        await updateBusinessServiceMutation(serviceData).unwrap();
+
+        const updatedService: StoreService = { ...serviceDetails };
+        dispatch(updateBusinessServiceAction(updatedService));
+
+        toast.success("Service updated successfully!");
+      } else {
+        // If no ID, just update locally
+        const updatedService: StoreService = { ...serviceDetails };
+        dispatch(updateBusinessServiceAction(updatedService));
+
+        toast.success("Service updated locally.");
+      }
+
+      dispatch(addServiceEditIndex(null));
+      router.push("services");
+    } catch (error) {
+      console.error("Failed to update service:", error);
+      toast.error("Failed to update service. Please try again.");
+      setFormError({
+        ...formError,
+        general: "An error occurred while updating. Please try again.",
+      });
+    }
   };
 
   const formatDuration = (hours: number, minutes: number): string => {
@@ -230,14 +388,12 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
     }
   };
 
-  // Helper function to safely find hour option
   const findHourOption = (hours: number): ServiceDurationOption => {
     return (
       hourOptions.find((option) => option.value === hours) || hourOptions[0]
     );
   };
 
-  // Helper function to safely find minute option
   const findMinuteOption = (minutes: number): ServiceDurationOption => {
     return (
       minuteOptions.find((option) => option.value === minutes) ||
@@ -247,6 +403,12 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
 
   return (
     <div className="space-y-5">
+      {formError.general && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+          {formError.general}
+        </div>
+      )}
+
       {!addServices && (
         <>
           <div className="space-y-3">
@@ -284,7 +446,6 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                           <h3 className="font-medium text-gray-900">
                             {service.name}
                           </h3>
-                          {/* Use optional chaining for startAt since it might be undefined */}
                           {service.startAt && (
                             <span className="ml-2 text-xs bg-primary-50 text-primary px-2 py-0.5 rounded-full">
                               Starting price
@@ -317,10 +478,15 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                         <div className="flex">
                           <button
                             onClick={() => handleRemoveService(index)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50"
                             aria-label="Remove service"
+                            disabled={deletingServiceIndex === index}
                           >
-                            <FaTimes className="w-4 h-4" />
+                            {deletingServiceIndex === index ? (
+                              <FaSpinner className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <FaTimes className="w-4 h-4" />
+                            )}
                           </button>
 
                           <button
@@ -330,6 +496,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                             }}
                             className="p-2 text-gray-400 hover:text-primary hover:bg-primary-50 rounded-full transition-colors"
                             aria-label="Edit service"
+                            disabled={deletingServiceIndex === index}
                           >
                             <FaChevronRight className="w-4 h-4" />
                           </button>
@@ -360,7 +527,8 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
             onClick={handleSubmit}
             primary
             rounded
-            disabled={services.service.length === 0}
+            disabled={services.service.length === 0 || isSaving}
+            className="relative"
           >
             Continue
           </Button>
@@ -385,6 +553,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                 }
               }}
               error={formError.name}
+              disabled={isLoading}
             />
           </div>
 
@@ -399,6 +568,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
               isSearchable={true}
               isClearable={true}
               maxMenuHeight={300}
+              isDisabled={isLoading}
             />
           </div>
 
@@ -412,6 +582,7 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                   onChange={handleDurationHour}
                   placeholder="Hours"
                   maxMenuHeight={200}
+                  isDisabled={isLoading}
                 />
               </div>
               <div>
@@ -422,16 +593,15 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                   onChange={handleDurationMin}
                   placeholder="Minutes"
                   maxMenuHeight={200}
+                  isDisabled={isLoading}
                 />
               </div>
             </div>
           </div>
 
-          {/* Price section with horizontal layout */}
           <div>
             <div className="grid grid-cols-2 gap-4 items-start">
               <div>
-                {/* Price input */}
                 <NumericFormat
                   id="service-price"
                   value={serviceDetails.price}
@@ -456,11 +626,11 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                   error={formError.price}
                   decimalScale={2}
                   allowNegative={false}
+                  disabled={isLoading}
                 />
               </div>
 
               <div className="flex items-center h-full pt-3">
-                {/* Starting price checkbox */}
                 <input
                   id="price-start-toggle"
                   name="price-start"
@@ -472,11 +642,14 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
                       startAt: e.target.checked,
                     })
                   }
-                  className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                  className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary disabled:opacity-50"
+                  disabled={isLoading}
                 />
                 <label
                   htmlFor="price-start-toggle"
-                  className="ml-2 block text-sm text-gray-700"
+                  className={`ml-2 block text-sm text-gray-700 ${
+                    isLoading ? "opacity-50" : ""
+                  }`}
                 >
                   Starting price
                 </label>
@@ -487,19 +660,20 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
           {services.editingIndex !== null ? (
             <Button
               el="button"
-              onClick={() => {
-                if (!validateForm()) return;
-                // Convert LocalService to StoreService for Redux
-                const updatedService: StoreService = { ...serviceDetails };
-                dispatch(updateBusinessService(updatedService));
-                router.push("services");
-              }}
+              onClick={updateServiceHandler}
               primary
               rounded
               className="w-full py-3 mt-6"
               disabled={isSaveButtonDisabled}
             >
-              Update Service
+              {isUpdating ? (
+                <>
+                  <FaSpinner className="animate-spin mr-2 inline-block" />
+                  Updating...
+                </>
+              ) : (
+                "Update Service"
+              )}
             </Button>
           ) : (
             <Button
@@ -510,7 +684,14 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
               className="w-full py-3 mt-6"
               disabled={isSaveButtonDisabled}
             >
-              Save Service
+              {isSaving ? (
+                <>
+                  <FaSpinner className="animate-spin mr-2 inline-block" />
+                  Saving...
+                </>
+              ) : (
+                "Save Service"
+              )}
             </Button>
           )}
         </div>

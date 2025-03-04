@@ -1,3 +1,4 @@
+import { WORKINGDAYS } from "@/constant";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface BusinessDetail {
@@ -34,6 +35,7 @@ type WorkingHoursType = {
 };
 
 interface Service {
+  id: number | null;
   name: string;
   type: { value: string; label: string } | null; // Allow null for clearing
   groupLabel: string;
@@ -50,6 +52,20 @@ interface BusinessAddress {
   longitude: number | null;
   latitude: number | null;
 }
+interface AdditionalInformationType {
+  teamSize?: string;
+  activationDate?: string;
+  activationOption?: string;
+  isLaunched?: boolean;
+}
+
+interface travelFeeAndDistanceType {
+  feeType: string;
+  travelFee: number;
+  distance: number;
+  travelPolicy: string;
+  currencyCode?: string | undefined;
+}
 
 interface initialStateType {
   businessAddress: BusinessAddress;
@@ -59,6 +75,8 @@ interface initialStateType {
   businessInfo: BusinessDetail;
   services: { editingIndex: null | number; service: Service[] };
   workingHours: WorkingHoursType[];
+  additionalInformation: AdditionalInformationType | null;
+  travelFeeAndDistance: travelFeeAndDistanceType | null;
 }
 
 const initialState: initialStateType = {
@@ -72,7 +90,6 @@ const initialState: initialStateType = {
     businessLocationOption: "",
   },
   services: { editingIndex: null, service: [] },
-
   businessAddress: {
     address: "",
     city: "",
@@ -82,57 +99,9 @@ const initialState: initialStateType = {
     longitude: null,
     latitude: null,
   },
-  workingHours: [
-    {
-      day_of_week: "Monday",
-      enabled: true,
-      start_time: "09:20",
-      end_time: "17:40",
-      breaks: [],
-    },
-    {
-      day_of_week: "Tuesday",
-      enabled: true,
-      start_time: "09:00",
-      end_time: "17:00",
-      breaks: [],
-    },
-    {
-      day_of_week: "Wednesday",
-      enabled: true,
-      start_time: "09:00",
-      end_time: "17:00",
-      breaks: [],
-    },
-    {
-      day_of_week: "Thursday",
-      enabled: true,
-      start_time: "09:00",
-      end_time: "17:00",
-      breaks: [],
-    },
-    {
-      day_of_week: "Friday",
-      enabled: true,
-      start_time: "09:00",
-      end_time: "17:00",
-      breaks: [],
-    },
-    {
-      day_of_week: "Saturday",
-      enabled: true,
-      start_time: "09:00",
-      end_time: "17:00",
-      breaks: [],
-    },
-    {
-      day_of_week: "Sunday",
-      enabled: false,
-      start_time: "09:00",
-      end_time: "17:00",
-      breaks: [],
-    },
-  ],
+  workingHours: WORKINGDAYS,
+  additionalInformation: null,
+  travelFeeAndDistance: null,
 };
 
 const businessSetupSlice = createSlice({
@@ -152,7 +121,8 @@ const businessSetupSlice = createSlice({
     },
 
     setBusinessDetail(state, actions: PayloadAction<BusinessDetail>) {
-      state.businessInfo = actions.payload;
+      const data = { ...state.businessInfo, ...actions.payload };
+      state.businessInfo = data;
     },
 
     addBusinessService(state, actions: PayloadAction<Service[]>) {
@@ -213,6 +183,21 @@ const businessSetupSlice = createSlice({
     setBusinessAddress: (state, action: PayloadAction<BusinessAddress>) => {
       state.businessAddress = action.payload;
     },
+
+    setAdditionalInformation: (
+      state,
+      action: PayloadAction<AdditionalInformationType>
+    ) => {
+      const data = { ...state.additionalInformation, ...action.payload };
+      state.additionalInformation = data;
+    },
+
+    setTravelFeeAndDistance: (
+      state,
+      action: PayloadAction<travelFeeAndDistanceType>
+    ) => {
+      state.travelFeeAndDistance = action.payload;
+    },
   },
 });
 
@@ -229,4 +214,6 @@ export const {
   updateMultipleWorkingHours,
   setBusinessAddress,
   toggleDay,
+  setAdditionalInformation,
+  setTravelFeeAndDistance,
 } = businessSetupSlice.actions;

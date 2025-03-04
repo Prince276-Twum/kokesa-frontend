@@ -7,4 +7,4 @@ export { default as BusinessServices } from "./BusinessServices";
 export { default as TravelFeeForm } from "./TravelFeeForm";
 export { default as BusinessWorkingHours } from "./WorkingHours";
 export { default as BusinessGoals } from "./BusinessGoals";
-export { default as CongrationCard } from "./LiveDate";
+export { default as CongrationCard } from "./ProfileLaunch";

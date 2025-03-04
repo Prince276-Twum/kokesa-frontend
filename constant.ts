@@ -43,3 +43,82 @@ export const stats: StatCardProps[] = [
   { number: "100+", label: "Countries" },
   { number: "50,000+", label: "Stylists & Professionals" },
 ];
+
+
+
+
+
+
+
+interface BreakTime {
+  start: string;
+  end: string;
+}
+
+type WorkingHoursType = {
+  day_of_week:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
+  enabled: boolean;
+  start_time: string; // Format: "HH:mm"
+  end_time: string; // Format: "HH:mm"
+  breaks: BreakTime[];
+}[];
+
+
+export const WORKINGDAYS : WorkingHoursType = [
+  {
+    day_of_week: "Monday",
+    enabled: true,
+    start_time: "09:20",
+    end_time: "17:40",
+    breaks: [],
+  },
+  {
+    day_of_week: "Tuesday",
+    enabled: true,
+    start_time: "09:00",
+    end_time: "17:00",
+    breaks: [],
+  },
+  {
+    day_of_week: "Wednesday",
+    enabled: true,
+    start_time: "09:00",
+    end_time: "17:00",
+    breaks: [],
+  },
+  {
+    day_of_week: "Thursday",
+    enabled: true,
+    start_time: "09:00",
+    end_time: "17:00",
+    breaks: [],
+  },
+  {
+    day_of_week: "Friday",
+    enabled: true,
+    start_time: "09:00",
+    end_time: "17:00",
+    breaks: [],
+  },
+  {
+    day_of_week: "Saturday",
+    enabled: true,
+    start_time: "09:00",
+    end_time: "17:00",
+    breaks: [],
+  },
+  {
+    day_of_week: "Sunday",
+    enabled: false,
+    start_time: "09:00",
+    end_time: "17:00",
+    breaks: [],
+  },
+]

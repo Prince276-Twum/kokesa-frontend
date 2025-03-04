@@ -1,11 +1,23 @@
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../UI/Button";
 import { MdGroups, MdPerson, MdCheck } from "react-icons/md";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setAdditionalInformation } from "@/store/features/businessSetupSlice";
+import { useAddAdditionalInformationMutation } from "@/store/features/businessApiSetupSlice";
 
 const TeamSizeSelector = () => {
   const [selectedSize, setSelectedSize] = useState("2-3");
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { additionalInformation } = useAppSelector(
+    (store) => store.businessSetup
+  );
+  const [addAdditionalInfo] = useAddAdditionalInformationMutation();
+
+  useEffect(() => {
+    setSelectedSize(additionalInformation?.teamSize || "2-3");
+  }, [additionalInformation?.teamSize]);
 
   const options = [
     {
@@ -38,7 +50,14 @@ const TeamSizeSelector = () => {
     if (!selectedSize) {
       return;
     }
-    router.push("services");
+
+    dispatch(setAdditionalInformation({ teamSize: selectedSize }));
+    addAdditionalInfo({ teamSize: selectedSize })
+      .unwrap()
+      .then(() => {
+        router.push("services");
+      })
+      .catch(() => {});
   };
 
   return (

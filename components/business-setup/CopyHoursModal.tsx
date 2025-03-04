@@ -28,15 +28,12 @@ const CopyHoursModal: React.FC<CopyHoursModalProps> = ({
   availableDays,
   onCopy,
 }) => {
-  // Filter out the current day from available days
   const otherDays = availableDays.filter(
     (day) => day.day_of_week !== currentDay
   );
 
-  // State to track selected days
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
-  // Toggle a day selection
   const toggleDay = (day: string) => {
     if (selectedDays.includes(day)) {
       setSelectedDays(selectedDays.filter((d) => d !== day));
@@ -45,7 +42,6 @@ const CopyHoursModal: React.FC<CopyHoursModalProps> = ({
     }
   };
 
-  // Select or deselect all days
   const toggleAll = () => {
     if (selectedDays.length === otherDays.length) {
       setSelectedDays([]);
@@ -54,13 +50,11 @@ const CopyHoursModal: React.FC<CopyHoursModalProps> = ({
     }
   };
 
-  // Handle the copy action
   const handleCopy = () => {
     onCopy(selectedDays);
     onClose();
   };
 
-  // Get day display name with first letter highlighted
   const getDayDisplay = (day: string) => {
     const firstLetter = day.charAt(0);
     const restOfDay = day.slice(1).toLowerCase();
@@ -89,7 +83,6 @@ const CopyHoursModal: React.FC<CopyHoursModalProps> = ({
         </div>
 
         <div className="space-y-3">
-          {/* Select all option */}
           <div className="pb-2 border-b border-gray-100">
             <button
               type="button"
@@ -105,7 +98,6 @@ const CopyHoursModal: React.FC<CopyHoursModalProps> = ({
             </button>
           </div>
 
-          {/* Day options */}
           <div className="space-y-1 max-h-60 overflow-y-auto">
             {otherDays.map((day) => (
               <button

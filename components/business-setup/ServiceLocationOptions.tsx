@@ -38,14 +38,12 @@ const ServiceLocationOptions = () => {
     }
   };
 
-  // Icons for each option
   const getIcon = (label: string) => {
     if (label.includes("Your Place") || label.includes("home")) {
       return <FaHome className="text-lg" />;
     } else if (label.includes("Business") || label.includes("Location")) {
       return <FaBuilding className="text-lg" />;
     } else {
-      // For the "both" option
       return (
         <div className="flex">
           <FaHome className="text-lg" />
