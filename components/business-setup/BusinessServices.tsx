@@ -94,14 +94,12 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
   }>({});
   const dispatch = useAppDispatch();
 
-  // API mutation hooks with loading and error states
   const [saveBusinessService, { isLoading: isSaving }] =
     useSaveBusinessServiceMutation();
   const [updateBusinessServiceMutation, { isLoading: isUpdating }] =
     useUpdateServiceMutation();
   const [deleteBusinessService] = useDeleteServiceMutation();
 
-  // Track which service is being deleted (for loading indicator)
   const [deletingServiceIndex, setDeletingServiceIndex] = useState<
     number | null
   >(null);
@@ -307,38 +305,13 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
       return;
     }
 
-    try {
-      const businessServicesData = {
-        services: services.service.map((service) => ({
-          id: service.id,
-          service_name: service.name,
-          type: service.type?.value || "",
-          type_label: service.type?.label || "",
-          service_group: service.groupLabel,
-          duration_hours: service.duration.hours,
-          duration_minutes: service.duration.minutes,
-          price: service.price,
-          is_starting_price: service.startAt || false,
-        })),
-      };
-
-      // This should be a different endpoint to save multiple services at once
-      // For now, we'll continue with the existing approach
-      await saveBusinessService(businessServicesData.services);
-
-      toast.success("Services saved successfully!");
-      router.push("hours");
-    } catch (error) {
-      console.error("Failed to save services:", error);
-      toast.error("Failed to save services. Please try again.");
-    }
+    router.push("hours");
   };
 
   const updateServiceHandler = async () => {
     if (!validateForm() || isLoading) return;
 
     try {
-      // If the service has an ID, update it on the backend
       if (serviceDetails.id) {
         const serviceData: ServiceApiPayload = {
           id: serviceDetails.id,
@@ -359,7 +332,6 @@ const BusinessServices: React.FC<Props> = ({ addServices = false }) => {
 
         toast.success("Service updated successfully!");
       } else {
-        // If no ID, just update locally
         const updatedService: StoreService = { ...serviceDetails };
         dispatch(updateBusinessServiceAction(updatedService));
 
