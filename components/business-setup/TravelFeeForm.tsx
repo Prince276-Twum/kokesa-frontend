@@ -16,12 +16,10 @@ import "leaflet/dist/leaflet.css";
 import { NumericFormat } from "react-number-format";
 import FloatingTextarea from "../UI/FloatingTextArea";
 import FloatingSelect from "../UI/FloatingSelect";
-
-// Ensure Leaflet is imported correctly
 import * as L from "leaflet";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setTravelFeeAndDistance } from "@/store/features/businessSetupSlice";
 
-// Unique identifier to prevent map container conflicts
 const generateUniqueId = () => `map-${Math.random().toString(36).substr(2, 9)}`;
 
 type TravelFeeOption = "fixed" | "varies" | "free" | "starts_at";
@@ -32,10 +30,6 @@ const priceTypeOptions = [
   { value: "free", label: "Free" },
   { value: "starts_at", label: "Starts at" },
 ];
-
-// Custom floating label Select component
-
-// Custom floating label TextArea component
 
 const TravelFeeForm: React.FC = () => {
   const [travelOption, setTravelOption] = useState<TravelFeeOption>("free");
@@ -55,6 +49,20 @@ const TravelFeeForm: React.FC = () => {
   const [addTravel, { isLoading }] = useAddTravelInfoMutation();
   const { currencyCode, currencySymbol } = useCurrencyInfo();
   const router = useRouter();
+  const { travelFeeAndDistance } = useAppSelector(
+    (store) => store.businessSetup
+  );
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (travelFeeAndDistance) {
+      setDistance(travelFeeAndDistance?.distance?.toString() || "15");
+      setFeeAmount(travelFeeAndDistance.travelFee?.toString() || "");
+      setTravelOption(
+        (travelFeeAndDistance.feeType as TravelFeeOption) || "free"
+      );
+      setTravelPolicy(travelFeeAndDistance.travelPolicy || "");
+    }
+  }, [travelFeeAndDistance]);
 
   const cleanupMap = useCallback(() => {
     try {
@@ -82,7 +90,7 @@ const TravelFeeForm: React.FC = () => {
   if (locationError) {
     toast.error(locationError);
   }
-  // Memoized location detection
+
   const detectLocation = useCallback(() => {
     setLocationError(null);
     if (navigator.geolocation) {
@@ -122,7 +130,6 @@ const TravelFeeForm: React.FC = () => {
     }
   }, []);
 
-  // Load saved address or detect location
   useEffect(() => {
     if (businessAddress) {
       try {
@@ -139,22 +146,17 @@ const TravelFeeForm: React.FC = () => {
     detectLocation();
   }, [detectLocation, businessAddress]);
 
-  // Initialize map when coordinates are available
   useEffect(() => {
-    // Prevent multiple initializations
     if (isMapInitializedRef.current) return;
 
-    // Cleanup any existing map first
     cleanupMap();
 
-    // Check for required conditions
     if (!latitude || !longitude) return;
 
     const mapContainer = document.getElementById(mapContainerId);
     if (!mapContainer) return;
 
     try {
-      // Create new map
       const map = L.map(mapContainer, {
         center: [latitude, longitude],
         zoom: 11,
@@ -163,7 +165,6 @@ const TravelFeeForm: React.FC = () => {
       });
       mapRef.current = map;
 
-      // Add tile layer
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -171,7 +172,6 @@ const TravelFeeForm: React.FC = () => {
         minZoom: 3,
       }).addTo(map);
 
-      // Add marker for business location
       const marker = L.marker([latitude, longitude], {
         icon: L.divIcon({
           className: "custom-marker",
@@ -184,9 +184,8 @@ const TravelFeeForm: React.FC = () => {
       }).addTo(map);
       markerRef.current = marker;
 
-      // Draw circle for travel radius
       const distanceValue = parseFloat(distance) || 15;
-      const radiusInMeters = distanceValue * 1000; // Convert km to meters
+      const radiusInMeters = distanceValue * 1000;
 
       const circle = L.circle([latitude, longitude], {
         color: "#EB5017",
@@ -196,13 +195,10 @@ const TravelFeeForm: React.FC = () => {
       }).addTo(map);
       circleRef.current = circle;
 
-      // Fit map to circle
       map.fitBounds(circle.getBounds());
 
-      // Mark map as initialized
       isMapInitializedRef.current = true;
 
-      // Add error handling for map interactions
       map.on("error", (e) => {
         console.error("Leaflet map error:", e);
       });
@@ -211,25 +207,21 @@ const TravelFeeForm: React.FC = () => {
       toast.error("Could not initialize map");
     }
 
-    // Cleanup function
     return () => {
       cleanupMap();
     };
   }, [latitude, longitude, distance, mapContainerId, cleanupMap]);
 
-  // Update map circle when distance changes
   useEffect(() => {
     if (!isMapInitializedRef.current || !mapRef.current) return;
 
     try {
-      // Remove existing circle if it exists
       if (circleRef.current) {
         mapRef.current.removeLayer(circleRef.current);
       }
 
-      // Create new circle
       const distanceValue = parseFloat(distance) || 15;
-      const radiusInMeters = distanceValue * 1000; // Convert km to meters
+      const radiusInMeters = distanceValue * 1000;
 
       const circle = L.circle([latitude || 0, longitude || 0], {
         color: "#EB5017",
@@ -240,53 +232,43 @@ const TravelFeeForm: React.FC = () => {
 
       circleRef.current = circle;
 
-      // Fit map to new circle
       mapRef.current.fitBounds(circle.getBounds());
     } catch (error) {
       console.error("Error updating map circle:", error);
     }
   }, [distance, latitude, longitude]);
 
-  // Handle travel option selection
   const handleOptionSelect = (option: any) => {
     if (option) {
       setTravelOption(option.value as TravelFeeOption);
 
-      // Clear fee amount when selecting free
       if (option.value === "free") {
         setFeeAmount("");
       }
     }
   };
 
-  // Handle distance change
   const handleDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow only numeric input, including decimal points
     const numericValue = value.replace(/[^0-9.]/g, "");
     setDistance(numericValue);
   };
 
-  // Handle fee amount change from NumericFormat
   const handleFeeAmountChange = (values: any) => {
     const { value } = values;
     setFeeAmount(value);
   };
 
-  // Validate form and check if the button should be disabled
   const isSubmitDisabled = useMemo(() => {
-    // Basic location check
     if (!latitude || !longitude) {
       return true;
     }
 
-    // Validate distance (ensure it's a positive number)
     const parsedDistance = parseFloat(distance);
     if (isNaN(parsedDistance) || parsedDistance <= 0) {
       return true;
     }
 
-    // Validate fee amount for options that need it
     if (
       (travelOption === "fixed" || travelOption === "starts_at") &&
       (!feeAmount || parseFloat(feeAmount) <= 0)
@@ -297,34 +279,26 @@ const TravelFeeForm: React.FC = () => {
     return false;
   }, [latitude, longitude, distance, travelOption, feeAmount]);
 
-  // Continue handler
   const handleContinue = useCallback(() => {
     let travelFee = 0;
 
-    // Calculate fee based on option
     if (travelOption === "fixed" || travelOption === "starts_at") {
       travelFee = parseFloat(feeAmount) || 0;
     }
 
-    // Prepare data structure for API
     const feeData = {
       feeType: travelOption,
-      feeAmount: travelFee,
+      travelFee: travelFee,
       distance: parseFloat(distance),
-      travelPolicy: travelPolicy || null,
+      travelPolicy: travelPolicy || "",
+      currencyCode,
     };
 
-    addTravel({
-      distance,
-      travelFee,
-      currencyCode,
-      latitude,
-      longitude,
-      feeStructure: JSON.stringify(feeData),
-    })
+    addTravel(feeData)
       .unwrap()
       .then(() => {
         router.push("team-size");
+        dispatch(setTravelFeeAndDistance(feeData));
       })
       .catch((error) => {
         console.error("Travel info submission error:", error);
@@ -335,27 +309,23 @@ const TravelFeeForm: React.FC = () => {
     feeAmount,
     distance,
     travelPolicy,
-    latitude,
-    longitude,
     currencyCode,
     addTravel,
+    dispatch,
     router,
   ]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       cleanupMap();
     };
   }, [cleanupMap]);
 
-  // Create km icon for distance input
   const KmIcon = () => <span className="text-gray-600 font-medium">km</span>;
 
   return (
     <div className="">
       <div className="grid grid-cols-2 gap-4 mb-6">
-        {/* Price Type Dropdown using FloatingSelect */}
         <div>
           <FloatingSelect
             id="price-type"
@@ -368,7 +338,6 @@ const TravelFeeForm: React.FC = () => {
           />
         </div>
 
-        {/* Fee Input Field using NumericFormat */}
         <div>
           <NumericFormat
             id="fee-amount"
@@ -376,7 +345,7 @@ const TravelFeeForm: React.FC = () => {
               travelOption === "free"
                 ? "0"
                 : travelOption == "varies"
-                ? "-"
+                ? ""
                 : feeAmount
             }
             onValueChange={handleFeeAmountChange}
@@ -396,7 +365,6 @@ const TravelFeeForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Distance Field */}
       <div className="mb-6">
         <Input
           id="travel-distance"
@@ -407,7 +375,6 @@ const TravelFeeForm: React.FC = () => {
         />
       </div>
 
-      {/* Map Container */}
       <div
         id={mapContainerId}
         className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 relative mb-6"
@@ -430,7 +397,6 @@ const TravelFeeForm: React.FC = () => {
         )}
       </div>
 
-      {/* Travel Policy */}
       <div className="mb-6">
         <FloatingTextarea
           id="travel-policy"
@@ -443,7 +409,6 @@ const TravelFeeForm: React.FC = () => {
         />
       </div>
 
-      {/* Continue Button */}
       <Button
         el="button"
         primary

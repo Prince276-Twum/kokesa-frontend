@@ -47,7 +47,7 @@ const useCurrencyInfo = () => {
       setCurrencyCode(currencyCode);
       setCountryCode(countryCode);
     }
-  }, []);
+  }, [businessAddress]);
 
   return { currencySymbol, currencyCode, countryCode };
 };

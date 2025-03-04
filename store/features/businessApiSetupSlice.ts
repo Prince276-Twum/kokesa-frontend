@@ -58,13 +58,6 @@ const businessApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    getBusinessDetail: builder.query<any, void>({
-      query: () => ({
-        url: "/business/setup_detail/",
-        method: "GET",
-      }),
-    }),
-
     setupBusiness: builder.mutation<any, SetupBusinessRequestBody>({
       query: ({ currentStep, ...data }) => {
         let body: Record<string, any> = {
@@ -93,11 +86,7 @@ const businessApiSlice = apiSlice.injectEndpoints({
               service_location: body.serviceLocation,
             };
             break;
-          case 4:
-            body = {
-              services: body.services,
-            };
-            break;
+
           default:
             throw new Error("Invalid currentStep");
         }
@@ -137,7 +126,8 @@ const businessApiSlice = apiSlice.injectEndpoints({
     }),
 
     addTravelInfo: builder.mutation({
-      query: ({ distance, travelFee, currencyCode }) => {
+      query: ({ distance, travelFee, currencyCode, travelPolicy, feeType }) => {
+        console.log(distance, travelFee, travelPolicy, currencyCode, feeType);
         return {
           url: "/business-travel/",
           method: "POST",
@@ -145,6 +135,8 @@ const businessApiSlice = apiSlice.injectEndpoints({
             travel_distance: distance,
             travel_fee: travelFee,
             currency: currencyCode,
+            travel_policy: travelPolicy,
+            fee_type: feeType,
           },
         };
       },
@@ -161,6 +153,83 @@ const businessApiSlice = apiSlice.injectEndpoints({
         };
       },
     }),
+
+    addAdditionalInformation: builder.mutation({
+      query: ({ teamSize, activationDate, activationOption, isLaunched }) => {
+        console.log(teamSize, activationDate, activationOption);
+        return {
+          url: "/additional-info/",
+          method: "POST",
+          body: {
+            team_size: teamSize,
+            activation_date: activationDate,
+            activation_option: activationOption,
+            is_launched: isLaunched,
+          },
+        };
+      },
+    }),
+
+    retrieveAdditionalInfo: builder.query({
+      query: () => {
+        return {
+          url: "/additional-info/",
+          method: "GET",
+        };
+      },
+    }),
+
+    retrieveTravelAndDistance: builder.query({
+      query: () => {
+        return {
+          url: "/business-travel/",
+          method: "GET",
+        };
+      },
+    }),
+
+    saveBusinessService: builder.mutation({
+      query: (data) => ({
+        url: "/business-service/",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    retrieveService: builder.query({
+      query: () => {
+        return {
+          url: "/business-service/",
+          method: "GET",
+        };
+      },
+    }),
+
+    updateService: builder.mutation({
+      query: ({ id, ...data }) => {
+        return {
+          url: `/business-service/${id}/`,
+          method: "PUT",
+          body: data,
+        };
+      },
+    }),
+
+    deleteService: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/business-service/${id}/`,
+          method: "DELETE",
+        };
+      },
+    }),
+    saveBusinessGoals: builder.mutation({
+      query: (data) => ({
+        url: "/business-goals/",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -170,4 +239,12 @@ export const {
   useAddBusinessAddressMutation,
   useAddTravelInfoMutation,
   useAddBusinessWorkingHoursMutation,
+  useAddAdditionalInformationMutation,
+  useSaveBusinessGoalsMutation,
+  useRetrieveAdditionalInfoQuery,
+  useRetrieveTravelAndDistanceQuery,
+  useSaveBusinessServiceMutation,
+  useRetrieveServiceQuery,
+  useUpdateServiceMutation,
+  useDeleteServiceMutation,
 } = businessApiSlice;
