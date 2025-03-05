@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import FloatingSelect from "../UI/FloatingSelect";
 import Button from "../UI/Button";
-import { setAdditionalInformation } from "@/store/features/businessSetupSlice";
+import {
+  setAdditionalInformation,
+  setBusinessComplete,
+} from "@/store/features/businessSetupSlice";
 import { useAddAdditionalInformationMutation } from "@/store/features/businessApiSetupSlice";
 
 // Define a more strict type for the option
@@ -118,6 +121,7 @@ function ProfileLaunch() {
     })
       .unwrap()
       .then(() => {
+        dispatch(setBusinessComplete(true));
         router.push("/business/complete");
       })
       .catch(() => {});

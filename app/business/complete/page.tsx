@@ -1,16 +1,25 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@/components/UI/Button";
 import { FiArrowRight } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import CompleteIlustration from "@/components/common/CompleteIlustration";
 import { useAppSelector } from "@/store/hooks";
 
 const BusinessSetupSuccess = ({}) => {
   const router = useRouter();
-  const { businessName, businessType } = useAppSelector(
-    (store) => store.businessSetup.businessInfo
-  );
+  const {
+    businessInfo: { businessName, businessType },
+    isSetupComplete,
+  } = useAppSelector((store) => store.businessSetup);
+
+  useEffect(() => {
+    if (!isSetupComplete) {
+      router.push("/business/onboarding/details");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <main className="relative min-h-screen bg-white md:bg-gradient-to-b md:from-gray-50 md:to-gray-100 py-0 px-0 md:py-16 md:px-0">
       <div className="max-w-lg mx-auto bg-white border-0 shadow-none md:shadow-xl md:rounded-xl">
@@ -81,7 +90,7 @@ const BusinessSetupSuccess = ({}) => {
               primary
               rounded
               className="w-full py-3"
-              onClick={() => router.push("dashboard")}
+              onClick={() => redirect("dashboard")}
             >
               Continue to Dashboard
               <FiArrowRight className="ml-2" />

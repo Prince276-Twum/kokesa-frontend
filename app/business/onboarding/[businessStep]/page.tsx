@@ -9,7 +9,7 @@ import {
   BusinessGoals,
 } from "@/components/business-setup/";
 import TravelFeeForm from "@/components/business-setup/TravelFeeForm";
-import { use } from "react";
+import { use, useEffect } from "react";
 import { redirect, useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 import { LocationOptions } from "@/utils/common-varialbles";
@@ -109,7 +109,6 @@ function Page({ params }: Props) {
     });
   }
 
-  // Calculate progress percentage for the ProgressBar
   const calculateProgressPercentage = (): number => {
     let stepIndex = stepContent.findIndex(
       (item) => item.path === `/business/onboarding/${currentStepPath}`
@@ -117,15 +116,18 @@ function Page({ params }: Props) {
 
     if (stepIndex === -1) stepIndex = 0;
 
-    // Convert to percentage (add 1 because steps are 0-indexed)
     const percentage = Math.floor(((stepIndex + 1) / stepContent.length) * 100);
-    return Math.min(percentage, 100); // Cap at 100%
+    return Math.min(percentage, 100);
   };
 
-  if (isSetupComplete) {
-    redirect("/business/dashboard");
-  }
+  useEffect(() => {
+    if (isSetupComplete) {
+      redirect("/business/dashboard");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  console.log(currentStep);
   const renderStepContent = () => {
     switch (currentStepPath) {
       case "details":
@@ -179,7 +181,6 @@ function Page({ params }: Props) {
   const subtitle = currentStepDetails?.subtitle || "";
   const icon = currentStepDetails?.icon || "";
 
-  // Check if we're on the first step
   const isFirstStep =
     stepContent.findIndex(
       (item) => item.path === `/business/onboarding/${currentStepPath}`
