@@ -154,6 +154,15 @@ const businessApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    RetrieveBusinessWorkingHours: builder.query({
+      query: () => {
+        return {
+          url: "/business-hours/",
+          method: "GET",
+        };
+      },
+    }),
+
     addAdditionalInformation: builder.mutation({
       query: ({ teamSize, activationDate, activationOption, isLaunched }) => {
         console.log(teamSize, activationDate, activationOption);
@@ -247,4 +256,5 @@ export const {
   useRetrieveServiceQuery,
   useUpdateServiceMutation,
   useDeleteServiceMutation,
+  useRetrieveBusinessWorkingHoursQuery,
 } = businessApiSlice;

@@ -1,4 +1,5 @@
 import {
+  useRetrieveBusinessWorkingHoursQuery,
   useRetrieveAdditionalInfoQuery,
   useRetrieveBusinessQuery,
   useRetrieveServiceQuery,
@@ -13,9 +14,14 @@ import {
   setAdditionalInformation,
   setTravelFeeAndDistance,
   addBusinessService,
+  updateMultipleWorkingHours,
+  toggleDay,
+  setWorkingHours,
+  type WorkingHoursType,
+  type BreakTime,
 } from "@/store/features/businessSetupSlice";
 import { useAppDispatch } from "@/store/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { type BusinessResponse } from "@/store/features/businessApiSetupSlice";
 import useCurrencyInfo from "@/hooks/useCurrencyInfo";
 
@@ -26,15 +32,33 @@ interface VerifyResponse {
   isLoading: boolean;
 }
 
+// Define the API working hours type
+interface WorkingHourFromAPI {
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+  enabled: boolean;
+  breaks: {
+    start: string;
+    end: string;
+  }[];
+}
+
 function useVerifyBusinessComplete() {
   const dispatch = useAppDispatch();
   const { currencySymbol, currencyCode } = useCurrencyInfo();
+
+  // Add a ref to track first load
+  const isFirstLoad = useRef(true);
+
+  console.log("useVerifyBusinessComplete hook running");
 
   const [businessProfileProcessed, setBusinessProfileProcessed] =
     useState(false);
   const [additionalInfoProcessed, setAdditionalInfoProcessed] = useState(false);
   const [travelDataProcessed, setTravelDataProcessed] = useState(false);
   const [serviceDataProcessed, setServiceDataProcessed] = useState(false);
+  const [workingHoursProcessed, setWorkingHoursProcessed] = useState(false);
 
   const {
     data: businessProfileData,
@@ -42,6 +66,15 @@ function useVerifyBusinessComplete() {
     isError: isVerificationError,
     isLoading: isVerificationLoading,
   } = useRetrieveBusinessQuery<VerifyResponse>();
+
+  const {
+    data: businessWorkingHours,
+    isLoading: isBusinessWorkingHoursLoading,
+    isFetching: isBusinessWorkingHoursFetching,
+    isError: isBusinessWorkingHoursError,
+    error: businessWorkingHoursError,
+    refetch: refetchBusinessWorkingHours,
+  } = useRetrieveBusinessWorkingHoursQuery(undefined);
 
   const {
     data: businessAdditionalDetails,
@@ -64,7 +97,10 @@ function useVerifyBusinessComplete() {
   } = useRetrieveTravelAndDistanceQuery(undefined);
 
   useEffect(() => {
-    if (isVerificationLoading) return;
+    // Skip if still loading or if already processed
+    if (isVerificationLoading || businessProfileProcessed) return;
+
+    console.log("Business profile useEffect running");
 
     if (businessProfileData && businessProfileData.length > 0) {
       const businessData = businessProfileData[0];
@@ -116,6 +152,7 @@ function useVerifyBusinessComplete() {
           businessName: "",
           userName: "",
           phoneNumber: "",
+          businessLocationOption: "",
           businessType: "",
         })
       );
@@ -150,11 +187,14 @@ function useVerifyBusinessComplete() {
     verificationError,
     isVerificationError,
     isVerificationLoading,
+    businessProfileProcessed,
     dispatch,
   ]);
 
   useEffect(() => {
-    if (isAdditionalInfoLoading) return;
+    if (isAdditionalInfoLoading || additionalInfoProcessed) return;
+
+    console.log("Additional info useEffect running");
 
     if (businessAdditionalDetails && businessAdditionalDetails.length > 0) {
       const additionalData = businessAdditionalDetails[0];
@@ -188,11 +228,14 @@ function useVerifyBusinessComplete() {
     additionalInfoError,
     isAdditionalInfoError,
     isAdditionalInfoLoading,
+    additionalInfoProcessed,
     dispatch,
   ]);
 
   useEffect(() => {
-    if (isTravelLoading) return;
+    if (isTravelLoading || travelDataProcessed) return;
+
+    console.log("Travel data useEffect running");
 
     if (travelDistanceData && travelDistanceData.length > 0) {
       const travelData = travelDistanceData[0];
@@ -221,10 +264,18 @@ function useVerifyBusinessComplete() {
     }
 
     setTravelDataProcessed(true);
-  }, [travelDistanceData, isTravelError, isTravelLoading, dispatch]);
+  }, [
+    travelDistanceData,
+    isTravelError,
+    isTravelLoading,
+    travelDataProcessed,
+    dispatch,
+  ]);
 
   useEffect(() => {
-    if (isServiceLoading) return;
+    if (isServiceLoading || serviceDataProcessed) return;
+
+    console.log("Service data useEffect running");
 
     if (serviceData && serviceData.length > 0) {
       interface Service {
@@ -235,7 +286,7 @@ function useVerifyBusinessComplete() {
         service_group: string;
         duration_hours: string;
         duration_minutes: string;
-        duration: { hours: number; minutes: number }; // Service duration
+        duration: { hours: number; minutes: number };
         price: number;
         is_starting_price: boolean;
       }
@@ -252,11 +303,11 @@ function useVerifyBusinessComplete() {
         startAt: service.is_starting_price,
       }));
 
-      console.log(services);
+      console.log("Services formatted:", services);
 
       dispatch(addBusinessService(services));
 
-      console.log("Service data loaded:", services);
+      console.log("Service data loaded successfully");
     } else {
       dispatch(addBusinessService([]));
 
@@ -268,14 +319,87 @@ function useVerifyBusinessComplete() {
     }
 
     setServiceDataProcessed(true);
-  }, [serviceData, isServiceError, serviceError, isServiceLoading, dispatch]);
+  }, [
+    serviceData,
+    isServiceError,
+    serviceError,
+    isServiceLoading,
+    serviceDataProcessed,
+    dispatch,
+  ]);
+
+  useEffect(() => {
+    if (
+      isBusinessWorkingHoursLoading ||
+      isBusinessWorkingHoursFetching ||
+      workingHoursProcessed
+    )
+      return;
+
+    console.log("Working hours useEffect running");
+
+    if (businessWorkingHours && businessWorkingHours.length > 0) {
+      // Helper function to convert time from "HH:MM:SS" to "HH:MM"
+      const formatTime = (time: string): string => {
+        // Check if the time includes seconds (HH:MM:SS format)
+        if (time.split(":").length === 3) {
+          return time.substring(0, 5); // Take only the first 5 characters (HH:MM)
+        }
+        return time;
+      };
+
+      // Create properly formatted working hours data from API response
+      const formattedWorkingHours: WorkingHoursType[] =
+        businessWorkingHours.map((workingHour: WorkingHourFromAPI) => ({
+          day_of_week:
+            workingHour.day_of_week as WorkingHoursType["day_of_week"],
+          start_time: formatTime(workingHour.start_time),
+          end_time: formatTime(workingHour.end_time),
+          enabled: workingHour.enabled,
+          breaks: workingHour.breaks
+            ? workingHour.breaks.map((breakItem: BreakTime) => ({
+                start: formatTime(breakItem.start),
+                end: formatTime(breakItem.end),
+              }))
+            : [],
+        }));
+
+      // Use the imported action directly
+      dispatch(setWorkingHours(formattedWorkingHours));
+
+      console.log(
+        "Working hours data loaded successfully:",
+        formattedWorkingHours
+      );
+    } else {
+      console.log("No working hours data available");
+    }
+
+    if (isBusinessWorkingHoursError) {
+      console.log(
+        "Error fetching working hours data:",
+        businessWorkingHoursError
+      );
+    }
+
+    setWorkingHoursProcessed(true);
+  }, [
+    businessWorkingHours,
+    isBusinessWorkingHoursError,
+    businessWorkingHoursError,
+    isBusinessWorkingHoursLoading,
+    isBusinessWorkingHoursFetching,
+    workingHoursProcessed,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (
       businessProfileProcessed &&
       additionalInfoProcessed &&
       travelDataProcessed &&
-      serviceDataProcessed
+      serviceDataProcessed &&
+      workingHoursProcessed
     ) {
       dispatch(setFinishBusinessLoading());
       console.log("All business data loaded successfully");
@@ -285,8 +409,17 @@ function useVerifyBusinessComplete() {
     additionalInfoProcessed,
     travelDataProcessed,
     serviceDataProcessed,
+    workingHoursProcessed,
     dispatch,
   ]);
+
+  // Cleanup function when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log("Cleaning up useVerifyBusinessComplete");
+      // Clean up logic if needed
+    };
+  }, []);
 
   return;
 }
