@@ -47,6 +47,23 @@ const BusinessWorkingHours = () => {
   const [addWorkingDay, { isLoading }] = useAddBusinessWorkingHoursMutation();
   const router = useRouter();
 
+  // Show loading state if workingHours is null
+  if (!workingHours) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-center">
+          <MdSchedule className="mx-auto text-gray-300 text-6xl mb-4" />
+          <h3 className="text-xl font-medium text-gray-700 mb-2">
+            Loading working hours...
+          </h3>
+          <p className="text-gray-500">
+            Please wait while we fetch your business hours.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const timeToMinutes = (time: string): number => {
     const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
@@ -95,6 +112,7 @@ const BusinessWorkingHours = () => {
   };
 
   const handleEdit = (day: string): void => {
+    // workingHours is guaranteed to be non-null at this point
     const dayData = workingHours.find((h) => h.day_of_week === day);
     if (!dayData) return;
 
@@ -191,7 +209,7 @@ const BusinessWorkingHours = () => {
   };
 
   const handleCopyHours = (selectedDays: string[]): void => {
-    if (!editingDay || selectedDays.length === 0) return;
+    if (!editingDay || selectedDays.length === 0 || !workingHours) return;
 
     const dayData = workingHours.find((h) => h.day_of_week === editingDay);
     if (!dayData) return;
@@ -233,6 +251,8 @@ const BusinessWorkingHours = () => {
   };
 
   const handleNext = (): void => {
+    if (!workingHours) return;
+
     addWorkingDay({ workingDays: workingHours })
       .unwrap()
       .then(() => {
@@ -580,7 +600,7 @@ const BusinessWorkingHours = () => {
       )}
 
       {/* Copy Hours Modal */}
-      {showCopyModal && editingDay && (
+      {showCopyModal && editingDay && workingHours && (
         <CopyHoursModal
           isOpen={showCopyModal}
           onClose={() => {
