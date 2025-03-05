@@ -6,7 +6,7 @@ import Button from "../UI/Button";
 function Hero() {
   return (
     <div className="relative overflow-hidden bg-secondary pt-24 pb-16 lg:pt-32 lg:pb-28">
-      <div className="container mx-auto px-6 lg:px-8 relative z-10">
+      <div className="content-max-width mx-auto px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
           {/* Text Content */}
           <div className="flex flex-col items-center lg:items-start gap-8 lg:gap-10 max-w-3xl">

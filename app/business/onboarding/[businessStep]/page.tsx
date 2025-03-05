@@ -16,7 +16,7 @@ import { LocationOptions } from "@/utils/common-varialbles";
 import TeamSize from "@/components/business-setup/TeamSize";
 import { IoArrowBack } from "react-icons/io5";
 import { motion } from "framer-motion";
-import LiveDate from "@/components/business-setup/ProfileLaunch";
+import ProfileLunch from "@/components/business-setup/ProfileLaunch";
 
 interface Props {
   params: Promise<{ businessStep: string }>;
@@ -149,7 +149,7 @@ function Page({ params }: Props) {
       case "business-goals":
         return <BusinessGoals />;
       case "live-date":
-        return <LiveDate />;
+        return <ProfileLunch />;
       default:
         return <SetupDetails />;
     }
