@@ -118,7 +118,7 @@ function ProfileLaunch() {
     })
       .unwrap()
       .then(() => {
-        router.push("/business/dashboard");
+        router.push("/business/complete");
       })
       .catch(() => {});
   };

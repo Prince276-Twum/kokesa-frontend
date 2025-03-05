@@ -80,6 +80,7 @@ function useVerifyBusinessComplete() {
           userName: businessData.user_name,
           phoneNumber: businessData.phone_number,
           businessLocationOption: businessData.service_location,
+          businessType: businessData.business_type,
         })
       );
 
@@ -115,6 +116,7 @@ function useVerifyBusinessComplete() {
           businessName: "",
           userName: "",
           phoneNumber: "",
+          businessType: "",
         })
       );
       dispatch(setBusinessComplete(false));
