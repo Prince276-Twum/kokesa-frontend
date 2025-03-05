@@ -6,7 +6,7 @@ interface BusinessDetail {
   userName: string;
   phoneNumber: string | undefined;
   businessLocationOption?: string;
-  businessType: string;
+  businessType?: string;
 }
 interface BreakTime {
   start: string;
