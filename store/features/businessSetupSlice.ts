@@ -1,4 +1,3 @@
-import { WORKINGDAYS } from "@/constant";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface BusinessDetail {
@@ -8,19 +7,20 @@ interface BusinessDetail {
   businessLocationOption?: string;
   businessType?: string;
 }
-interface BreakTime {
+
+export interface BreakTime {
   start: string;
   end: string;
 }
 
-interface UpdateWorkingHourPayload {
+export interface UpdateWorkingHourPayload {
   day: string;
   start: string;
   end: string;
   breaks: BreakTime[];
 }
 
-type WorkingHoursType = {
+export type WorkingHoursType = {
   day_of_week:
     | "Monday"
     | "Tuesday"
@@ -30,8 +30,8 @@ type WorkingHoursType = {
     | "Saturday"
     | "Sunday";
   enabled: boolean;
-  start_time: string; // Format: "HH:mm"
-  end_time: string; // Format: "HH:mm"
+  start_time: string;
+  end_time: string;
   breaks: BreakTime[];
 };
 
@@ -44,6 +44,7 @@ interface Service {
   price: number;
   startAt: boolean;
 }
+
 interface BusinessAddress {
   address: string;
   city: string;
@@ -53,6 +54,7 @@ interface BusinessAddress {
   longitude: number | null;
   latitude: number | null;
 }
+
 interface AdditionalInformationType {
   teamSize?: string;
   activationDate?: string;
@@ -75,7 +77,7 @@ interface initialStateType {
   isLoading: boolean;
   businessInfo: BusinessDetail;
   services: { editingIndex: null | number; service: Service[] };
-  workingHours: WorkingHoursType[];
+  workingHours: WorkingHoursType[] | null;
   additionalInformation: AdditionalInformationType | null;
   travelFeeAndDistance: travelFeeAndDistanceType | null;
 }
@@ -101,7 +103,7 @@ const initialState: initialStateType = {
     longitude: null,
     latitude: null,
   },
-  workingHours: WORKINGDAYS,
+  workingHours: null,
   additionalInformation: null,
   travelFeeAndDistance: null,
 };
@@ -135,14 +137,21 @@ const businessSetupSlice = createSlice({
       if (state.services.editingIndex === null) return;
       state.services.service[state.services.editingIndex] = actions.payload;
     },
+
     addServiceEditIndex(state, actions: PayloadAction<number | null>) {
       state.services.editingIndex = actions.payload;
+    },
+
+    setWorkingHours: (state, action: PayloadAction<WorkingHoursType[]>) => {
+      state.workingHours = action.payload;
     },
 
     updateWorkingHour: (
       state,
       action: PayloadAction<UpdateWorkingHourPayload>
     ) => {
+      if (state.workingHours === null) return;
+
       const { day, start, end, breaks } = action.payload;
       const workingHour = state.workingHours.find(
         (hour) => hour.day_of_week === day
@@ -158,9 +167,13 @@ const businessSetupSlice = createSlice({
       state,
       action: PayloadAction<UpdateWorkingHourPayload[]>
     ) => {
+      if (state.workingHours === null) return;
+
       const updates = action.payload;
 
       updates.forEach((update) => {
+        if (state.workingHours === null) return;
+
         const dayIndex = state.workingHours.findIndex(
           (day) => day.day_of_week === update.day
         );
@@ -174,7 +187,8 @@ const businessSetupSlice = createSlice({
     },
 
     toggleDay: (state, action: PayloadAction<string>) => {
-      console.log(action.payload);
+      if (state.workingHours === null) return;
+
       const day = state.workingHours.find(
         (hour) => hour.day_of_week === action.payload
       );
@@ -182,6 +196,7 @@ const businessSetupSlice = createSlice({
         day.enabled = !day.enabled;
       }
     },
+
     setBusinessAddress: (state, action: PayloadAction<BusinessAddress>) => {
       state.businessAddress = action.payload;
     },
@@ -218,4 +233,5 @@ export const {
   toggleDay,
   setAdditionalInformation,
   setTravelFeeAndDistance,
+  setWorkingHours, // Added new action
 } = businessSetupSlice.actions;
