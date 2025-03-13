@@ -8,11 +8,12 @@ import {
   updateWorkingHour,
   updateMultipleWorkingHours,
 } from "@/store/features/businessSetupSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks";
 import { CustomLabel } from "../common/CustomLable";
 import { MdSchedule, MdAccessTime, MdClose, MdEdit } from "react-icons/md";
 import { FaMugHot } from "react-icons/fa";
 import { useAddBusinessWorkingHoursMutation } from "@/store/features/businessApiSetupSlice";
+import { useWorkingHours } from "@/hooks/useWorkingHours";
 import { useRouter } from "next/navigation";
 import CopyHoursModal from "./CopyHoursModal";
 import { toast } from "react-toastify";
@@ -33,7 +34,13 @@ interface BreakTime extends Break {
 
 const BusinessWorkingHours = () => {
   const dispatch = useAppDispatch();
-  const { workingHours } = useAppSelector((store) => store.businessSetup);
+  // Use our custom hook to handle fetching and managing working hours
+  const {
+    workingHours,
+    isLoading: isWorkingHoursLoading,
+    refetch: refetchWorkingHours,
+  } = useWorkingHours();
+
   const [editingDay, setEditingDay] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<TimeProp>({
     value: "",
@@ -44,11 +51,12 @@ const BusinessWorkingHours = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showBreakInput, setShowBreakInput] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
-  const [addWorkingDay, { isLoading }] = useAddBusinessWorkingHoursMutation();
+  const [addWorkingDay, { isLoading: isSaving }] =
+    useAddBusinessWorkingHoursMutation();
   const router = useRouter();
 
-  // Show loading state if workingHours is null
-  if (!workingHours) {
+  // Show loading state if workingHours is null or still loading
+  if (isWorkingHoursLoading || !workingHours) {
     return (
       <div className="flex justify-center items-center p-8">
         <div className="text-center">
@@ -233,6 +241,22 @@ const BusinessWorkingHours = () => {
     setEditingDay(null);
   };
 
+  const handleNext = (): void => {
+    if (!workingHours) return;
+
+    addWorkingDay({ workingDays: workingHours })
+      .unwrap()
+      .then(() => {
+        // After saving, trigger a refetch of the working hours
+        refetchWorkingHours();
+        router.push("business-goals");
+      })
+      .catch((error) => {
+        console.error("Error saving working hours:", error);
+        toast.error("Failed to save working hours. Please try again.");
+      });
+  };
+
   const availableEndTimes = timeIntervals.filter((time) => {
     if (!startTime.value) return true;
     return timeToMinutes(time.value) > timeToMinutes(startTime.value);
@@ -248,20 +272,6 @@ const BusinessWorkingHours = () => {
       ...time,
       isDisabled: isTimeInBreakRange(time.value, currentBreakIndex),
     }));
-  };
-
-  const handleNext = (): void => {
-    if (!workingHours) return;
-
-    addWorkingDay({ workingDays: workingHours })
-      .unwrap()
-      .then(() => {
-        router.push("business-goals");
-      })
-      .catch((error) => {
-        console.error("Error saving working hours:", error);
-        toast.error("Failed to save working hours. Please try again.");
-      });
   };
 
   // Custom styles for react-select
@@ -368,7 +378,7 @@ const BusinessWorkingHours = () => {
       ))}
 
       <Button
-        loading={isLoading}
+        loading={isSaving}
         onClick={handleNext}
         el="button"
         primary

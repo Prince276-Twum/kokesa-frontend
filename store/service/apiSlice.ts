@@ -10,7 +10,7 @@ import fetch from "cross-fetch";
 
 const mutex = new Mutex();
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${process.env.NEXT_PUBLIC_HOST}/api`,
+  baseUrl: `/api`,
   credentials: "include",
   fetchFn: fetch,
 });
