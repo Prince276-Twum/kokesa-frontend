@@ -19,8 +19,8 @@ function GoogleAuthPage() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const code = searchParams.get("code");
-    const state = searchParams.get("state");
+    const code = searchParams?.get("code");
+    const state = searchParams?.get("state");
 
     if (state && code && !effectRan.current) {
       googleSignIn({ state, code })
