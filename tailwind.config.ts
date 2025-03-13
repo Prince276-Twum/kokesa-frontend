@@ -1,3 +1,4 @@
+import { Sidebar } from "lucide-react";
 import type { Config } from "tailwindcss";
 
 export default {
@@ -35,6 +36,7 @@ export default {
           light: "#666666",
           dark: "#000000",
           hover: "#FFECE5",
+          Sidebar: "#101928",
         },
         text: {
           primary: "#1A1A1A", // Main text color
@@ -52,6 +54,7 @@ export default {
           300: "#D1D5DB",
           400: "#9CA3AF",
           500: "#6B7280",
+          550: "#667185",
           600: "#4B5563",
           700: "#374151",
           800: "#1F2937",

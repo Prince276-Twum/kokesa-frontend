@@ -1,5 +1,4 @@
 import {
-  useRetrieveBusinessWorkingHoursQuery,
   useRetrieveAdditionalInfoQuery,
   useRetrieveBusinessQuery,
   useRetrieveServiceQuery,
@@ -14,11 +13,6 @@ import {
   setAdditionalInformation,
   setTravelFeeAndDistance,
   addBusinessService,
-  updateMultipleWorkingHours,
-  toggleDay,
-  setWorkingHours,
-  type WorkingHoursType,
-  type BreakTime,
 } from "@/store/features/businessSetupSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { useEffect, useState, useRef } from "react";
@@ -30,18 +24,6 @@ interface VerifyResponse {
   error: { status: string; data: { detail: string } };
   isError: boolean;
   isLoading: boolean;
-}
-
-// Define the API working hours type
-interface WorkingHourFromAPI {
-  day_of_week: string;
-  start_time: string;
-  end_time: string;
-  enabled: boolean;
-  breaks: {
-    start: string;
-    end: string;
-  }[];
 }
 
 function useVerifyBusinessComplete() {
@@ -58,7 +40,7 @@ function useVerifyBusinessComplete() {
   const [additionalInfoProcessed, setAdditionalInfoProcessed] = useState(false);
   const [travelDataProcessed, setTravelDataProcessed] = useState(false);
   const [serviceDataProcessed, setServiceDataProcessed] = useState(false);
-  const [workingHoursProcessed, setWorkingHoursProcessed] = useState(false);
+  // Removed workingHoursProcessed state
 
   const {
     data: businessProfileData,
@@ -67,14 +49,7 @@ function useVerifyBusinessComplete() {
     isLoading: isVerificationLoading,
   } = useRetrieveBusinessQuery<VerifyResponse>();
 
-  const {
-    data: businessWorkingHours,
-    isLoading: isBusinessWorkingHoursLoading,
-    isFetching: isBusinessWorkingHoursFetching,
-    isError: isBusinessWorkingHoursError,
-    error: businessWorkingHoursError,
-    refetch: refetchBusinessWorkingHours,
-  } = useRetrieveBusinessWorkingHoursQuery(undefined);
+  // Removed working hours query
 
   const {
     data: businessAdditionalDetails,
@@ -328,78 +303,15 @@ function useVerifyBusinessComplete() {
     dispatch,
   ]);
 
-  useEffect(() => {
-    if (
-      isBusinessWorkingHoursLoading ||
-      isBusinessWorkingHoursFetching ||
-      workingHoursProcessed
-    )
-      return;
-
-    console.log("Working hours useEffect running");
-
-    if (businessWorkingHours && businessWorkingHours.length > 0) {
-      // Helper function to convert time from "HH:MM:SS" to "HH:MM"
-      const formatTime = (time: string): string => {
-        // Check if the time includes seconds (HH:MM:SS format)
-        if (time.split(":").length === 3) {
-          return time.substring(0, 5); // Take only the first 5 characters (HH:MM)
-        }
-        return time;
-      };
-
-      // Create properly formatted working hours data from API response
-      const formattedWorkingHours: WorkingHoursType[] =
-        businessWorkingHours.map((workingHour: WorkingHourFromAPI) => ({
-          day_of_week:
-            workingHour.day_of_week as WorkingHoursType["day_of_week"],
-          start_time: formatTime(workingHour.start_time),
-          end_time: formatTime(workingHour.end_time),
-          enabled: workingHour.enabled,
-          breaks: workingHour.breaks
-            ? workingHour.breaks.map((breakItem: BreakTime) => ({
-                start: formatTime(breakItem.start),
-                end: formatTime(breakItem.end),
-              }))
-            : [],
-        }));
-
-      // Use the imported action directly
-      dispatch(setWorkingHours(formattedWorkingHours));
-
-      console.log(
-        "Working hours data loaded successfully:",
-        formattedWorkingHours
-      );
-    } else {
-      console.log("No working hours data available");
-    }
-
-    if (isBusinessWorkingHoursError) {
-      console.log(
-        "Error fetching working hours data:",
-        businessWorkingHoursError
-      );
-    }
-
-    setWorkingHoursProcessed(true);
-  }, [
-    businessWorkingHours,
-    isBusinessWorkingHoursError,
-    businessWorkingHoursError,
-    isBusinessWorkingHoursLoading,
-    isBusinessWorkingHoursFetching,
-    workingHoursProcessed,
-    dispatch,
-  ]);
+  // Removed working hours useEffect
 
   useEffect(() => {
     if (
       businessProfileProcessed &&
       additionalInfoProcessed &&
       travelDataProcessed &&
-      serviceDataProcessed &&
-      workingHoursProcessed
+      serviceDataProcessed
+      // Removed workingHoursProcessed from this check
     ) {
       dispatch(setFinishBusinessLoading());
       console.log("All business data loaded successfully");
@@ -409,7 +321,7 @@ function useVerifyBusinessComplete() {
     additionalInfoProcessed,
     travelDataProcessed,
     serviceDataProcessed,
-    workingHoursProcessed,
+    // Removed workingHoursProcessed from this dependency array
     dispatch,
   ]);
 
