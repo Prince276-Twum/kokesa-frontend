@@ -121,14 +121,13 @@ const AppointmentsPage = () => {
 
   // Helper functions to get the current data and loading state - wrap in useCallback
   const getCurrentData = useCallback(() => {
-    console.log(upcomingResult.data);
     switch (activeTab) {
       case "upcoming":
         return upcomingResult.data || [];
       case "past":
-        return pastResult.data?.appointments || [];
+        return pastResult.data || [];
       case "cancelled":
-        return cancelledResult.data?.appointments || [];
+        return cancelledResult.data || [];
       default:
         return [];
     }
@@ -175,7 +174,6 @@ const AppointmentsPage = () => {
     return Math.ceil(count / itemsPerPage);
   }, [getTotalCount, itemsPerPage]);
 
-  // Log appointments data when it changes
   useEffect(() => {
     const currentData = getCurrentData();
     if (currentData.length > 0) {
@@ -513,7 +511,7 @@ const AppointmentsPage = () => {
       </div>
 
       {/* No results message */}
-      {!isCurrentTabLoading && currentData.length === 0 && (
+      {!isCurrentTabLoading && currentData?.results?.length === 0 && (
         <NoResults searchQuery={searchQuery} resetFilters={resetFilters} />
       )}
 
