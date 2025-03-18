@@ -5,7 +5,10 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import Button from "../UI/Button";
 import Input from "../UI/Input";
 import { useAppDispatch } from "@/store/hooks";
-import { setCurrentStep } from "@/store/features/businessSetupSlice";
+import {
+  setBusinessCategory,
+  setCurrentStep,
+} from "@/store/features/businessSetupSlice";
 
 const businessCategories = [
   "Barber",
@@ -46,6 +49,7 @@ const BusinessCategory = () => {
     setupBusiness({ currentStep: 2, businessCategory: category })
       .unwrap()
       .then(() => {
+        dispatch(setBusinessCategory(category));
         dispatch(setCurrentStep(3));
         redirect("location-option");
       });

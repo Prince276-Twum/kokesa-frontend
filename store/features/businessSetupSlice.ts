@@ -116,6 +116,12 @@ const businessSetupSlice = createSlice({
       state.isSetupComplete = actions.payload;
     },
 
+    setBusinessCategory(state, action: PayloadAction<string>) {
+      state.businessInfo = {
+        ...state.businessInfo,
+        businessType: action.payload,
+      };
+    },
     setCurrentStep(state, actions: PayloadAction<number>) {
       state.currentStep = actions.payload;
     },
@@ -223,6 +229,7 @@ export const {
   updateBusinessService,
   addServiceEditIndex,
   addBusinessService,
+  setBusinessCategory,
   setCurrentStep,
   setBusinessComplete,
   setFinishBusinessLoading,
@@ -233,5 +240,5 @@ export const {
   toggleDay,
   setAdditionalInformation,
   setTravelFeeAndDistance,
-  setWorkingHours, // Added new action
+  setWorkingHours,
 } = businessSetupSlice.actions;

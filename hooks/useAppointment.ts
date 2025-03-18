@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Appointment } from "@/components/dashboard/apointments/AppointmentTable";
-import { ReminderItem } from "@/components/dashboard/apointments/AppointmentReminders";
 import { TabOption } from "@/components/dashboard/apointments/TabNavigation";
 import { ViewOption } from "@/components/dashboard/apointments/ViewToggle";
 
@@ -43,35 +42,6 @@ export const useAppointment = ({
         price: 75.0,
         duration: 60,
         paymentStatus: "unpaid",
-      },
-    ],
-    []
-  );
-  const reminders = useMemo<ReminderItem[]>(
-    () => [
-      {
-        id: 1,
-        clientName: "Sarah Johnson",
-        clientId: 101,
-        service: "Hair Styling",
-        serviceId: 201,
-        serviceProvider: "Emma Rodriguez",
-        serviceProviderId: 3,
-        timeLeft: 4,
-        startTime: "2:00 PM",
-        status: "confirmed",
-      },
-      {
-        id: 2,
-        clientName: "Michael Brown",
-        clientId: 102,
-        service: "Haircut",
-        serviceId: 202,
-        serviceProvider: "David Chen",
-        serviceProviderId: 5,
-        timeLeft: 6,
-        startTime: "4:30 PM",
-        status: "confirmed",
       },
     ],
     []
@@ -245,7 +215,6 @@ export const useAppointment = ({
 
   return {
     appointments,
-    reminders,
     serviceProviders,
     tabOptions,
     viewOptions,
