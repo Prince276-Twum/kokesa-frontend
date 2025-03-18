@@ -35,6 +35,7 @@ type SetupBusinessRequestBody =
       businessName: string;
       userName: string;
       phoneNumber: string | undefined;
+      termsAccepted: boolean;
     }
   | {
       currentStep: 2;
@@ -72,6 +73,7 @@ const businessApiSlice = apiSlice.injectEndpoints({
               business_name: body.businessName,
               user_name: body.userName,
               phone_number: body.phoneNumber,
+              terms_accepted: body.termsAccepted,
             };
             break;
           case 2:

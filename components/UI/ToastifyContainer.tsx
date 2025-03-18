@@ -2,7 +2,7 @@
 import { ToastContainer } from "react-toastify";
 
 function ToastifyContainer() {
-  return <ToastContainer theme="dark" />;
+  return <ToastContainer limit={1} theme="dark" />;
 }
 
 export default ToastifyContainer;

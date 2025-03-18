@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import classnames from "classnames";
@@ -9,7 +9,7 @@ interface NavItem {
   icon: ReactNode;
   text: string;
   href: string;
-  exact?: boolean; // Add this to determine if path match should be exact
+  exact?: boolean;
 }
 
 interface NavSection {
@@ -37,6 +37,23 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   isCollapsed = false,
 }) => {
   const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect if we're on a mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    // Set initial value
+    checkIfMobile();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIfMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
 
   // Function to check if a link is active
   const isLinkActive = (href: string, exact: boolean = false) => {
@@ -51,26 +68,28 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
     return pathname ? pathname.endsWith(href) : false;
   };
 
-  console.log(pathname);
+  // On mobile, we always want to show the expanded sidebar regardless of isCollapsed state
+  const effectivelyCollapsed = isCollapsed && !isMobile;
 
   return (
     <div
       className={classnames(
         "bg-secondary-Sidebar text-white h-full flex flex-col transition-all duration-300",
         {
-          "w-20": isCollapsed,
-          "w-60": !isCollapsed,
+          "w-20": effectivelyCollapsed,
+          "w-60 lg:w-60": !effectivelyCollapsed,
+          "w-full": isMobile && !effectivelyCollapsed,
         }
       )}
     >
       {/* Logo and Toggle Button */}
       <div className="p-4 flex items-center justify-between">
-        <div className={isCollapsed ? "mx-auto" : ""}>{logo}</div>
-        {!isCollapsed && onToggleCollapse && (
+        <div className={effectivelyCollapsed ? "mx-auto" : ""}>{logo}</div>
+        {!effectivelyCollapsed && onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
             className="text-gray-400 hover:text-white p-1 hidden lg:block"
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label="Collapse sidebar"
           >
             <ChevronLeft size={18} />
           </button>
@@ -78,7 +97,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       </div>
 
       {/* Collapse button when sidebar is collapsed */}
-      {isCollapsed && onToggleCollapse && (
+      {effectivelyCollapsed && onToggleCollapse && (
         <button
           onClick={onToggleCollapse}
           className="mx-auto mb-4 text-gray-400 hover:text-white p-1 hidden lg:block"
@@ -93,7 +112,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         {/* Only render main navigation items (first section) in the main area */}
         {sections.length > 0 && (
           <div className="mt-2">
-            {sections[0].title && !isCollapsed && (
+            {sections[0].title && !effectivelyCollapsed && (
               <h6 className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
                 {sections[0].title}
               </h6>
@@ -106,7 +125,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                 text={item.text}
                 href={item.href}
                 isActive={isLinkActive(item.href, item.exact)}
-                isCollapsed={isCollapsed}
+                isCollapsed={effectivelyCollapsed}
               />
             ))}
           </div>
@@ -116,7 +135,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       {/* Account/Settings Section - Placed just above user profile */}
       {sections.length > 1 && (
         <div className="mt-auto pt-2">
-          {!isCollapsed && sections[1].title && (
+          {!effectivelyCollapsed && sections[1].title && (
             <h6 className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
               {sections[1].title}
             </h6>
@@ -129,7 +148,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
               text={item.text}
               href={item.href}
               isActive={isLinkActive(item.href, item.exact)}
-              isCollapsed={isCollapsed}
+              isCollapsed={effectivelyCollapsed}
             />
           ))}
         </div>
@@ -139,26 +158,28 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       {user && (
         <div className="mt-4 p-4 border-t border-gray-700">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+            <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg">
               {user.avatar ? (
                 <Image
                   src={user.avatar}
                   alt={user.name}
                   className="w-full h-full rounded-full object-cover"
+                  width={40}
+                  height={40}
                 />
               ) : (
                 user.name.charAt(0)
               )}
             </div>
 
-            {!isCollapsed && (
+            {!effectivelyCollapsed && (
               <div className="ml-3 overflow-hidden">
                 <p className="text-sm font-medium truncate">{user.name}</p>
                 <p className="text-xs text-gray-400 truncate">{user.email}</p>
               </div>
             )}
 
-            {!isCollapsed && onToggleCollapse && (
+            {!effectivelyCollapsed && onToggleCollapse && (
               <button
                 className="ml-auto text-gray-400 hover:text-white p-1 lg:hidden"
                 onClick={onToggleCollapse}
@@ -191,12 +212,15 @@ const NavItemComponent: React.FC<{
           : "text-gray-300 hover:bg-gray-800 hover:text-white"
       } transition-colors relative group`}
     >
-      <div className={`${isCollapsed ? "mx-auto" : "mr-3"} text-lg`}>
+      <div
+        className={`${isCollapsed ? "mx-auto" : "mr-3"} text-lg flex-shrink-0`}
+      >
         {icon}
       </div>
-      {!isCollapsed && <span className="text-sm">{text}</span>}
 
-      {/* Tooltip for collapsed state */}
+      {!isCollapsed && <span className="text-sm truncate">{text}</span>}
+
+      {/* Tooltip only on desktop when collapsed */}
       {isCollapsed && (
         <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-50 whitespace-nowrap">
           {text}

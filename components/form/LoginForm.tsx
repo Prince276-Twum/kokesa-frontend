@@ -80,10 +80,8 @@ function LoginForm() {
         {/* Email field */}
         <div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MdEmail className="h-5 w-5 text-gray-400" />
-            </div>
             <Input
+              leftIcon={<MdEmail className="h-5 w-5 text-gray-400" />}
               id="email"
               type="email"
               placeholder="Email address"
@@ -112,10 +110,8 @@ function LoginForm() {
         {/* Password field */}
         <div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MdLock className="h-5 w-5 text-gray-400" />
-            </div>
             <Input
+              leftIcon={<MdLock className="h-5 w-5 text-gray-400" />}
               id="password"
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
@@ -179,25 +175,6 @@ function LoginForm() {
           </Button>
         </div>
       </form>
-
-      {/* Additional Security Note */}
-      <p className="mt-6 text-xs text-center text-gray-500">
-        This site is protected by reCAPTCHA and the Google{" "}
-        <a
-          href="https://policies.google.com/privacy"
-          className="text-primary hover:underline"
-        >
-          Privacy Policy
-        </a>{" "}
-        and{" "}
-        <a
-          href="https://policies.google.com/terms"
-          className="text-primary hover:underline"
-        >
-          Terms of Service
-        </a>{" "}
-        apply.
-      </p>
     </div>
   );
 }

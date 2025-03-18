@@ -2,7 +2,7 @@
 import { MoreVertical, ExternalLink, Calendar, Clock } from "lucide-react";
 import Avatar from "../Avatar";
 import StatusBadge from "../StatusBadge";
-import { formatDateTime } from "@/utils/dateTimme";
+import { formatDateTime } from "@/utils/dateTime";
 
 export type AppointmentStatus =
   | "confirmed"

@@ -20,13 +20,14 @@ import {
   useLazyGetUpcomingAppointmentsQuery,
   useLazyGetPastAppointmentsQuery,
   useLazyGetCancelledAppointmentsQuery,
+  useGetTodayAppointmentsQuery,
 } from "@/store/features/appointmentApiSlice";
 
 const AppointmentsPage = () => {
   const [viewMode, setViewMode] = useState<string>("list");
   const [activeTab, setActiveTab] = useState<string>("upcoming");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(8);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [calendarViewMode, setCalendarViewMode] = useState<string>("week");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -50,10 +51,14 @@ const AppointmentsPage = () => {
   const [fetchCancelledAppointments, cancelledResult] =
     useLazyGetCancelledAppointmentsQuery();
 
-  // Get all appointment data and helpers from the custom hook
+  const {
+    data: reminderData,
+    isLoading: isLoadingReminderData,
+    refetch: refetchReminder,
+  } = useGetTodayAppointmentsQuery(undefined);
+
   const {
     appointments,
-    reminders,
     serviceProviders,
     tabOptions,
     viewOptions,
@@ -77,9 +82,10 @@ const AppointmentsPage = () => {
     const fetchData = () => {
       const params = {
         page: currentPage,
-        itemsPerPage: itemsPerPage,
-        searchQuery: searchQuery,
-        ...filters,
+        page_size: itemsPerPage,
+        // itemsPerPage: itemsPerPage,
+        // searchQuery: searchQuery,
+        // ...filters,
       };
 
       console.log(params);
@@ -149,19 +155,19 @@ const AppointmentsPage = () => {
   const getTotalCount = useCallback(() => {
     switch (activeTab) {
       case "upcoming":
-        return upcomingResult.data?.totalCount || 0;
+        return upcomingResult?.data?.count || 0;
       case "past":
-        return pastResult.data?.totalCount || 0;
+        return pastResult.data?.count || 0;
       case "cancelled":
-        return cancelledResult.data?.totalCount || 0;
+        return cancelledResult.data?.count || 0;
       default:
         return 0;
     }
   }, [
     activeTab,
-    upcomingResult.data?.totalCount,
-    pastResult.data?.totalCount,
-    cancelledResult.data?.totalCount,
+    upcomingResult.data?.count,
+    pastResult.data?.count,
+    cancelledResult.data?.count,
   ]);
 
   const getApiTotalPages = useCallback(() => {
@@ -389,10 +395,10 @@ const AppointmentsPage = () => {
   const apiTotalPages = getApiTotalPages();
   const totalCount = getTotalCount();
 
-  console.log(currentData);
+  console.log(currentData.results);
 
   return (
-    <div className="p-3 md:p-6">
+    <div className="p-6">
       {/* Desktop Header */}
       <DesktopHeader
         refreshAppointments={refreshAppointments}
@@ -419,9 +425,10 @@ const AppointmentsPage = () => {
       {/* Reminders section */}
       <div className="mb-4">
         <AppointmentReminders
-          reminders={reminders}
+          timeZone={reminderData?.timezone}
+          reminders={reminderData?.results?.slice(0, 3) || []}
           onSendReminder={handleSendReminder}
-          isLoading={isLoading}
+          isLoading={isLoadingReminderData}
         />
       </div>
 
@@ -461,7 +468,7 @@ const AppointmentsPage = () => {
           <>
             <div className="overflow-x-auto">
               <AppointmentTable
-                appointments={currentData}
+                appointments={currentData.results || []}
                 onAppointmentAction={handleAppointmentAction}
                 isLoading={isCurrentTabLoading}
               />
@@ -480,7 +487,7 @@ const AppointmentsPage = () => {
         ) : viewMode === "grid" ? (
           <div className="p-3 md:p-4">
             <AppointmentGrid
-              appointments={currentData}
+              appointments={currentData.results || []}
               onAppointmentAction={handleAppointmentAction}
             />
 

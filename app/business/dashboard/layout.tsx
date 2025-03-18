@@ -29,12 +29,12 @@ const navigationSections = [
         icon: <Home size={20} />,
         text: "Dashboard",
         href: "/business/dashboard",
-        isActive: true,
+        exact: true,
       },
       {
         icon: <Calendar size={20} />,
         text: "Appointments",
-        href: "dashboard/appointments",
+        href: "/business/dashboard/appointments",
       },
       { icon: <Users size={20} />, text: "Customers", href: "/customers" },
       { icon: <BarChart2 size={20} />, text: "Services", href: "/services" },
@@ -48,6 +48,7 @@ const navigationSections = [
     ],
   },
   {
+    title: "Account",
     items: [
       { icon: <Settings size={20} />, text: "Settings", href: "/settings" },
       { icon: <HelpCircle size={20} />, text: "Help Center", href: "/help" },
@@ -68,16 +69,23 @@ const userData = {
 function DashboardLayout({ children }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkIfMobile = () => {
-      if (window.innerWidth < 1024) {
-        setIsCollapsed(true);
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+
+      // On mobile, default to collapsed on desktop, but don't affect the open state
+      if (mobile) {
+        setIsCollapsed(false);
+      } else {
+        setIsCollapsed(false);
         setIsMobileOpen(false);
       }
     };
-    checkIfMobile();
 
+    checkIfMobile();
     window.addEventListener("resize", checkIfMobile);
 
     // Clean up
@@ -123,11 +131,11 @@ function DashboardLayout({ children }: Props) {
               id="mobile-sidebar"
               className={`fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 ${
                 isMobileOpen ? "translate-x-0" : "-translate-x-full"
-              } ${isCollapsed ? "lg:w-20" : "lg:w-64"}`}
+              }`}
             >
               <SidebarNavigation
                 logo={
-                  isCollapsed ? (
+                  isCollapsed && !isMobile ? (
                     <div className="text-white font-bold text-xl">K</div>
                   ) : (
                     <div className="text-white font-bold text-xl">Kokesa</div>
@@ -145,12 +153,12 @@ function DashboardLayout({ children }: Props) {
               <Header
                 onMenuToggle={toggleMobileMenu}
                 userName={userData.name}
-                userInitials={userData.name.charAt(0)}
+                userInitials={userData.name.charAt(1)}
                 avatarColorScheme="primary"
               />
 
               {/* Page Content */}
-              <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+              <main className="flex-1 overflow-y-auto  gap-4 md:gap-6">
                 {children}
               </main>
             </div>
