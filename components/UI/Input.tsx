@@ -28,7 +28,6 @@ function Input({
   const hasLeftIcon = !!leftIcon;
   const hasRightIcon = !!rightIcon;
 
-  // Using classnames library to merge classes with cn taking priority
   const inputClasses = classnames(
     "peer block w-full rounded-lg border",
     error ? "border-red-400" : "border-gray-300",
@@ -38,7 +37,6 @@ function Input({
     hasLeftIcon ? "pl-10" : "px-4",
     hasRightIcon ? "pr-10" : "px-4",
     "pt-3 pb-2",
-    // By placing cn at the end, it will override any conflicting styles
     cn
   );
 

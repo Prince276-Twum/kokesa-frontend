@@ -23,6 +23,8 @@ interface UseBusinessSetupReturnType {
   isButtonDisabled: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isBusinessLoading: boolean;
+  agreedToTerms: boolean;
+  setAgreedToTerms: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const useBusinessSetup = (): UseBusinessSetupReturnType => {
@@ -35,6 +37,7 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
   const [businessName, setBusinessName] = useState("");
   const [userName, setUserName] = useState("");
   const [phoneValue, setPhoneValue] = useState<string>();
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [defaultCountry, setDefaultCountry] = useState<Country | undefined>(
     "GH"
   );
@@ -60,14 +63,21 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
     const isBusinessNameValid = businessName.trim().length > 0;
     const isUserNameValid = userName.trim().length > 0;
     const isPhoneValid = phoneValue && phoneValue.length > 0;
+    const isTermsAccepted = agreedToTerms;
+
     setIsButtonDisabled(
-      !(isBusinessNameValid && isUserNameValid && isPhoneValid)
+      !(
+        isBusinessNameValid &&
+        isUserNameValid &&
+        isPhoneValid &&
+        isTermsAccepted
+      )
     );
   };
 
   useEffect(() => {
     validateForm();
-  }, [businessName, userName, phoneValue]);
+  }, [businessName, userName, phoneValue, agreedToTerms]);
 
   useEffect(() => {
     setBusinessName(businessInfo.businessName);
@@ -75,56 +85,48 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
     setUserName(businessInfo.userName);
   }, [businessInfo]);
 
-  // useEffect(() => {
-  //   if (detail.businessName && detail.userName && detail.phoneNumber) {
-  //     setBusinessName(detail.businessName);
-  //     setUserName(detail.userName);
-  //     setPhoneValue(detail.phoneNumber);
-  //   } else {
-  //     if (isLoading) return;
-  //     if (isError) {
-  //       // toast.error("Something went wrong");
-  //     }
-  //     if (data && Array.isArray(data) && data.length === 0) {
-  //       // No business profile exists, clear fields
-  //       setBusinessName("");
-  //       setUserName("");
-  //       setPhoneValue("");
-  //     } else if (data) {
-  //       const businessData = data[0];
-  //       setBusinessName(businessData?.business_name);
-  //       setUserName(businessData?.user_name);
-  //       setPhoneValue(businessData?.phone_number);
-  //     }
-  //   }
-  // }, [currentStep, isLoading, isError, data, detail]);
-
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!isButtonDisabled) {
-      setupBusiness({
-        businessName,
-        userName,
-        phoneNumber: phoneValue,
-        currentStep: 1,
-      })
-        .unwrap()
-        .then(() => {
-          dispatch(
-            setBusinessDetail({
-              businessName,
-              userName,
-              phoneNumber: phoneValue,
-            })
-          );
-          dispatch(setCurrentStep(2));
-          router.push("category");
-        })
-        .catch(() => {
-          toast.error("Something went wrong");
-        });
+    if (
+      !businessName.trim() ||
+      !userName.trim() ||
+      !phoneValue ||
+      !agreedToTerms
+    ) {
+      if (!agreedToTerms) {
+        toast.error("Please accept the terms and conditions to continue");
+      }
+      return;
     }
+
+    setupBusiness({
+      businessName,
+      userName,
+      phoneNumber: phoneValue,
+      currentStep: 1,
+      termsAccepted: agreedToTerms,
+    })
+      .unwrap()
+      .then(() => {
+        dispatch(
+          setBusinessDetail({
+            businessName,
+            userName,
+            phoneNumber: phoneValue,
+          })
+        );
+        dispatch(setCurrentStep(2));
+        router.push("category");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.data?.phone_number) {
+          toast.error(`Phone number error: ${error.data.phone_number}`);
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+      });
   };
 
   return {
@@ -138,6 +140,8 @@ const useBusinessSetup = (): UseBusinessSetupReturnType => {
     isButtonDisabled,
     onSubmit,
     isBusinessLoading,
+    agreedToTerms,
+    setAgreedToTerms,
   };
 };
 
