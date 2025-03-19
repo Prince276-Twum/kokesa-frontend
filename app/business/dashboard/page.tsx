@@ -11,16 +11,28 @@ import InfoStat from "@/components/dashboard/InfoStat";
 import StaffTable from "@/components/dashboard/StaffTable";
 import StaffTableSkeleton from "@/components/loading-states/StaffTableSkeleton";
 import { StatusType } from "@/components/dashboard/StatusBadge";
-import { useGetUpcomingAppointmentsQuery } from "@/store/features/appointmentApiSlice";
+import {
+  useGetAppointmentsMetricsQuery,
+  useGetUpcomingAppointmentsQuery,
+} from "@/store/features/appointmentApiSlice";
+import { getCurrencySymbol } from "@/utils/get-currency-symbol";
+import { useAppSelector } from "@/store/hooks";
+import { store } from "@/store/store";
 
 const Dashboard = () => {
   // Loading states
+  const { defaultCurrency } = useAppSelector(
+    (store) => store.businessSetup.businessInfo
+  );
   const [isStaffLoading, setIsStaffLoading] = useState(false);
   const [isAppointmentsLoading, setIsAppointmentsLoading] = useState(false);
 
   const [staffMembers, setStaffMembers] = useState([]);
   const { data: upcomingAppointments, isLoading: isUpcomingLoading } =
     useGetUpcomingAppointmentsQuery(undefined);
+
+  const { data: appointmentMetricData, isLoading: isMetricLoading } =
+    useGetAppointmentsMetricsQuery(undefined);
 
   // Simulate loading data
   useEffect(() => {
@@ -84,19 +96,27 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 ">
         <StatCard
-          value="234"
+          isLoading={isMetricLoading}
+          value={appointmentMetricData?.total_appointments.value || 0}
           title="Total Appointments"
           icon={<Calendar size={18} className="text-red-500" />}
-          change={12}
+          change={appointmentMetricData?.total_appointments.percent_change}
+          isPositive={appointmentMetricData?.total_appointments.is_positive}
           iconBgColor="bg-red-100"
           iconColor="text-red-500"
         />
 
         <StatCard
           title="Earnings This Month"
-          value="$ 50,000.00"
+          value={
+            getCurrencySymbol(defaultCurrency) +
+              " " +
+              appointmentMetricData?.earnings_this_month.value.toFixed(2) || 0.0
+          }
+          // value={appointmentMetricData?.earnings_this_month.value || 0}
           icon={<span className="text-orange-500 font-bold">$</span>}
-          change={25}
+          change={appointmentMetricData?.earnings_this_month.percent_change}
+          isPositive={appointmentMetricData?.earnings_this_month.is_positive}
           iconBgColor="bg-orange-100"
           iconColor="text-orange-500"
         />

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import {
   setBusinessAddress,
   setCurrentStep,
+  setDefaultCurrency,
 } from "@/store/features/businessSetupSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { LocationOptions } from "@/utils/common-varialbles";
@@ -206,7 +207,9 @@ const BusinessAddress = ({ current_step }: { current_step: number }) => {
 
     addAddress(businessAddress)
       .unwrap()
-      .then(() => {
+      .then((response) => {
+        dispatch(setDefaultCurrency(response.default_currency));
+        console.log(response.defaultCurrency);
         dispatch(setCurrentStep(current_step + 1));
 
         if (

@@ -433,7 +433,7 @@ const BusinessCalendar: React.FC<BusinessCalendarProps> = ({
 
       setAppointments(sampleAppointments);
       setIsLoading(false);
-    }, 800); // Simulate loading delay
+    }, 800);
   }, []);
 
   // Handle view change
@@ -512,7 +512,7 @@ const BusinessCalendar: React.FC<BusinessCalendarProps> = ({
               step={30}
               timeslots={2}
               components={{
-                event: AppointmentEvent as any, // Type cast due to react-big-calendar typing limitations
+                event: AppointmentEvent as any,
                 toolbar: CustomToolbar as any,
               }}
               popup
