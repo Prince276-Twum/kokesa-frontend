@@ -94,7 +94,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-6 p-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <StatCard
           isLoading={isMetricLoading}
           value={appointmentMetricData?.total_appointments.value || 0}
@@ -108,12 +108,9 @@ const Dashboard = () => {
 
         <StatCard
           title="Earnings This Month"
-          value={
-            getCurrencySymbol(defaultCurrency) +
-              " " +
-              appointmentMetricData?.earnings_this_month.value.toFixed(2) || 0.0
-          }
-          // value={appointmentMetricData?.earnings_this_month.value || 0}
+          value={`${getCurrencySymbol(defaultCurrency)} ${
+            appointmentMetricData?.earnings_this_month.value.toFixed(2) || 0.0
+          }`}
           icon={<span className="text-orange-500 font-bold">$</span>}
           change={appointmentMetricData?.earnings_this_month.percent_change}
           isPositive={appointmentMetricData?.earnings_this_month.is_positive}

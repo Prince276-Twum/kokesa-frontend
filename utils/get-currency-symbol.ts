@@ -1,5 +1,5 @@
 export function getCurrencySymbol(currencyCode?: string): string {
-  if (!currencyCode) return "";
+  if (currencyCode === undefined) return "";
 
   try {
     // Use Intl.NumberFormat to get the symbol
