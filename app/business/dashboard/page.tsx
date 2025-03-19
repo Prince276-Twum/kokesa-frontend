@@ -86,14 +86,12 @@ const Dashboard = () => {
     fetchAppointmentsData();
   }, []);
 
-  // Handle staff action clicks
   const handleStaffAction = (actionType: string, staffId: string | number) => {
     console.log(`${actionType} clicked for staff ${staffId}`);
   };
 
   return (
     <div className="space-y-6 p-6">
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <StatCard
           isLoading={isMetricLoading}
