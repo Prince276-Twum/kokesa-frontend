@@ -68,6 +68,15 @@ interface AppointmentParams {
 const appointmentApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => {
     return {
+      getAppointmentsMetrics: builder.query({
+        query: () => {
+          return {
+            url: "/dashboard/metrics/",
+            method: "GET",
+          };
+        },
+      }),
+
       getUpcomingAppointments: builder.query<
         UpcomingAppointmentResponse,
         AppointmentParams | void
@@ -148,4 +157,5 @@ export const {
   useLazyGetUpcomingAppointmentsQuery,
   useGetUpcomingAppointmentsQuery,
   useGetTodayAppointmentsQuery,
+  useGetAppointmentsMetricsQuery,
 } = appointmentApiSlice;

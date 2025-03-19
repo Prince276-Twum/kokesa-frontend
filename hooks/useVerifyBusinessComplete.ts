@@ -92,6 +92,7 @@ function useVerifyBusinessComplete() {
           phoneNumber: businessData.phone_number,
           businessLocationOption: businessData.service_location,
           businessType: businessData.business_type,
+          defaultCurrency: businessData.default_currency,
         })
       );
 
@@ -129,6 +130,7 @@ function useVerifyBusinessComplete() {
           phoneNumber: "",
           businessLocationOption: "",
           businessType: "",
+          defaultCurrency: "",
         })
       );
       dispatch(setBusinessComplete(false));

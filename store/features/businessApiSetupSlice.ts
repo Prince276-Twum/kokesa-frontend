@@ -10,6 +10,7 @@ export interface BusinessResponse {
   service_location: string;
   user_name: string;
   phone_number: string;
+  default_currency: string;
   business_address: [
     {
       street_address: string;

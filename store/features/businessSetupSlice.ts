@@ -6,6 +6,7 @@ interface BusinessDetail {
   phoneNumber: string | undefined;
   businessLocationOption?: string;
   businessType?: string;
+  defaultCurrency?: string;
 }
 
 export interface BreakTime {
@@ -92,6 +93,7 @@ const initialState: initialStateType = {
     phoneNumber: "",
     businessLocationOption: "",
     businessType: "",
+    defaultCurrency: "",
   },
   services: { editingIndex: null, service: [] },
   businessAddress: {
@@ -207,6 +209,10 @@ const businessSetupSlice = createSlice({
       state.businessAddress = action.payload;
     },
 
+    setDefaultCurrency: (state, action: PayloadAction<string>) => {
+      state.businessInfo.defaultCurrency = action.payload;
+    },
+
     setAdditionalInformation: (
       state,
       action: PayloadAction<AdditionalInformationType>
@@ -241,4 +247,5 @@ export const {
   setAdditionalInformation,
   setTravelFeeAndDistance,
   setWorkingHours,
+  setDefaultCurrency,
 } = businessSetupSlice.actions;
