@@ -37,7 +37,7 @@ function LoginForm() {
         .unwrap()
         .then(() => {
           dispatch(setAuth());
-          router.replace("/business/dashboard");
+          router.push("/business/dashboard");
         })
         .catch(() => {
           toast.error("Invalid credentials. Please try again.");
