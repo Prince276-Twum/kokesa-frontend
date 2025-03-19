@@ -112,6 +112,7 @@ const Dashboard = () => {
           icon={<span className="text-orange-500 font-bold">$</span>}
           change={appointmentMetricData?.earnings_this_month.percent_change}
           isPositive={appointmentMetricData?.earnings_this_month.is_positive}
+          isLoading={isMetricLoading}
           iconBgColor="bg-orange-100"
           iconColor="text-orange-500"
         />
