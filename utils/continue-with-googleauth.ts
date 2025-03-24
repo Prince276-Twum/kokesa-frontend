@@ -1,32 +1,46 @@
 import { toast } from "react-toastify";
 
 export async function continueWithGoogleAuth(): Promise<void> {
+  const userType: string = "business";
   try {
-    const redirectUri: string = 
+    const redirectUri: string =
       process.env.NODE_ENV === "production"
         ? process.env.NEXT_PUBLIC_REDIRECT_URL || ""
         : "http://localhost:3000/auth/google";
 
-    const url: string = `/api/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`;
-
-    const res: Response = await fetch(url, {
-      method: "GET",
+    const initResponse = await fetch("/api/initiate-google-auth/", {
+      method: "POST",
       credentials: "include",
       headers: {
+        "Content-Type": "application/json",
         Accept: "application/json",
       },
+      body: JSON.stringify({
+        user_type: userType,
+      }),
     });
 
-    interface AuthorizationResponse {
-      authorization_url: string;
+    if (!initResponse.ok) {
+      throw new Error("Failed to initialize Google auth");
     }
 
-    const data: AuthorizationResponse = await res.json();
+    const googleAuthResponse = await fetch(
+      `/api/o/google-oauth2/?redirect_uri=${encodeURIComponent(redirectUri)}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
 
-    if (res.status === 200 && typeof window !== "undefined") {
-      window.location.replace(data.authorization_url);
+    const authData = await googleAuthResponse.json();
+
+    if (authData.authorization_url) {
+      window.location.replace(authData.authorization_url);
     } else {
-      toast.error("Something went wrong");
+      toast.error("Failed to get authorization URL");
     }
   } catch (error) {
     console.error("Google Auth Error:", error);
